@@ -4,15 +4,17 @@
     <PreferenceCategory android:title="Network" >
         <EditTextPreference
             android:key="ip"
-            android:title="@string/tv_ip" >
+            android:title="@string/tv_ip">
         </EditTextPreference>
         <EditTextPreference
             android:key="port"
-            android:title="@string/tv_port" >
+            android:title="@string/tv_port"
+            android:inputType="number">
         </EditTextPreference>
         <EditTextPreference
             android:key="id"
-            android:title="@string/tv_id" >
+            android:title="@string/tv_id"
+            android:inputType="number">
         </EditTextPreference>
     </PreferenceCategory>
 

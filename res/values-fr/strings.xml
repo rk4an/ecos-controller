@@ -12,6 +12,6 @@
 	<string name="tv_connect">Connecté</string>
 	<string name="tv_disconnect">Déconnecté</string>
 	<string name="tv_ip">IP</string>
-	<string name="tv_port">Port</string>
-	<string name="tv_id">ID Train</string>
+	<string name="tv_port">Port (15471)</string>
+	<string name="tv_id">ID Train (1000)</string>
 </resources>

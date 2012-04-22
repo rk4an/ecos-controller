@@ -45,6 +45,9 @@ public class TrainManager
 extends Activity 
 implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 
+	private static int DEFAULT_PORT = 15471;
+	private static int DEFAULT_TRAINID = 1000;
+			
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -98,7 +101,16 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 	public void onClick(View v) {
 		
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-		int trainId = Integer.parseInt(pref.getString("id", "1000"));
+		
+		//check trainID
+		int trainId = TrainManager.DEFAULT_TRAINID;
+		try{
+			trainId = Integer.parseInt(pref.getString("id", TrainManager.DEFAULT_TRAINID+""));
+		}
+		catch(Exception e) {
+			trainId = TrainManager.DEFAULT_TRAINID;
+		}
+		
 		TrainManagerController.trainId = trainId;
 		
 		if(v.getId() == R.id.btnF0) {	//light
@@ -119,14 +131,25 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 			if(((ToggleButton) v).isChecked()) {
 
 				String consoleIp = pref.getString("ip", "");
-				int consolePort = Integer.parseInt(pref.getString("port", "15471"));
 
+				//check port
+				int consolePort = TrainManager.DEFAULT_PORT;
+				try{
+					consolePort = Integer.parseInt(
+							pref.getString("port", TrainManager.DEFAULT_PORT+""));
+				}
+				catch(Exception e) {
+					consolePort = TrainManager.DEFAULT_PORT;
+				}
+				
 				try {
 					TrainManagerController.getInstance().openSocket(consoleIp, consolePort,trainId);
-					tvState.setText(this.getString(R.string.tv_state) + " " + this.getString(R.string.tv_connect));
+					tvState.setText(
+							this.getString(R.string.tv_state) + " " + this.getString(R.string.tv_connect));
 					TrainManagerController.getInstance().setConnected(true);
 				} catch (IOException e) {
-					tvState.setText(this.getString(R.string.tv_state) + " " + e.getMessage());
+					tvState.setText(
+							this.getString(R.string.tv_state) + " " + e.getMessage());
 					TrainManagerController.getInstance().setConnected(false);
 				}
 
@@ -155,11 +178,13 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 					TrainManagerController.getInstance().releaseControl();
 
 					try {
-						tvState.setText(this.getString(R.string.tv_state) + " " + this.getString(R.string.tv_disconnect));
+						tvState.setText(
+								this.getString(R.string.tv_state) + " " + this.getString(R.string.tv_disconnect));
 						TrainManagerController.getInstance().closeSocket();
 						TrainManagerController.getInstance().setConnected(false);
 					} catch (Exception e) {
-						tvState.setText(this.getString(R.string.tv_state) + " " + e.getMessage());
+						tvState.setText(
+								this.getString(R.string.tv_state) + " " + e.getMessage());
 						TrainManagerController.getInstance().setConnected(false);
 					}
 
