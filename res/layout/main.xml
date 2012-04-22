@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ScrollView01"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    android:scrollbars="none" >
+
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:orientation="vertical" android:layout_width="fill_parent"
+		android:layout_height="fill_parent" android:padding="10dip">
+		<TextView android:text="@string/tv_state" android:id="@+id/tvState"
+			android:layout_width="fill_parent" android:layout_height="wrap_content"></TextView>
+		<ToggleButton android:text="@string/btn_control"
+			android:id="@+id/btnControl" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:textOn="@string/btn_control"
+			android:textOff="@string/btn_control"></ToggleButton>
+
+		<LinearLayout
+		    android:id="@+id/linearLayout1"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content" >
+
+		    <ToggleButton
+		        android:id="@+id/btnF0"
+		        android:layout_width="0dp"
+		        android:layout_height="wrap_content"
+		        android:layout_weight="1"
+		        android:state_enabled="false"
+		        android:text="@string/btn_light"
+		        android:textOff="@string/btn_light"
+		        android:textOn="@string/btn_light" />
+
+		    <ToggleButton
+		        android:id="@+id/btnF1"
+		        android:layout_width="0dp"
+		        android:layout_height="wrap_content"
+		        android:layout_weight="1"
+		        android:state_enabled="false"
+		        android:text="@string/btn_light"
+		        android:textOff="@string/btn_f1"
+		        android:textOn="@string/btn_f1" />
+		</LinearLayout>
+
+		<CheckBox android:text="@string/cb_reverse" android:id="@+id/cbReverse"
+			android:layout_width="fill_parent" android:layout_height="wrap_content"
+			android:state_enabled="false"></CheckBox>
+		<TextView android:text="@string/tv_speed" android:id="@+id/tvSpeed"
+			android:layout_width="fill_parent" android:layout_height="wrap_content" android:gravity="center"></TextView>
+		<SeekBar android:id="@+id/sbSpeed" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:max="127"
+			android:padding="10dip"></SeekBar>
+
+	</LinearLayout>
+</ScrollView>

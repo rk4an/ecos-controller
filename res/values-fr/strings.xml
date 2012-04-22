@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">ECoS Controller</string>
+	<string name="btn_control">Contrôle</string>
+	<string name="btn_light">Lumière</string>
+	<string name="btn_f1">F1</string>
+	<string name="tv_state">État:</string>
+	<string name="tv_speed">Vitesse:</string>
+	<string name="btn_about">A propos</string>
+	<string name="btn_settings">Paramètres</string>
+	<string name="cb_reverse">Inverser</string>
+	<string name="tv_connect">Connecté</string>
+	<string name="tv_disconnect">Déconnecté</string>
+	<string name="tv_ip">IP</string>
+	<string name="tv_port">Port</string>
+	<string name="tv_id">ID Train</string>
+</resources>
