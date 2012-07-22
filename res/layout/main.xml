@@ -39,6 +39,74 @@
 		        android:text="@string/btn_light"
 		        android:textOff="@string/btn_f1"
 		        android:textOn="@string/btn_f1" />
+
+		    <ToggleButton
+		        android:id="@+id/btnF2"
+		        android:layout_width="0dp"
+		        android:layout_height="wrap_content"
+		        android:layout_weight="1"
+		        android:state_enabled="false"
+		        android:text="@string/btn_light"
+		        android:textOff="@string/btn_f2"
+		        android:textOn="@string/btn_f2" />
+
+		    <ToggleButton
+		        android:id="@+id/btnF3"
+		        android:layout_width="0dp"
+		        android:layout_height="wrap_content"
+		        android:layout_weight="1"
+		        android:state_enabled="false"
+		        android:text="@string/btn_light"
+		        android:textOff="@string/btn_f3"
+		        android:textOn="@string/btn_f3" />
+
+		</LinearLayout>
+
+		<LinearLayout
+		    android:id="@+id/LinearLayout01"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:layout_weight="1" >
+
+		    <ToggleButton
+		        android:id="@+id/btnF4"
+		        android:layout_width="0dp"
+		        android:layout_height="wrap_content"
+		        android:layout_weight="1"
+		        android:state_enabled="false"
+		        android:text="@string/btn_light"
+		        android:textOff="@string/btn_f4"
+		        android:textOn="@string/btn_f4" />
+
+		    <ToggleButton
+		        android:id="@+id/btnF5"
+		        android:layout_width="0dp"
+		        android:layout_height="wrap_content"
+		        android:layout_weight="1"
+		        android:state_enabled="false"
+		        android:text="@string/btn_light"
+		        android:textOff="@string/btn_f5"
+		        android:textOn="@string/btn_f5" />
+
+		    <ToggleButton
+		        android:id="@+id/btnF6"
+		        android:layout_width="0dp"
+		        android:layout_height="wrap_content"
+		        android:layout_weight="1"
+		        android:state_enabled="false"
+		        android:text="@string/btn_light"
+		        android:textOff="@string/btn_f6"
+		        android:textOn="@string/btn_f6" />
+
+		    <ToggleButton
+		        android:id="@+id/btnF7"
+		        android:layout_width="0dp"
+		        android:layout_height="wrap_content"
+		        android:layout_weight="1"
+		        android:state_enabled="false"
+		        android:text="@string/btn_light"
+		        android:textOff="@string/btn_f7"
+		        android:textOn="@string/btn_f7" />
 		</LinearLayout>
 
 		<CheckBox android:text="@string/cb_reverse" android:id="@+id/cbReverse"

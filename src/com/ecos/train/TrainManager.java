@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -53,11 +54,21 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		//TODO: FIX ME
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+		StrictMode.setThreadPolicy(policy);
+		
 		setContentView(R.layout.main);
 		TextView tvState = (TextView) findViewById(R.id.tvState);
 		ToggleButton btnControl = (ToggleButton) findViewById(R.id.btnControl);
 		ToggleButton btnF0 = (ToggleButton) findViewById(R.id.btnF0);
 		ToggleButton btnF1 = (ToggleButton) findViewById(R.id.btnF1);
+		ToggleButton btnF2 = (ToggleButton) findViewById(R.id.btnF2);
+		ToggleButton btnF3 = (ToggleButton) findViewById(R.id.btnF3);
+		ToggleButton btnF4 = (ToggleButton) findViewById(R.id.btnF4);
+		ToggleButton btnF5 = (ToggleButton) findViewById(R.id.btnF5);
+		ToggleButton btnF6 = (ToggleButton) findViewById(R.id.btnF6);
+		ToggleButton btnF7 = (ToggleButton) findViewById(R.id.btnF7);
 		CheckBox cbReverse = (CheckBox) findViewById(R.id.cbReverse);
 		TextView tvSpeed = (TextView) findViewById(R.id.tvSpeed);
 		SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
@@ -66,12 +77,24 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 		sbSpeed.setEnabled(false);
 		btnF0.setEnabled(false);
 		btnF1.setEnabled(false);
+		btnF2.setEnabled(false);
+		btnF3.setEnabled(false);
+		btnF4.setEnabled(false);
+		btnF5.setEnabled(false);
+		btnF6.setEnabled(false);
+		btnF7.setEnabled(false);
 		cbReverse.setEnabled(false);
 		sbSpeed.setEnabled(false);
 
 		btnControl.setOnClickListener(this);
 		btnF0.setOnClickListener(this);
 		btnF1.setOnClickListener(this);
+		btnF2.setOnClickListener(this);
+		btnF3.setOnClickListener(this);
+		btnF4.setOnClickListener(this);
+		btnF5.setOnClickListener(this);
+		btnF6.setOnClickListener(this);
+		btnF7.setOnClickListener(this);
 		cbReverse.setOnCheckedChangeListener(this);
 		sbSpeed.setOnSeekBarChangeListener(this);
 
@@ -84,6 +107,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 			if(btnControl.isChecked()) {
 				btnF0.setEnabled(true);
 				btnF1.setEnabled(true);
+				btnF2.setEnabled(true);
+				btnF3.setEnabled(true);
+				btnF4.setEnabled(true);
+				btnF5.setEnabled(true);
+				btnF6.setEnabled(true);
+				btnF7.setEnabled(true);
 				cbReverse.setEnabled(true);
 				sbSpeed.setEnabled(true);
 			}
@@ -119,11 +148,36 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 		else if(v.getId() == R.id.btnF1) {
 			TrainManagerController.getInstance().setButton(1, ((ToggleButton) v).isChecked());
 		}
+		else if(v.getId() == R.id.btnF2) {
+			TrainManagerController.getInstance().setButton(2, ((ToggleButton) v).isChecked());
+		}
+		else if(v.getId() == R.id.btnF3) {
+			TrainManagerController.getInstance().setButton(3, ((ToggleButton) v).isChecked());
+		}
+		else if(v.getId() == R.id.btnF4) {
+			TrainManagerController.getInstance().setButton(4, ((ToggleButton) v).isChecked());
+		}
+		else if(v.getId() == R.id.btnF5) {
+			TrainManagerController.getInstance().setButton(5, ((ToggleButton) v).isChecked());
+		}
+		else if(v.getId() == R.id.btnF6) {
+			TrainManagerController.getInstance().setButton(6, ((ToggleButton) v).isChecked());
+		}
+		else if(v.getId() == R.id.btnF7) {
+			TrainManagerController.getInstance().setButton(7, ((ToggleButton) v).isChecked());
+		}
+		
 		else if(v.getId() == R.id.btnControl) {
 
 			TextView tvState = (TextView) findViewById(R.id.tvState);
 			ToggleButton btnF0 = (ToggleButton) findViewById(R.id.btnF0);
 			ToggleButton btnF1 = (ToggleButton) findViewById(R.id.btnF1);
+			ToggleButton btnF2 = (ToggleButton) findViewById(R.id.btnF2);
+			ToggleButton btnF3 = (ToggleButton) findViewById(R.id.btnF3);
+			ToggleButton btnF4 = (ToggleButton) findViewById(R.id.btnF4);
+			ToggleButton btnF5 = (ToggleButton) findViewById(R.id.btnF5);
+			ToggleButton btnF6 = (ToggleButton) findViewById(R.id.btnF6);
+			ToggleButton btnF7 = (ToggleButton) findViewById(R.id.btnF7);
 			CheckBox cbReverse = (CheckBox) findViewById(R.id.cbReverse);
 			SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
 			TextView tvSpeed = (TextView) findViewById(R.id.tvSpeed);
@@ -158,11 +212,24 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 
 					btnF0.setEnabled(true);
 					btnF1.setEnabled(true);
+					btnF2.setEnabled(true);
+					btnF3.setEnabled(true);
+					btnF4.setEnabled(true);
+					btnF5.setEnabled(true);
+					btnF6.setEnabled(true);
+					btnF7.setEnabled(true);
 					cbReverse.setEnabled(true);
 					sbSpeed.setEnabled(true);
 
 					btnF0.setChecked(TrainManagerController.getInstance().getButton(0));
 					btnF1.setChecked(TrainManagerController.getInstance().getButton(1));
+					btnF2.setChecked(TrainManagerController.getInstance().getButton(2));
+					btnF3.setChecked(TrainManagerController.getInstance().getButton(3));
+					btnF4.setChecked(TrainManagerController.getInstance().getButton(4));
+					btnF5.setChecked(TrainManagerController.getInstance().getButton(5));
+					btnF6.setChecked(TrainManagerController.getInstance().getButton(6));
+					btnF7.setChecked(TrainManagerController.getInstance().getButton(7));
+					
 					cbReverse.setChecked(!TrainManagerController.getInstance().getDir());
 					int speed = TrainManagerController.getInstance().getSpeed();
 					sbSpeed.setProgress(speed);
@@ -190,6 +257,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 
 					btnF0.setEnabled(false);
 					btnF1.setEnabled(false);
+					btnF2.setEnabled(false);
+					btnF3.setEnabled(false);
+					btnF4.setEnabled(false);
+					btnF5.setEnabled(false);
+					btnF6.setEnabled(false);
+					btnF7.setEnabled(false);
 					cbReverse.setEnabled(false);
 					sbSpeed.setEnabled(false);
 				}

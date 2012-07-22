@@ -4,6 +4,12 @@
 	<string name="btn_control">Control</string>
 	<string name="btn_light">Light</string>
 	<string name="btn_f1">F1</string>
+	<string name="btn_f2">F2</string>
+	<string name="btn_f3">F3</string>
+	<string name="btn_f4">F4</string>
+	<string name="btn_f5">F5</string>
+	<string name="btn_f6">F6</string>
+	<string name="btn_f7">F7</string>
 	<string name="tv_state">State:</string>
 	<string name="tv_speed">Speed:</string>
 	<string name="btn_about">About</string>
