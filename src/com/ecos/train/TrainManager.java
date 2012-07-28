@@ -58,46 +58,38 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 		StrictMode.setThreadPolicy(policy);
 		
+		//get elements
 		setContentView(R.layout.main);
 		TextView tvState = (TextView) findViewById(R.id.tvState);
 		ToggleButton btnControl = (ToggleButton) findViewById(R.id.btnControl);
-		ToggleButton btnF0 = (ToggleButton) findViewById(R.id.btnF0);
-		ToggleButton btnF1 = (ToggleButton) findViewById(R.id.btnF1);
-		ToggleButton btnF2 = (ToggleButton) findViewById(R.id.btnF2);
-		ToggleButton btnF3 = (ToggleButton) findViewById(R.id.btnF3);
-		ToggleButton btnF4 = (ToggleButton) findViewById(R.id.btnF4);
-		ToggleButton btnF5 = (ToggleButton) findViewById(R.id.btnF5);
-		ToggleButton btnF6 = (ToggleButton) findViewById(R.id.btnF6);
-		ToggleButton btnF7 = (ToggleButton) findViewById(R.id.btnF7);
 		CheckBox cbReverse = (CheckBox) findViewById(R.id.cbReverse);
 		TextView tvSpeed = (TextView) findViewById(R.id.tvSpeed);
+		TextView tvName = (TextView) findViewById(R.id.tvName);
+		TextView tvId = (TextView) findViewById(R.id.tvId);
 		SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
+		
+		//default values
 		tvSpeed.setText(this.getString(R.string.tv_speed) + " 0");
+		tvName.setText(this.getString(R.string.tv_name) + " ");
+		tvId.setText(this.getString(R.string.tv_idd) + " ");
 		tvState.setText(this.getString(R.string.tv_state) + " " + this.getString(R.string.tv_disconnect));
 		sbSpeed.setEnabled(false);
-		btnF0.setEnabled(false);
-		btnF1.setEnabled(false);
-		btnF2.setEnabled(false);
-		btnF3.setEnabled(false);
-		btnF4.setEnabled(false);
-		btnF5.setEnabled(false);
-		btnF6.setEnabled(false);
-		btnF7.setEnabled(false);
+		setFnButtons(false);
 		cbReverse.setEnabled(false);
 		sbSpeed.setEnabled(false);
 
+		//listeners
 		btnControl.setOnClickListener(this);
-		btnF0.setOnClickListener(this);
-		btnF1.setOnClickListener(this);
-		btnF2.setOnClickListener(this);
-		btnF3.setOnClickListener(this);
-		btnF4.setOnClickListener(this);
-		btnF5.setOnClickListener(this);
-		btnF6.setOnClickListener(this);
-		btnF7.setOnClickListener(this);
+		((ToggleButton) findViewById(R.id.btnF0)).setOnClickListener(this);
+		((ToggleButton) findViewById(R.id.btnF1)).setOnClickListener(this);
+		((ToggleButton) findViewById(R.id.btnF2)).setOnClickListener(this);
+		((ToggleButton) findViewById(R.id.btnF3)).setOnClickListener(this);
+		((ToggleButton) findViewById(R.id.btnF4)).setOnClickListener(this);
+		((ToggleButton) findViewById(R.id.btnF5)).setOnClickListener(this);
+		((ToggleButton) findViewById(R.id.btnF6)).setOnClickListener(this);
+		((ToggleButton) findViewById(R.id.btnF7)).setOnClickListener(this);
 		cbReverse.setOnCheckedChangeListener(this);
 		sbSpeed.setOnSeekBarChangeListener(this);
-
 
 		//restore previous state
 		if(savedInstanceState != null) {
@@ -105,14 +97,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 			btnControl.setChecked(savedInstanceState.getBoolean("btnControl"));
 
 			if(btnControl.isChecked()) {
-				btnF0.setEnabled(true);
-				btnF1.setEnabled(true);
-				btnF2.setEnabled(true);
-				btnF3.setEnabled(true);
-				btnF4.setEnabled(true);
-				btnF5.setEnabled(true);
-				btnF6.setEnabled(true);
-				btnF7.setEnabled(true);
+				setFnButtons(true);
 				cbReverse.setEnabled(true);
 				sbSpeed.setEnabled(true);
 			}
@@ -170,14 +155,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 		else if(v.getId() == R.id.btnControl) {
 
 			TextView tvState = (TextView) findViewById(R.id.tvState);
-			ToggleButton btnF0 = (ToggleButton) findViewById(R.id.btnF0);
-			ToggleButton btnF1 = (ToggleButton) findViewById(R.id.btnF1);
-			ToggleButton btnF2 = (ToggleButton) findViewById(R.id.btnF2);
-			ToggleButton btnF3 = (ToggleButton) findViewById(R.id.btnF3);
-			ToggleButton btnF4 = (ToggleButton) findViewById(R.id.btnF4);
-			ToggleButton btnF5 = (ToggleButton) findViewById(R.id.btnF5);
-			ToggleButton btnF6 = (ToggleButton) findViewById(R.id.btnF6);
-			ToggleButton btnF7 = (ToggleButton) findViewById(R.id.btnF7);
+			TextView tvName = (TextView) findViewById(R.id.tvName);
+			TextView tvId = (TextView) findViewById(R.id.tvId);
 			CheckBox cbReverse = (CheckBox) findViewById(R.id.cbReverse);
 			SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
 			TextView tvSpeed = (TextView) findViewById(R.id.tvSpeed);
@@ -210,30 +189,28 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 				if(TrainManagerController.getInstance().isConnected()) {
 					TrainManagerController.getInstance().takeControl();
 
-					btnF0.setEnabled(true);
-					btnF1.setEnabled(true);
-					btnF2.setEnabled(true);
-					btnF3.setEnabled(true);
-					btnF4.setEnabled(true);
-					btnF5.setEnabled(true);
-					btnF6.setEnabled(true);
-					btnF7.setEnabled(true);
+					setFnButtons(true);
 					cbReverse.setEnabled(true);
 					sbSpeed.setEnabled(true);
 
-					btnF0.setChecked(TrainManagerController.getInstance().getButton(0));
-					btnF1.setChecked(TrainManagerController.getInstance().getButton(1));
-					btnF2.setChecked(TrainManagerController.getInstance().getButton(2));
-					btnF3.setChecked(TrainManagerController.getInstance().getButton(3));
-					btnF4.setChecked(TrainManagerController.getInstance().getButton(4));
-					btnF5.setChecked(TrainManagerController.getInstance().getButton(5));
-					btnF6.setChecked(TrainManagerController.getInstance().getButton(6));
-					btnF7.setChecked(TrainManagerController.getInstance().getButton(7));
+					((ToggleButton) findViewById(R.id.btnF0)).setChecked(TrainManagerController.getInstance().getButton(0));
+					((ToggleButton) findViewById(R.id.btnF1)).setChecked(TrainManagerController.getInstance().getButton(1));
+					((ToggleButton) findViewById(R.id.btnF2)).setChecked(TrainManagerController.getInstance().getButton(2));
+					((ToggleButton) findViewById(R.id.btnF3)).setChecked(TrainManagerController.getInstance().getButton(3));
+					((ToggleButton) findViewById(R.id.btnF4)).setChecked(TrainManagerController.getInstance().getButton(4));
+					((ToggleButton) findViewById(R.id.btnF5)).setChecked(TrainManagerController.getInstance().getButton(5));
+					((ToggleButton) findViewById(R.id.btnF6)).setChecked(TrainManagerController.getInstance().getButton(6));
+					((ToggleButton) findViewById(R.id.btnF7)).setChecked(TrainManagerController.getInstance().getButton(7));
 					
 					cbReverse.setChecked(!TrainManagerController.getInstance().getDir());
 					int speed = TrainManagerController.getInstance().getSpeed();
 					sbSpeed.setProgress(speed);
 					tvSpeed.setText(this.getString(R.string.tv_speed) + speed);
+					
+					String name = TrainManagerController.getInstance().getName();
+					tvName.setText(this.getString(R.string.tv_name) + " " + name);
+					
+					tvId.setText(this.getString(R.string.tv_idd) + " " + TrainManagerController.trainId);
 				}
 				else {
 					((ToggleButton) v).setChecked(false);
@@ -255,14 +232,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 						TrainManagerController.getInstance().setConnected(false);
 					}
 
-					btnF0.setEnabled(false);
-					btnF1.setEnabled(false);
-					btnF2.setEnabled(false);
-					btnF3.setEnabled(false);
-					btnF4.setEnabled(false);
-					btnF5.setEnabled(false);
-					btnF6.setEnabled(false);
-					btnF7.setEnabled(false);
+					setFnButtons(false);
 					cbReverse.setEnabled(false);
 					sbSpeed.setEnabled(false);
 				}
@@ -345,6 +315,21 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 	}
 
 
+	/**
+	 * 
+	 * @param isEnabled
+	 */
+	private void setFnButtons(boolean isEnabled) {
+		((ToggleButton) findViewById(R.id.btnF0)).setEnabled(isEnabled);
+		((ToggleButton) findViewById(R.id.btnF1)).setEnabled(isEnabled);
+		((ToggleButton) findViewById(R.id.btnF2)).setEnabled(isEnabled);
+		((ToggleButton) findViewById(R.id.btnF3)).setEnabled(isEnabled);
+		((ToggleButton) findViewById(R.id.btnF4)).setEnabled(isEnabled);
+		((ToggleButton) findViewById(R.id.btnF5)).setEnabled(isEnabled);
+		((ToggleButton) findViewById(R.id.btnF6)).setEnabled(isEnabled);
+		((ToggleButton) findViewById(R.id.btnF7)).setEnabled(isEnabled);
+	}
+	
 	@Override
 	protected void onStop() {
 		super.onStop();

@@ -181,7 +181,6 @@ public class TrainManagerController {
 			return result.substring(index1+1, index2).toUpperCase().equals("GO");
 		}
 		catch(Exception s) {
-			TrainManagerController.activity.displayError(TrainManagerController.RESPONSE_ERROR);
 			return false;
 		}
 	}
@@ -210,6 +209,26 @@ public class TrainManagerController {
 
 	/**
 	 * 
+	 * @return name
+	 */
+	public String getName() {
+		String result = this.sendMsg("get("+TrainManagerController.trainId+", name)");
+		
+		int index1 = result.lastIndexOf('[');
+		int index2 = result.lastIndexOf(']');
+
+		try {
+			return result.substring(index1+1, index2);
+		}
+		catch(Exception s) {
+			TrainManagerController.activity.displayError(TrainManagerController.RESPONSE_ERROR);
+			return "";
+		}
+	}
+	
+	
+	/**
+	 * 
 	 * @return
 	 */
 	public int getSpeed() {
@@ -222,7 +241,6 @@ public class TrainManagerController {
 			return Integer.parseInt(result.substring(index1+1, index2));
 		}
 		catch(Exception s) {
-			TrainManagerController.activity.displayError(TrainManagerController.RESPONSE_ERROR);
 			return 0;
 		}
 	}
@@ -252,7 +270,6 @@ public class TrainManagerController {
 					? true : false;
 		}
 		catch(Exception s) {
-			TrainManagerController.activity.displayError(TrainManagerController.RESPONSE_ERROR);;
 			return false;
 		}
 
@@ -270,7 +287,7 @@ public class TrainManagerController {
 	 * 
 	 */
 	public void getLoco() {
-		this.sendMsg("queryObjects(10)");
+		String result = this.sendMsg("queryObjects(10)");
 	}
 
 	/**
@@ -311,7 +328,6 @@ public class TrainManagerController {
 					? true : false;
 		}
 		catch(Exception s) {
-			TrainManagerController.activity.displayError(TrainManagerController.RESPONSE_ERROR);
 			return false;
 		}
 

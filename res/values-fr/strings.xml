@@ -12,6 +12,8 @@
 	<string name="btn_f7">F7</string>
 	<string name="tv_state">État:</string>
 	<string name="tv_speed">Vitesse:</string>
+	<string name="tv_name">Nom:</string>
+	<string name="tv_idd">Id:</string>
 	<string name="btn_about">A propos</string>
 	<string name="btn_settings">Paramètres</string>
 	<string name="cb_reverse">Inverser</string>

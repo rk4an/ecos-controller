@@ -11,6 +11,8 @@
 	<string name="btn_f6">F6</string>
 	<string name="btn_f7">F7</string>
 	<string name="tv_state">State:</string>
+	<string name="tv_name">Name:</string>
+	<string name="tv_idd">Id:</string>
 	<string name="tv_speed">Speed:</string>
 	<string name="btn_about">About</string>
 	<string name="btn_settings">Settings</string>
