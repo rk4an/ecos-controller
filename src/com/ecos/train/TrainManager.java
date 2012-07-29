@@ -54,7 +54,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		//TODO: FIX ME
+		//TODO: rewrite the network part
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 		StrictMode.setThreadPolicy(policy);
 		
@@ -280,7 +280,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 			try {
 				PackageInfo manager = getPackageManager().getPackageInfo(getPackageName(), 0);
 				Toast toast = Toast.makeText(
-						this, this.getString(R.string.app_name) + " " + manager.versionName , 1000);
+						this, this.getString(R.string.app_name) + " " + manager.versionName , Toast.LENGTH_SHORT);
 				toast.show();
 			} catch (Exception e) {
 				//
@@ -345,6 +345,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 	 * @param error
 	 */
 	public void displayError(String error) {
-		Toast.makeText(this, error , 2000).show();
+		Toast.makeText(this, error , Toast.LENGTH_SHORT).show();
 	}
 }

@@ -40,17 +40,10 @@ public class TrainManagerController {
 
 	private boolean connected = false;
 
-	/**
-	 * 
-	 * @param activity
-	 */
+
 	private TrainManagerController() {
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
 	public static TrainManagerController getInstance() {
 		if(instance == null)
 			instance = new TrainManagerController();
@@ -58,16 +51,12 @@ public class TrainManagerController {
 		return instance;
 	}
 
-	/**
-	 * 
-	 * @param activity
-	 */
 	public static void setActivity(TrainManager activity) {
 		TrainManagerController.activity = activity;
 	}
 
 	/**
-	 * 
+	 * open a socket for console
 	 * @param consoleIp
 	 * @param consolePort
 	 * @throws IOException
@@ -94,7 +83,7 @@ public class TrainManagerController {
 	}
 
 	/**
-	 * 
+	 * set connected state
 	 * @param state
 	 */
 	public void setConnected(boolean state) {
@@ -102,7 +91,7 @@ public class TrainManagerController {
 	}
 
 	/**
-	 * 
+	 * get connected state
 	 * @return
 	 */
 	public boolean isConnected() {
@@ -111,7 +100,7 @@ public class TrainManagerController {
 
 
 	/**
-	 * 
+	 * read a line on the soket
 	 * @return
 	 */
 	public String readLine() {
@@ -124,7 +113,7 @@ public class TrainManagerController {
 	}
 
 	/**
-	 * 
+	 * close socket
 	 * @throws IOException
 	 */
 	public void closeSocket() throws IOException {
@@ -136,7 +125,7 @@ public class TrainManagerController {
 
 
 	/**
-	 * 
+	 * send a command message to the console
 	 * @param msg
 	 */
 	private String sendMsg(String msg) {
@@ -168,7 +157,8 @@ public class TrainManagerController {
 
 
 	/**
-	 * 
+	 * get emergency state
+	 * @return
 	 */
 	public boolean getEmergencyState() {
 
@@ -187,7 +177,7 @@ public class TrainManagerController {
 
 
 	/**
-	 * 
+	 * trigger emergency stop
 	 * @param state
 	 */
 	public void emergencyStop(boolean state) {
@@ -200,7 +190,8 @@ public class TrainManagerController {
 	}
 
 	/**
-	 * 
+	 * get info about console
+	 * TODO: return console information
 	 */
 	public void getInfo() {
 		this.sendMsg("get(1, info)");
@@ -208,12 +199,12 @@ public class TrainManagerController {
 
 
 	/**
-	 * 
+	 * get name of a train
 	 * @return name
 	 */
 	public String getName() {
 		String result = this.sendMsg("get("+TrainManagerController.trainId+", name)");
-		
+
 		int index1 = result.lastIndexOf('[');
 		int index2 = result.lastIndexOf(']');
 
@@ -225,10 +216,10 @@ public class TrainManagerController {
 			return "";
 		}
 	}
-	
-	
+
+
 	/**
-	 * 
+	 * get speed of a train
 	 * @return
 	 */
 	public int getSpeed() {
@@ -247,7 +238,7 @@ public class TrainManagerController {
 
 
 	/**
-	 * 
+	 * set speed of the train
 	 * @param speed
 	 */
 	public void setSpeed(int speed) {
@@ -255,8 +246,8 @@ public class TrainManagerController {
 	}
 
 	/**
-	 * 
-	 * @return true if direction is GO_FORWARD
+	 * get direction of the train
+	 * @return true = GO_FORWARD
 	 */
 	public boolean getDir() {
 
@@ -276,36 +267,42 @@ public class TrainManagerController {
 	}
 
 	/**
-	 * 
-	 * @param x
+	 * set direction of the train
+	 * @param true = GO_FORWARD
 	 */
-	public void setDir(int x) {
-		this.sendMsg("set("+TrainManagerController.trainId+", dir["+x+"])");
+	public void setDir(int dir) {
+		this.sendMsg("set("+TrainManagerController.trainId+", dir["+dir+"])");
 	}
 
 	/**
-	 * 
+	 * get list of train
+	 * TODO: test this with multiple trains
 	 */
-	public void getLoco() {
+	public String[] getTrains() {
 		String result = this.sendMsg("queryObjects(10)");
+		String[] list = result.split("\n");
+		
+		return list;
 	}
 
 	/**
-	 * 
+	 * take control of the train
 	 */
 	public void takeControl() {
 		this.sendMsg("request("+TrainManagerController.trainId+", control, force)");
 	}
 
 	/**
-	 * 
+	 * release control of the train
 	 */
 	public void releaseControl() {
 		this.sendMsg("release("+TrainManagerController.trainId+", control)");
 	}
 
 	/**
-	 * 
+	 * set button state
+	 * @param i
+	 * @param enabled
 	 */
 	public void setButton(int i, boolean enabled) {
 		int value = (enabled) ? 1 : 0;
@@ -313,7 +310,7 @@ public class TrainManagerController {
 	}
 
 	/**
-	 * 
+	 * get button state
 	 * @param i
 	 * @return
 	 */
