@@ -279,9 +279,16 @@ public class TrainManagerController {
 	 * TODO: test this with multiple trains
 	 */
 	public String[] getTrains() {
-		String result = this.sendMsg("queryObjects(10)");
-		String[] list = result.split("\n");
 		
+		String[] list = new String[0];
+	
+		try {
+			String result = this.sendMsg("queryObjects(10)");
+			list = result.split("\n");
+		}
+		catch(Exception e) {
+			
+		}
 		return list;
 	}
 
