@@ -129,9 +129,8 @@
 		        android:textOn="@string/btn_f7" />
 		</LinearLayout>
 
-		<CheckBox android:text="@string/cb_reverse" android:id="@+id/cbReverse"
-			android:layout_width="fill_parent" android:layout_height="wrap_content"
-			android:state_enabled="false"></CheckBox>
+
+
 		<TextView android:text="@string/tv_speed" android:id="@+id/tvSpeed"
 			android:layout_width="fill_parent" android:layout_height="wrap_content" android:gravity="center"></TextView>
 
@@ -140,9 +139,15 @@
 		    android:layout_width="fill_parent"
 		    android:layout_height="wrap_content"
 		    android:max="127"
-		    android:padding="20dip" >
-</SeekBar>
+		    android:padding="20dip" />
 
+		<CheckBox
+            android:id="@+id/cbReverse"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:state_enabled="false"
+            android:text="@string/cb_reverse" />
+		
 		<LinearLayout
 		    android:layout_width="match_parent"
 		    android:layout_height="wrap_content"

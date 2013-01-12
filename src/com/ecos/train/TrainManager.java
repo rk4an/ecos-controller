@@ -61,7 +61,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 			StrictMode.setThreadPolicy(policy);
 		}
 		
-		
 		//get elements
 		setContentView(R.layout.main);
 		TextView tvState = (TextView) findViewById(R.id.tvState);
@@ -113,7 +112,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 			tvSpeed.setText(savedInstanceState.getString("tvSpeed"));
 			tvState.setText(savedInstanceState.getString("tvState"));
 			tvIdAvailable.setText(savedInstanceState.getString("tvIdAvailable"));
-			
+			tvName.setText(savedInstanceState.getString("tvName"));
+			tvId.setText(savedInstanceState.getString("tvId"));
 		}
 		
 		TrainManagerController.setActivity(this);
@@ -201,14 +201,22 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 					cbReverse.setEnabled(true);
 					sbSpeed.setEnabled(true);
 
-					((ToggleButton) findViewById(R.id.btnF0)).setChecked(TrainManagerController.getInstance().getButton(0));
-					((ToggleButton) findViewById(R.id.btnF1)).setChecked(TrainManagerController.getInstance().getButton(1));
-					((ToggleButton) findViewById(R.id.btnF2)).setChecked(TrainManagerController.getInstance().getButton(2));
-					((ToggleButton) findViewById(R.id.btnF3)).setChecked(TrainManagerController.getInstance().getButton(3));
-					((ToggleButton) findViewById(R.id.btnF4)).setChecked(TrainManagerController.getInstance().getButton(4));
-					((ToggleButton) findViewById(R.id.btnF5)).setChecked(TrainManagerController.getInstance().getButton(5));
-					((ToggleButton) findViewById(R.id.btnF6)).setChecked(TrainManagerController.getInstance().getButton(6));
-					((ToggleButton) findViewById(R.id.btnF7)).setChecked(TrainManagerController.getInstance().getButton(7));
+					((ToggleButton) findViewById(R.id.btnF0)).setChecked(
+							TrainManagerController.getInstance().getButton(0));
+					((ToggleButton) findViewById(R.id.btnF1)).setChecked(
+							TrainManagerController.getInstance().getButton(1));
+					((ToggleButton) findViewById(R.id.btnF2)).setChecked(
+							TrainManagerController.getInstance().getButton(2));
+					((ToggleButton) findViewById(R.id.btnF3)).setChecked(
+							TrainManagerController.getInstance().getButton(3));
+					((ToggleButton) findViewById(R.id.btnF4)).setChecked(
+							TrainManagerController.getInstance().getButton(4));
+					((ToggleButton) findViewById(R.id.btnF5)).setChecked(
+							TrainManagerController.getInstance().getButton(5));
+					((ToggleButton) findViewById(R.id.btnF6)).setChecked(
+							TrainManagerController.getInstance().getButton(6));
+					((ToggleButton) findViewById(R.id.btnF7)).setChecked(
+							TrainManagerController.getInstance().getButton(7));
 					
 					String trains[] = TrainManagerController.getInstance().getTrains();
 					
@@ -219,7 +227,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 						else 
 							trainsAvailable += (trains[i]+",");
 					}
-					((TextView) findViewById(R.id.tvIdAvailable)).setText(this.getString(R.string.tv_id_available) + " " + trainsAvailable);
+					((TextView) findViewById(R.id.tvIdAvailable)).setText(
+							this.getString(R.string.tv_id_available) + " " + trainsAvailable);
 					
 					cbReverse.setChecked(!TrainManagerController.getInstance().getDir());
 					int speed = TrainManagerController.getInstance().getSpeed();
@@ -322,7 +331,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 		TextView tvSpeed = (TextView) findViewById(R.id.tvSpeed);
 		SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
 		TextView tvIdAvailable = ((TextView) findViewById(R.id.tvIdAvailable));
-
+		TextView tvName = ((TextView) findViewById(R.id.tvName));
+		TextView tvId = ((TextView) findViewById(R.id.tvId));
+		
 		outState.putBoolean("btnControl", btnControl.isChecked());
 		outState.putBoolean("btnF0", btnF0.isChecked());
 		outState.putBoolean("btnF1", btnF1.isChecked());
@@ -331,7 +342,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 		outState.putString("tvSpeed", tvSpeed.getText()+"");
 		outState.putString("tvState", tvState.getText()+"");
 		outState.putString("tvIdAvailable", tvIdAvailable.getText()+"");
-
+		outState.putString("tvName", tvName.getText()+"");
+		outState.putString("tvId", tvId.getText()+"");
+		
+		
 		super.onSaveInstanceState(outState);
 	}
 
