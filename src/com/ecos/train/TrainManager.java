@@ -20,6 +20,7 @@
 package com.ecos.train;
 
 import java.io.IOException;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -29,28 +30,31 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 public class TrainManager 
 extends Activity 
-implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
+implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, OnItemSelectedListener {
 
 	private static int DEFAULT_PORT = 15471;
-	private static int DEFAULT_TRAINID = 1000;
-			
-	/** Called when the activity is first created. */
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -60,7 +64,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 			StrictMode.setThreadPolicy(policy);
 		}
-		
+
 		//get elements
 		setContentView(R.layout.main);
 		TextView tvState = (TextView) findViewById(R.id.tvState);
@@ -68,14 +72,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 		CheckBox cbReverse = (CheckBox) findViewById(R.id.cbReverse);
 		TextView tvSpeed = (TextView) findViewById(R.id.tvSpeed);
 		TextView tvName = (TextView) findViewById(R.id.tvName);
-		TextView tvId = (TextView) findViewById(R.id.tvId);
 		SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
 		TextView tvIdAvailable = ((TextView) findViewById(R.id.tvIdAvailable));
-		
+
 		//default values
 		tvSpeed.setText(this.getString(R.string.tv_speed) + " 0");
 		tvName.setText(this.getString(R.string.tv_name) + " ");
-		tvId.setText(this.getString(R.string.tv_idd) + " ");
 		tvState.setText(this.getString(R.string.tv_state) + " " + this.getString(R.string.tv_disconnect));
 		sbSpeed.setEnabled(false);
 		setFnButtons(false);
@@ -83,7 +85,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 		sbSpeed.setEnabled(false);
 		tvIdAvailable.setText("");
 
-		//listeners
+		//add listeners
 		btnControl.setOnClickListener(this);
 		((ToggleButton) findViewById(R.id.btnF0)).setOnClickListener(this);
 		((ToggleButton) findViewById(R.id.btnF1)).setOnClickListener(this);
@@ -98,7 +100,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 
 		//restore previous state
 		if(savedInstanceState != null) {
-		
+
 			btnControl.setChecked(savedInstanceState.getBoolean("btnControl"));
 
 			if(btnControl.isChecked()) {
@@ -113,28 +115,18 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 			tvState.setText(savedInstanceState.getString("tvState"));
 			tvIdAvailable.setText(savedInstanceState.getString("tvIdAvailable"));
 			tvName.setText(savedInstanceState.getString("tvName"));
-			tvId.setText(savedInstanceState.getString("tvId"));
+			
+			getTrainIds();
 		}
-		
+
 		TrainManagerController.setActivity(this);
 	}
 
 	@Override
 	public void onClick(View v) {
-		
+
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-		
-		//check trainID
-		int trainId = TrainManager.DEFAULT_TRAINID;
-		try{
-			trainId = Integer.parseInt(pref.getString("id", TrainManager.DEFAULT_TRAINID+""));
-		}
-		catch(Exception e) {
-			trainId = TrainManager.DEFAULT_TRAINID;
-		}
-		
-		TrainManagerController.trainId = trainId;
-		
+
 		if(v.getId() == R.id.btnF0) {	//light
 			TrainManagerController.getInstance().setButton(0, ((ToggleButton) v).isChecked());
 		}
@@ -159,16 +151,13 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 		else if(v.getId() == R.id.btnF7) {
 			TrainManagerController.getInstance().setButton(7, ((ToggleButton) v).isChecked());
 		}
-		
-		else if(v.getId() == R.id.btnControl) {
+		else if(v.getId() == R.id.btnControl) { //click on connect
 
 			TextView tvState = (TextView) findViewById(R.id.tvState);
-			TextView tvName = (TextView) findViewById(R.id.tvName);
-			TextView tvId = (TextView) findViewById(R.id.tvId);
 			CheckBox cbReverse = (CheckBox) findViewById(R.id.cbReverse);
 			SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
-			TextView tvSpeed = (TextView) findViewById(R.id.tvSpeed);
 
+			//connect
 			if(((ToggleButton) v).isChecked()) {
 
 				String consoleIp = pref.getString("ip", "");
@@ -182,9 +171,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 				catch(Exception e) {
 					consolePort = TrainManager.DEFAULT_PORT;
 				}
-				
+
+				//open socket
 				try {
-					TrainManagerController.getInstance().openSocket(consoleIp, consolePort,trainId);
+					TrainManagerController.getInstance().openSocket(consoleIp, consolePort);
 					tvState.setText(
 							this.getString(R.string.tv_state) + " " + this.getString(R.string.tv_connect));
 					TrainManagerController.getInstance().setConnected(true);
@@ -194,58 +184,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 					TrainManagerController.getInstance().setConnected(false);
 				}
 
-				if(TrainManagerController.getInstance().isConnected()) {
-					TrainManagerController.getInstance().takeControl();
-
-					setFnButtons(true);
-					cbReverse.setEnabled(true);
-					sbSpeed.setEnabled(true);
-
-					((ToggleButton) findViewById(R.id.btnF0)).setChecked(
-							TrainManagerController.getInstance().getButton(0));
-					((ToggleButton) findViewById(R.id.btnF1)).setChecked(
-							TrainManagerController.getInstance().getButton(1));
-					((ToggleButton) findViewById(R.id.btnF2)).setChecked(
-							TrainManagerController.getInstance().getButton(2));
-					((ToggleButton) findViewById(R.id.btnF3)).setChecked(
-							TrainManagerController.getInstance().getButton(3));
-					((ToggleButton) findViewById(R.id.btnF4)).setChecked(
-							TrainManagerController.getInstance().getButton(4));
-					((ToggleButton) findViewById(R.id.btnF5)).setChecked(
-							TrainManagerController.getInstance().getButton(5));
-					((ToggleButton) findViewById(R.id.btnF6)).setChecked(
-							TrainManagerController.getInstance().getButton(6));
-					((ToggleButton) findViewById(R.id.btnF7)).setChecked(
-							TrainManagerController.getInstance().getButton(7));
-					
-					String trains[] = TrainManagerController.getInstance().getTrains();
-					
-					String trainsAvailable = "";
-					for(int i=0; i<trains.length; i++) {
-						if(i == trains.length -1)
-							trainsAvailable += (trains[i]);
-						else 
-							trainsAvailable += (trains[i]+",");
-					}
-					((TextView) findViewById(R.id.tvIdAvailable)).setText(
-							this.getString(R.string.tv_id_available) + " " + trainsAvailable);
-					
-					cbReverse.setChecked(!TrainManagerController.getInstance().getDir());
-					int speed = TrainManagerController.getInstance().getSpeed();
-					sbSpeed.setProgress(speed);
-					tvSpeed.setText(this.getString(R.string.tv_speed) + speed);
-					
-					String name = TrainManagerController.getInstance().getName();
-					tvName.setText(this.getString(R.string.tv_name) + " " + name);
-					
-					tvId.setText(this.getString(R.string.tv_idd) + " " + TrainManagerController.trainId);
-				}
-				else {
-					((ToggleButton) v).setChecked(false);
-				}
+				//load train id
+				getTrainIds();
 			}
-			else {
-
+			else {	//disconnect
 				if(TrainManagerController.getInstance().isConnected()) {
 					TrainManagerController.getInstance().releaseControl();
 
@@ -265,8 +207,25 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 					sbSpeed.setEnabled(false);
 				}
 			}
-		}
 
+		}
+	}
+
+	private void getTrainIds() {
+		//get all train id in a list
+		if(TrainManagerController.getInstance().isConnected()) {
+			List<String> list = TrainManagerController.getInstance().getTrains();
+
+			Spinner sTrainId = (Spinner) findViewById(R.id.sTrainId);
+
+			ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+					android.R.layout.simple_spinner_item, list);
+
+			dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+			sTrainId.setAdapter(dataAdapter);
+			sTrainId.setOnItemSelectedListener(this);
+		}
 	}
 
 	@Override
@@ -323,6 +282,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 
+		//get elems
 		TextView tvState = (TextView) findViewById(R.id.tvState);
 		ToggleButton btnControl = (ToggleButton) findViewById(R.id.btnControl);
 		ToggleButton btnF0 = (ToggleButton) findViewById(R.id.btnF0);
@@ -332,8 +292,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 		SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
 		TextView tvIdAvailable = ((TextView) findViewById(R.id.tvIdAvailable));
 		TextView tvName = ((TextView) findViewById(R.id.tvName));
-		TextView tvId = ((TextView) findViewById(R.id.tvId));
+		Spinner sTrainId = (Spinner) findViewById(R.id.sTrainId);
 		
+		//save
 		outState.putBoolean("btnControl", btnControl.isChecked());
 		outState.putBoolean("btnF0", btnF0.isChecked());
 		outState.putBoolean("btnF1", btnF1.isChecked());
@@ -343,8 +304,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 		outState.putString("tvState", tvState.getText()+"");
 		outState.putString("tvIdAvailable", tvIdAvailable.getText()+"");
 		outState.putString("tvName", tvName.getText()+"");
-		outState.putString("tvId", tvId.getText()+"");
-		
 		
 		super.onSaveInstanceState(outState);
 	}
@@ -364,7 +323,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 		((ToggleButton) findViewById(R.id.btnF6)).setEnabled(isEnabled);
 		((ToggleButton) findViewById(R.id.btnF7)).setEnabled(isEnabled);
 	}
-	
+
 	@Override
 	protected void onStop() {
 		super.onStop();
@@ -381,5 +340,59 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 	 */
 	public void displayError(String error) {
 		Toast.makeText(this, error , Toast.LENGTH_SHORT).show();
+	}
+
+	@Override
+	public void onItemSelected(AdapterView<?> parent, View view, int pos,long id) {
+
+		TextView tvName = (TextView) findViewById(R.id.tvName);
+		CheckBox cbReverse = (CheckBox) findViewById(R.id.cbReverse);
+		SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
+		TextView tvSpeed = (TextView) findViewById(R.id.tvSpeed);
+
+		try {
+			TrainManagerController.trainId = Integer.parseInt(parent.getItemAtPosition(pos).toString());
+		}
+		catch (Exception e) {
+			TrainManagerController.trainId = 1000;
+		}
+
+		if(TrainManagerController.getInstance().isConnected()) {
+			TrainManagerController.getInstance().takeControl();
+
+			//activate button
+			setFnButtons(true);
+			cbReverse.setEnabled(true);
+			sbSpeed.setEnabled(true);
+
+			((ToggleButton) findViewById(R.id.btnF0)).setChecked(
+					TrainManagerController.getInstance().getButton(0));
+			((ToggleButton) findViewById(R.id.btnF1)).setChecked(
+					TrainManagerController.getInstance().getButton(1));
+			((ToggleButton) findViewById(R.id.btnF2)).setChecked(
+					TrainManagerController.getInstance().getButton(2));
+			((ToggleButton) findViewById(R.id.btnF3)).setChecked(
+					TrainManagerController.getInstance().getButton(3));
+			((ToggleButton) findViewById(R.id.btnF4)).setChecked(
+					TrainManagerController.getInstance().getButton(4));
+			((ToggleButton) findViewById(R.id.btnF5)).setChecked(
+					TrainManagerController.getInstance().getButton(5));
+			((ToggleButton) findViewById(R.id.btnF6)).setChecked(
+					TrainManagerController.getInstance().getButton(6));
+			((ToggleButton) findViewById(R.id.btnF7)).setChecked(
+					TrainManagerController.getInstance().getButton(7));
+
+			cbReverse.setChecked(!TrainManagerController.getInstance().getDir());
+			int speed = TrainManagerController.getInstance().getSpeed();
+			sbSpeed.setProgress(speed);
+			tvSpeed.setText(this.getString(R.string.tv_speed) + speed);
+
+			String name = TrainManagerController.getInstance().getName();
+			tvName.setText(this.getString(R.string.tv_name) + " " + name);
+		}
+	}
+
+	@Override
+	public void onNothingSelected(AdapterView<?> arg0) {
 	}
 }

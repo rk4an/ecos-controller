@@ -27,19 +27,20 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TrainManagerController {
 
 	private Socket socket;
 	private BufferedReader plecClient;
 	private PrintWriter predClient;
-	private static TrainManagerController instance = null;
+	private boolean connected = false;
+	
 	public static int trainId = 1000;
+	private static TrainManagerController instance = null;
 	private static TrainManager activity;
 	private static String RESPONSE_ERROR = "Can't read the ECoS response";
-
-	private boolean connected = false;
-
 
 	private TrainManagerController() {
 	}
@@ -61,9 +62,7 @@ public class TrainManagerController {
 	 * @param consolePort
 	 * @throws IOException
 	 */
-	public void openSocket(String consoleIp, int consolePort, int trainId) throws IOException {
-
-		TrainManagerController.trainId = trainId;
+	public void openSocket(String consoleIp, int consolePort) throws IOException {
 
 		if(this.socket != null) 
 			return;
@@ -217,7 +216,6 @@ public class TrainManagerController {
 		}
 	}
 
-
 	/**
 	 * get speed of a train
 	 * @return
@@ -278,18 +276,21 @@ public class TrainManagerController {
 	 * get list of train
 	 * TODO: test this with multiple trains
 	 */
-	public String[] getTrains() {
+	public List<String> getTrains() {
 		
-		String[] list = new String[0];
-	
+		List<String> trainId = new ArrayList<String>();
+
 		try {
 			String result = this.sendMsg("queryObjects(10)");
-			list = result.split("\n");
+			String list[] = result.split("\n");
+			for(int i=0; i<list.length; i++) {
+				trainId.add(list[i]);
+			}
 		}
 		catch(Exception e) {
 			
 		}
-		return list;
+		return trainId;
 	}
 
 	/**
