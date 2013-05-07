@@ -167,7 +167,7 @@ public class TrainManagerController {
 		int index2 = result.lastIndexOf(']');
 
 		try {
-			return result.substring(index1+1, index2).toUpperCase().equals("GO");
+			return result.substring(index1+1, index2).toUpperCase().equals("STOP");
 		}
 		catch(Exception s) {
 			return false;

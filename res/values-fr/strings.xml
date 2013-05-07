@@ -23,4 +23,5 @@
 	<string name="tv_port">Port (15471)</string>
 	<string name="tv_id">ID Train (1000)</string>
 	<string name="tv_id_available">Liste des IDs:</string>
+	<string name="btn_emergency">Urgence</string>
 </resources>

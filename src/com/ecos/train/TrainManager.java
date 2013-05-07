@@ -30,7 +30,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -68,22 +67,14 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		//get elements
 		setContentView(R.layout.main);
 		TextView tvState = (TextView) findViewById(R.id.tvState);
-		ToggleButton btnControl = (ToggleButton) findViewById(R.id.btnControl);
+		ToggleButton btnControl = (ToggleButton) findViewById(R.id.btnConnect);
 		CheckBox cbReverse = (CheckBox) findViewById(R.id.cbReverse);
 		TextView tvSpeed = (TextView) findViewById(R.id.tvSpeed);
 		TextView tvName = (TextView) findViewById(R.id.tvName);
 		SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
-		TextView tvIdAvailable = ((TextView) findViewById(R.id.tvIdAvailable));
+		ToggleButton btnEmergency = (ToggleButton) findViewById(R.id.btnEmergency);
 
-		//default values
-		tvSpeed.setText(this.getString(R.string.tv_speed) + " 0");
-		tvName.setText(this.getString(R.string.tv_name) + " ");
-		tvState.setText(this.getString(R.string.tv_state) + " " + this.getString(R.string.tv_disconnect));
-		sbSpeed.setEnabled(false);
-		setFnButtons(false);
-		cbReverse.setEnabled(false);
-		sbSpeed.setEnabled(false);
-		tvIdAvailable.setText("");
+		setStateButtons(false);
 
 		//add listeners
 		btnControl.setOnClickListener(this);
@@ -95,28 +86,26 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		((ToggleButton) findViewById(R.id.btnF5)).setOnClickListener(this);
 		((ToggleButton) findViewById(R.id.btnF6)).setOnClickListener(this);
 		((ToggleButton) findViewById(R.id.btnF7)).setOnClickListener(this);
+		((ToggleButton) findViewById(R.id.btnEmergency)).setOnClickListener(this);
 		cbReverse.setOnCheckedChangeListener(this);
 		sbSpeed.setOnSeekBarChangeListener(this);
 
 		//restore previous state
 		if(savedInstanceState != null) {
-
 			btnControl.setChecked(savedInstanceState.getBoolean("btnControl"));
 
 			if(btnControl.isChecked()) {
-				setFnButtons(true);
-				cbReverse.setEnabled(true);
-				sbSpeed.setEnabled(true);
-			}
+				setStateButtons(true);
+				cbReverse.setChecked(savedInstanceState.getBoolean("cbReverse"));
+				sbSpeed.setProgress(savedInstanceState.getInt("sbSpeed"));
+				tvSpeed.setText(savedInstanceState.getString("tvSpeed"));
+				tvState.setText(savedInstanceState.getString("tvState"));
+				tvName.setText(savedInstanceState.getString("tvName"));
 
-			cbReverse.setChecked(savedInstanceState.getBoolean("cbReverse"));
-			sbSpeed.setProgress(savedInstanceState.getInt("sbSpeed"));
-			tvSpeed.setText(savedInstanceState.getString("tvSpeed"));
-			tvState.setText(savedInstanceState.getString("tvState"));
-			tvIdAvailable.setText(savedInstanceState.getString("tvIdAvailable"));
-			tvName.setText(savedInstanceState.getString("tvName"));
-			
-			getTrainIds();
+				//reload info
+				btnEmergency.setChecked(savedInstanceState.getBoolean("btnEmergency"));
+				getTrainIds();
+			}
 		}
 
 		TrainManagerController.setActivity(this);
@@ -124,7 +113,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 
 	@Override
 	public void onClick(View v) {
-
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
 
 		if(v.getId() == R.id.btnF0) {	//light
@@ -151,11 +139,13 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		else if(v.getId() == R.id.btnF7) {
 			TrainManagerController.getInstance().setButton(7, ((ToggleButton) v).isChecked());
 		}
-		else if(v.getId() == R.id.btnControl) { //click on connect
+		else if(v.getId() == R.id.btnEmergency) {
+			TrainManagerController.getInstance().emergencyStop(((ToggleButton) v).isChecked());
+		}
+		else if(v.getId() == R.id.btnConnect) { //click on connect
 
 			TextView tvState = (TextView) findViewById(R.id.tvState);
-			CheckBox cbReverse = (CheckBox) findViewById(R.id.cbReverse);
-			SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
+			ToggleButton btnEmergency = (ToggleButton) findViewById(R.id.btnEmergency);
 
 			//connect
 			if(((ToggleButton) v).isChecked()) {
@@ -178,14 +168,18 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 					tvState.setText(
 							this.getString(R.string.tv_state) + " " + this.getString(R.string.tv_connect));
 					TrainManagerController.getInstance().setConnected(true);
+					
+					btnEmergency.setEnabled(true);
+					
+					btnEmergency.setChecked(TrainManagerController.getInstance().getEmergencyState());
+					getTrainIds();
+					
 				} catch (IOException e) {
 					tvState.setText(
 							this.getString(R.string.tv_state) + " " + e.getMessage());
 					TrainManagerController.getInstance().setConnected(false);
+					((ToggleButton) findViewById(R.id.btnConnect)).setChecked(false);
 				}
-
-				//load train id
-				getTrainIds();
 			}
 			else {	//disconnect
 				if(TrainManagerController.getInstance().isConnected()) {
@@ -202,9 +196,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 						TrainManagerController.getInstance().setConnected(false);
 					}
 
-					setFnButtons(false);
-					cbReverse.setEnabled(false);
-					sbSpeed.setEnabled(false);
+					setStateButtons(false);
 				}
 			}
 
@@ -284,16 +276,15 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 
 		//get elems
 		TextView tvState = (TextView) findViewById(R.id.tvState);
-		ToggleButton btnControl = (ToggleButton) findViewById(R.id.btnControl);
+		ToggleButton btnControl = (ToggleButton) findViewById(R.id.btnConnect);
 		ToggleButton btnF0 = (ToggleButton) findViewById(R.id.btnF0);
 		ToggleButton btnF1 = (ToggleButton) findViewById(R.id.btnF1);
 		CheckBox cbReverse = (CheckBox) findViewById(R.id.cbReverse);
 		TextView tvSpeed = (TextView) findViewById(R.id.tvSpeed);
 		SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
-		TextView tvIdAvailable = ((TextView) findViewById(R.id.tvIdAvailable));
 		TextView tvName = ((TextView) findViewById(R.id.tvName));
-		Spinner sTrainId = (Spinner) findViewById(R.id.sTrainId);
-		
+		ToggleButton btnEmergency = (ToggleButton) findViewById(R.id.btnEmergency);
+
 		//save
 		outState.putBoolean("btnControl", btnControl.isChecked());
 		outState.putBoolean("btnF0", btnF0.isChecked());
@@ -302,9 +293,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		outState.putInt("sbSpeed", sbSpeed.getProgress());
 		outState.putString("tvSpeed", tvSpeed.getText()+"");
 		outState.putString("tvState", tvState.getText()+"");
-		outState.putString("tvIdAvailable", tvIdAvailable.getText()+"");
 		outState.putString("tvName", tvName.getText()+"");
-		
+		outState.putBoolean("btnEmergency", btnEmergency.isChecked());
+
 		super.onSaveInstanceState(outState);
 	}
 
@@ -361,9 +352,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 			TrainManagerController.getInstance().takeControl();
 
 			//activate button
-			setFnButtons(true);
-			cbReverse.setEnabled(true);
-			sbSpeed.setEnabled(true);
+			setStateButtons(true);
 
 			((ToggleButton) findViewById(R.id.btnF0)).setChecked(
 					TrainManagerController.getInstance().getButton(0));
@@ -394,5 +383,30 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 
 	@Override
 	public void onNothingSelected(AdapterView<?> arg0) {
+	}
+
+	public void setStateButtons(boolean state) {
+		//get elements
+		
+		TextView tvState = (TextView) findViewById(R.id.tvState);
+		CheckBox cbReverse = (CheckBox) findViewById(R.id.cbReverse);
+		TextView tvSpeed = (TextView) findViewById(R.id.tvSpeed);
+		TextView tvName = (TextView) findViewById(R.id.tvName);
+		SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
+		ToggleButton btnEmergency = (ToggleButton) findViewById(R.id.btnEmergency);
+
+		//default values
+		if(!state) {
+			tvSpeed.setText(this.getString(R.string.tv_speed) + " 0");
+			tvName.setText(this.getString(R.string.tv_name) + " ");
+			tvState.setText(this.getString(R.string.tv_state) + " " + this.getString(R.string.tv_disconnect));
+		}
+
+		sbSpeed.setEnabled(state);
+		setFnButtons(state);
+		cbReverse.setEnabled(state);
+		sbSpeed.setEnabled(state);
+		btnEmergency.setEnabled(state);
+
 	}
 }

@@ -20,7 +20,7 @@
 	    </TextView>
 
 	    <ToggleButton
-	        android:id="@+id/btnControl"
+	        android:id="@+id/btnConnect"
 	        android:layout_width="fill_parent"
 	        android:layout_height="0dp"
 	        android:layout_weight="1"
@@ -200,10 +200,15 @@
 	        android:layout_weight="1"
 	        android:orientation="vertical" >
 
-	        <TextView
-	            android:id="@+id/tvIdAvailable"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content" />
+	        <ToggleButton
+	            android:id="@+id/btnEmergency"
+	            android:layout_width="fill_parent"
+	            android:layout_height="0dp"
+	            android:layout_weight="1"
+	            android:text="@string/btn_emergency"
+	            android:textOff="@string/btn_emergency"
+	            android:textOn="@string/btn_emergency" />
+
 	    </LinearLayout>
 	</LinearLayout>
 
