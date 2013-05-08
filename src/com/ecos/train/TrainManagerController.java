@@ -36,7 +36,7 @@ public class TrainManagerController {
 	private BufferedReader plecClient;
 	private PrintWriter predClient;
 	private boolean connected = false;
-	
+
 	public static int trainId = 1000;
 	private static TrainManagerController instance = null;
 	private static TrainManager activity;
@@ -277,7 +277,7 @@ public class TrainManagerController {
 	 * TODO: test this with multiple trains
 	 */
 	public List<String> getTrains() {
-		
+
 		List<String> trainId = new ArrayList<String>();
 
 		try {
@@ -288,28 +288,28 @@ public class TrainManagerController {
 			}
 		}
 		catch(Exception e) {
-			
+
 		}
 		return trainId;
 	}
 
-	/*public List<String> getFullTrains() {
-		
+	public List<String> getFullTrains() {
+
 		List<String> trainId = new ArrayList<String>();
 
 		try {
-			String result = this.sendMsg("queryObjects(10, addr, name)");
+			String result = this.sendMsg("queryObjects(10, name, addr)");
 			String list[] = result.split("\n");
 			for(int i=0; i<list.length; i++) {
 				trainId.add(list[i]);
 			}
 		}
 		catch(Exception e) {
-			
+
 		}
 		return trainId;
-	}*/
-	
+	}
+
 	/**
 	 * take control of the train
 	 */
