@@ -25,6 +25,7 @@ import java.util.List;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.os.Build;
 import android.os.Bundle;
@@ -89,6 +90,19 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		cbReverse.setOnCheckedChangeListener(this);
 		sbSpeed.setOnSeekBarChangeListener(this);
 
+		//show toast message
+		int version = 280;
+		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+		int info = pref.getInt("info", 0);
+		
+		if(info != version) {
+			Toast toast = Toast.makeText(this, "Please rate this app on Google Play." , Toast.LENGTH_LONG);
+			toast.show();
+			Editor editor = pref.edit();
+			editor.putInt("info", version);
+			editor.commit();
+		}
+		
 		//restore previous state
 		if(savedInstanceState != null) {
 			btnControl.setChecked(savedInstanceState.getBoolean("btnControl"));
