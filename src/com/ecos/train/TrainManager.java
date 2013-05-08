@@ -91,7 +91,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		sbSpeed.setOnSeekBarChangeListener(this);
 
 		//show toast message
-		int version = 280;
+		int version = 281;
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
 		int info = pref.getInt("info", 0);
 		

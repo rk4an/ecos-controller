@@ -29,6 +29,10 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import android.util.Log;
 
 public class TrainManagerController {
 
@@ -293,25 +297,35 @@ public class TrainManagerController {
 		return trainId;
 	}
 
-/*
-<REPLY queryObjects(10, name, addr)>
-1000 name["TSO BR215"] addr[3]
-<END 0 (OK)>
-*/
+	/**
+	 * return id, name and address of the train
+	 * @return
+	 */
 	public List<String> getFullTrains() {
 
 		List<String> trainId = new ArrayList<String>();
 
-		try {
-			String result = this.sendMsg("queryObjects(10, name, addr)");
-			String list[] = result.split("\n");
-			for(int i=0; i<list.length; i++) {
-				trainId.add(list[i]);
-			}
-		}
-		catch(Exception e) {
+		String result = this.sendMsg("queryObjects(10, name, addr)");
 
+		String list[] = result.split("\n");
+		Pattern p = Pattern.compile("(.*) name\\[\"(.*)\"\\] addr\\[(.*)\\]");
+		String id = "";
+		String addr = "";
+		String name = "";
+
+		for(int i=0; i<list.length; i++) {
+			Matcher m = p.matcher(list[i]);
+
+			while (m.find() == true) {
+				Log.d("id",m.group(1).trim());
+				id = m.group(1).trim();
+				name = m.group(2).trim();
+				addr = m.group(3).trim();
+			}
+
+			trainId.add(id + " (" + name + ") (" + addr + ")");
 		}
+
 		return trainId;
 	}
 
