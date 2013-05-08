@@ -32,8 +32,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.util.Log;
-
 public class TrainManagerController {
 
 	private Socket socket;
@@ -317,7 +315,6 @@ public class TrainManagerController {
 			Matcher m = p.matcher(list[i]);
 
 			while (m.find() == true) {
-				Log.d("id",m.group(1).trim());
 				id = m.group(1).trim();
 				name = m.group(2).trim();
 				addr = m.group(3).trim();
