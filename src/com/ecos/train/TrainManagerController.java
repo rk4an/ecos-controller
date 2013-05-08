@@ -293,6 +293,23 @@ public class TrainManagerController {
 		return trainId;
 	}
 
+	/*public List<String> getFullTrains() {
+		
+		List<String> trainId = new ArrayList<String>();
+
+		try {
+			String result = this.sendMsg("queryObjects(10, addr, name)");
+			String list[] = result.split("\n");
+			for(int i=0; i<list.length; i++) {
+				trainId.add(list[i]);
+			}
+		}
+		catch(Exception e) {
+			
+		}
+		return trainId;
+	}*/
+	
 	/**
 	 * take control of the train
 	 */
