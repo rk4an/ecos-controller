@@ -293,6 +293,11 @@ public class TrainManagerController {
 		return trainId;
 	}
 
+/*
+<REPLY queryObjects(10, name, addr)>
+1000 name["TSO BR215"] addr[3]
+<END 0 (OK)>
+*/
 	public List<String> getFullTrains() {
 
 		List<String> trainId = new ArrayList<String>();
