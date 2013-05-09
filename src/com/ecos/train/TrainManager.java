@@ -91,18 +91,18 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		sbSpeed.setOnSeekBarChangeListener(this);
 
 		//show toast message
-		int version = 281;
+		int version = 282;
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
 		int info = pref.getInt("info", 0);
-		
+
 		if(info != version) {
-			Toast toast = Toast.makeText(this, "Please rate this app on Google Play." , Toast.LENGTH_LONG);
+			Toast toast = Toast.makeText(this, "Please rate this app on Google Play. You can also donate via PayPal. Thanks." , Toast.LENGTH_LONG);
 			toast.show();
 			Editor editor = pref.edit();
 			editor.putInt("info", version);
 			editor.commit();
 		}
-		
+
 		//restore previous state
 		if(savedInstanceState != null) {
 			btnControl.setChecked(savedInstanceState.getBoolean("btnControl"));
@@ -350,17 +350,21 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
 		TextView tvSpeed = (TextView) findViewById(R.id.tvSpeed);
 
-		try {
-			String value = parent.getItemAtPosition(pos).toString();
-			String[] values = value.split(" ");
-
-			TrainManagerController.trainId = Integer.parseInt(values[0]);
-		}
-		catch (Exception e) {
-			TrainManagerController.trainId = 1000;
-		}
-
+		//release control of the previous train
 		if(TrainManagerController.getInstance().isConnected()) {
+			TrainManagerController.getInstance().releaseControl();
+
+			try {
+				String value = parent.getItemAtPosition(pos).toString();
+				String[] values = value.split(" ");
+
+				TrainManagerController.trainId = Integer.parseInt(values[0]);
+			}
+			catch (Exception e) {
+				TrainManagerController.trainId = 1000;
+			}
+
+
 			TrainManagerController.getInstance().takeControl();
 
 			//activate button
@@ -384,6 +388,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 					TrainManagerController.getInstance().getButton(7));
 
 			cbReverse.setChecked(!TrainManagerController.getInstance().getDir());
+			
 			int speed = TrainManagerController.getInstance().getSpeed();
 			sbSpeed.setProgress(speed);
 			tvSpeed.setText(this.getString(R.string.tv_speed) + speed);
