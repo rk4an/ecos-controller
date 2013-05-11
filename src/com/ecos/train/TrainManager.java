@@ -58,7 +58,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		//TODO: rewrite the network part
 		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD) {
 			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
