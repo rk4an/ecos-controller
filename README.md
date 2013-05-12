@@ -1,9 +1,8 @@
-ECoS-Controller
-=========================
+# ECoS-Controller
 
 **ECoS Controller is an Android client for ESU-ECoS station.** 
 
-Features:
+## Features:
 
  * Multi trains selection
  * 8 buttons 
