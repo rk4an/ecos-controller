@@ -5,6 +5,8 @@ ECoS-Controller
 
 Features:
 
- * Speed control
- * Reverse
+ * Multi trains selection
  * 8 buttons 
+ * Speed control
+ * Reverse direction
+
