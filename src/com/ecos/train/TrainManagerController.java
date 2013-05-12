@@ -299,9 +299,9 @@ public class TrainManagerController {
 	 * return id, name and address of the train
 	 * @return
 	 */
-	public List<String> getFullTrains() {
+	public List<Train> getFullTrains() {
 
-		List<String> trainId = new ArrayList<String>();
+		List<Train> trainId = new ArrayList<Train>();
 
 		String result = this.sendMsg("queryObjects(10, name, addr)");
 
@@ -320,7 +320,7 @@ public class TrainManagerController {
 				addr = m.group(3).trim();
 			}
 
-			trainId.add(id + " (" + name + ") (" + addr + ")");
+			trainId.add(new Train(id, name, addr));
 		}
 
 		return trainId;

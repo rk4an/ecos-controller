@@ -218,11 +218,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 	private void getTrainIds() {
 		//get all train id in a list
 		if(TrainManagerController.getInstance().isConnected()) {
-			List<String> list = TrainManagerController.getInstance().getFullTrains();
+			List<Train> list = TrainManagerController.getInstance().getFullTrains();
 
 			Spinner sTrainId = (Spinner) findViewById(R.id.sTrainId);
 
-			ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+			SpinAdapter dataAdapter = new SpinAdapter(this,
 					android.R.layout.simple_spinner_item, list);
 
 			dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -355,10 +355,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 			TrainManagerController.getInstance().releaseControl();
 
 			try {
-				String value = parent.getItemAtPosition(pos).toString();
-				String[] values = value.split(" ");
-
-				TrainManagerController.trainId = Integer.parseInt(values[0]);
+				String value = ((Train)parent.getItemAtPosition(pos)).getId();
+				TrainManagerController.trainId = Integer.parseInt(value);
 			}
 			catch (Exception e) {
 				TrainManagerController.trainId = 1000;
