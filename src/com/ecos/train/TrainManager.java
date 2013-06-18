@@ -239,9 +239,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 	@Override
 	public void onItemSelected(AdapterView<?> parent, View view, int pos,long id) {
 
+		setStateButtons(false);
+		
 		if(Settings.trainId != -1) {
-			mTcpClient.releaseViewTrain();
-			mTcpClient.releaseControl();
+				mTcpClient.releaseViewTrain();
+				mTcpClient.releaseControl();
 		}
 
 		String value = ((Train)parent.getItemAtPosition(pos)).getId();
@@ -313,10 +315,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		protected void onProgressUpdate(String... values) {
 			super.onProgressUpdate(values);
 
+			String respLine[] = values[0].split("\n");
+
 			//state machine
 			if(Settings.state == Settings.State.NONE) {
 				if(values[0].equals("READY")) {
-					mTcpClient.viewConsole();
+					//mTcpClient.viewConsole();
 
 					tvState.setText("Connected");
 					((ToggleButton) findViewById(R.id.btnConnect)).setChecked(true);
@@ -330,31 +334,37 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 				}
 			}
 			else if(Settings.state == Settings.State.INIT_GET_EMERGENCY) {
-				Settings.state = Settings.State.INIT_GET_TRAINS;
-				boolean isEmergency = getEmergencyState(values[0]);
-				ToggleButton btnEmergency = (ToggleButton) findViewById(R.id.btnEmergency);
-				btnEmergency.setChecked(isEmergency);	
-				mTcpClient.getAllTrains();
+				if(respLine[0].equals("<REPLY get(1, status)>")) {
+					Settings.state = Settings.State.INIT_GET_TRAINS;
+					boolean isEmergency = getEmergencyState(values[0]);
+					ToggleButton btnEmergency = (ToggleButton) findViewById(R.id.btnEmergency);
+					btnEmergency.setChecked(isEmergency);	
+					mTcpClient.getAllTrains();
+				}
 			}
 			else if(Settings.state == Settings.State.INIT_GET_TRAINS) {
-
-				Settings.state = Settings.State.GET_TRAIN_MAIN_STATE;
-				Spinner sTrainId = (Spinner) findViewById(R.id.sTrainId);
-				SpinAdapter dataAdapter = new SpinAdapter(getApplicationContext(),
-						android.R.layout.simple_spinner_item, getAllTrains(values[0]));
-				dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-				sTrainId.setAdapter(dataAdapter);
+				if(respLine[0].equals("<REPLY queryObjects(10, name, addr)>")) {
+					Settings.state = Settings.State.GET_TRAIN_MAIN_STATE;
+					Spinner sTrainId = (Spinner) findViewById(R.id.sTrainId);
+					SpinAdapter dataAdapter = new SpinAdapter(getApplicationContext(),
+							android.R.layout.simple_spinner_item, getAllTrains(values[0]));
+					dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+					sTrainId.setAdapter(dataAdapter);
+				}
 			}
 			else if(Settings.state == Settings.State.GET_TRAIN_MAIN_STATE) {
-
-				Settings.state = Settings.State.GET_TRAIN_BUTTON_STATE;
-				getTrainMainState(values[0]);
-				mTcpClient.getTrainButtonState();
+				if(respLine[0].equals("<REPLY get("+Settings.trainId+",name,speed,dir)>")) {
+					Settings.state = Settings.State.GET_TRAIN_BUTTON_STATE;
+					getTrainMainState(values[0]);
+					mTcpClient.getTrainButtonState();
+				}
 			}
 			else if(Settings.state == Settings.State.GET_TRAIN_BUTTON_STATE) {
-
-				Settings.state = Settings.State.IDLE;
-				getTrainButtonState(values[0]);
+				if(respLine[0].equals("<REPLY get("+Settings.trainId+",func[0],func[1],func[2],func[3]," +
+						"func[4],func[5],func[6],func[7])>")) {
+					Settings.state = Settings.State.IDLE;
+					getTrainButtonState(values[0]);
+				}
 			}
 			else if(Settings.state == Settings.State.IDLE) {
 				if(values[0].startsWith("<EVENT")) {	//manage event
@@ -365,7 +375,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 					Pattern p = Pattern.compile("(.*) speed\\[(.*)\\]");
 					String id = "";
 					int iid = 0;
-					
+
 					String speed = "";
 
 					for(int i=1; i<list.length-1; i++) {
@@ -406,7 +416,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 								if(state.equals("1")) {
 									istate = true;
 								}
-	
+
 								if(ibtn == 0) {
 									((ToggleButton) findViewById(R.id.btnF0)).setChecked(istate);
 								}

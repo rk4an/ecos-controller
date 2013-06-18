@@ -143,7 +143,7 @@ public class TCPClient {
 	}
 	
 	public void takeControl() {
-		sendMessage("request("+Settings.trainId+", control)");
+		sendMessage("request("+Settings.trainId+", control, force)");
 	}
 	
 	public void releaseControl() {
