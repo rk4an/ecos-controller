@@ -1,4 +1,4 @@
-package com.ecos.train;
+package com.ecos.train.ui;
 
 import java.util.List;
 
@@ -8,6 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
+import com.ecos.train.R;
+import com.ecos.train.object.Train;
 
 public class SpinAdapter extends ArrayAdapter<Train>{
 

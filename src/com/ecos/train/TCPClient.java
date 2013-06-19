@@ -7,8 +7,6 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 
-import android.util.Log;
-
 
 public class TCPClient {
 

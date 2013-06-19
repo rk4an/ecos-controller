@@ -17,12 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package com.ecos.train;
+package com.ecos.train.activity;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.acra.ACRA;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -49,7 +51,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-public class TrainManager 
+import com.ecos.train.R;
+import com.ecos.train.Settings;
+import com.ecos.train.TCPClient;
+import com.ecos.train.object.Train;
+import com.ecos.train.ui.SpinAdapter;
+
+public class TrainManagerActivity 
 extends Activity 
 implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, OnItemSelectedListener {
 
@@ -128,13 +136,13 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 
 				Settings.consoleIp = pref.getString("ip", "");
 
-				Settings.consolePort = TrainManager.DEFAULT_PORT;
+				Settings.consolePort = TrainManagerActivity.DEFAULT_PORT;
 				try{
 					Settings.consolePort = Integer.parseInt(
-							pref.getString("port", TrainManager.DEFAULT_PORT+""));
+							pref.getString("port", TrainManagerActivity.DEFAULT_PORT+""));
 				}
 				catch(Exception e) {
-					Settings.consolePort = TrainManager.DEFAULT_PORT;
+					Settings.consolePort = TrainManagerActivity.DEFAULT_PORT;
 				}
 
 				//connect, begin state machine
@@ -183,7 +191,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.iSettings:
-			Intent i = new Intent(this, Preferences.class);
+			Intent i = new Intent(this, PreferencesActivity.class);
 			startActivity(i);
 			return true;
 		case R.id.iAbout:
@@ -196,6 +204,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 				//
 			}
 
+			return true;
+		case R.id.iReport:
+			ACRA.getErrorReporter().handleException(null);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -240,10 +251,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 	public void onItemSelected(AdapterView<?> parent, View view, int pos,long id) {
 
 		setStateButtons(false);
-		
+
 		if(Settings.trainId != -1) {
-				mTcpClient.releaseViewTrain();
-				mTcpClient.releaseControl();
+			mTcpClient.releaseViewTrain();
+			mTcpClient.releaseControl();
 		}
 
 		String value = ((Train)parent.getItemAtPosition(pos)).getId();
@@ -315,6 +326,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		protected void onProgressUpdate(String... values) {
 			super.onProgressUpdate(values);
 
+			Log.d("ECOS","state: " + Settings.state);
+			Log.d("ECOS","onProgressUpdate: " + values[0]);
+			
 			String respLine[] = values[0].split("\n");
 
 			//state machine
@@ -383,7 +397,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 
 						while (m.find() == true) {
 							id = m.group(1).trim();
-							iid = Integer.parseInt(id);
+							try {
+								iid = Integer.parseInt(id);
+							}
+							catch(Exception e) {	
+							}
 							speed = m.group(2).trim();
 
 							if(iid == Settings.trainId) {
@@ -406,12 +424,22 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 
 						while (m.find() == true) {
 							id = m.group(1).trim();
-							iid = Integer.parseInt(id);
 							btn = m.group(2).trim();
 							state = m.group(3).trim();
+							try {
+								iid = Integer.parseInt(id);
+							}
+							catch(Exception e) {		
+							}
 
 							if(iid == Settings.trainId) {
-								int ibtn = Integer.parseInt(btn);
+								int ibtn = -1;
+								try {
+									ibtn = Integer.parseInt(btn);
+								}
+								catch(Exception e) {	
+								}
+
 								boolean istate = false;
 								if(state.equals("1")) {
 									istate = true;

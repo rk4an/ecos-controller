@@ -17,12 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package com.ecos.train;
+package com.ecos.train.activity;
+
+import com.ecos.train.R;
+import com.ecos.train.R.xml;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
-public class Preferences extends PreferenceActivity {
+public class PreferencesActivity extends PreferenceActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState){

@@ -1,4 +1,4 @@
-package com.ecos.train;
+package com.ecos.train.object;
 
 public class Train {
 
