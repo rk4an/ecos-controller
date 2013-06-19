@@ -2,8 +2,10 @@ package com.ecos.train;
 
 public class Settings {
 
+	public static final int CONSOLE_PORT = 15471;
+	
 	public static String consoleIp = "";
-	public static int consolePort = 15471;
+	public static int consolePort = CONSOLE_PORT;
 	public static int trainId = -1;
 	
 	public static State state = State.NONE;

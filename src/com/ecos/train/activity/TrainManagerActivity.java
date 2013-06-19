@@ -61,7 +61,6 @@ public class TrainManagerActivity
 extends Activity 
 implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, OnItemSelectedListener {
 
-	private static int DEFAULT_PORT = 15471;
 	private TCPClient mTcpClient = null;
 	TextView tvState;
 
@@ -136,13 +135,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 
 				Settings.consoleIp = pref.getString("ip", "");
 
-				Settings.consolePort = TrainManagerActivity.DEFAULT_PORT;
 				try{
 					Settings.consolePort = Integer.parseInt(
-							pref.getString("port", TrainManagerActivity.DEFAULT_PORT+""));
+							pref.getString("port", Settings.CONSOLE_PORT+""));
 				}
 				catch(Exception e) {
-					Settings.consolePort = TrainManagerActivity.DEFAULT_PORT;
+					Settings.consolePort = Settings.CONSOLE_PORT;
 				}
 
 				//connect, begin state machine
