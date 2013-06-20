@@ -61,27 +61,44 @@ public class TrainManagerActivity
 extends Activity 
 implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, OnItemSelectedListener {
 
+	SharedPreferences pref;
 	private TCPClient mTcpClient = null;
+	
 	TextView tvState;
-
+	ToggleButton btnConnect;
+	CheckBox cbReverse;
+	Spinner sTrainId;
+	ToggleButton btnControl;
+	ToggleButton btnEmergency;
+	SeekBar sbSpeed;
+	TextView tvSpeed;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		//get elements
 		setContentView(R.layout.main);
-		ToggleButton btnControl = (ToggleButton) findViewById(R.id.btnConnect);
-		CheckBox cbReverse = (CheckBox) findViewById(R.id.cbReverse);
-		SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
-
+		btnConnect = (ToggleButton) findViewById(R.id.btnConnect);
+		cbReverse = (CheckBox) findViewById(R.id.cbReverse);
+		sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
+		sTrainId = (Spinner) findViewById(R.id.sTrainId);
+		btnControl = (ToggleButton) findViewById(R.id.tbControl);
 		tvState = (TextView) findViewById(R.id.tvState);
-
+		btnEmergency = (ToggleButton) findViewById(R.id.btnEmergency);
+		tvSpeed = (TextView) findViewById(R.id.tvSpeed);
+		
+		//init buttons
 		setStateButtons(false);
 		setStateEmergency(false);
 		setStateList(false);
 		setStateControl(false);
 
 		//add listeners
+		btnConnect.setOnClickListener(this);
+		cbReverse.setOnCheckedChangeListener(this);
+		sbSpeed.setOnSeekBarChangeListener(this);
+		sTrainId.setOnItemSelectedListener(this);
 		btnControl.setOnClickListener(this);
 		((ToggleButton) findViewById(R.id.btnF0)).setOnClickListener(this);
 		((ToggleButton) findViewById(R.id.btnF1)).setOnClickListener(this);
@@ -92,21 +109,13 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		((ToggleButton) findViewById(R.id.btnF6)).setOnClickListener(this);
 		((ToggleButton) findViewById(R.id.btnF7)).setOnClickListener(this);
 		((ToggleButton) findViewById(R.id.btnEmergency)).setOnClickListener(this);
-		cbReverse.setOnCheckedChangeListener(this);
-		sbSpeed.setOnSeekBarChangeListener(this);
-
-		Spinner sTrainId = (Spinner) findViewById(R.id.sTrainId);
-		sTrainId.setOnItemSelectedListener(this);
 		
-		ToggleButton tbControl = (ToggleButton) findViewById(R.id.tbControl);
-		tbControl.setOnClickListener(this);
-		
+		pref = PreferenceManager.getDefaultSharedPreferences(this);
 	}
 
 	@Override
 	public void onClick(View v) {
-		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-
+		
 		if(v.getId() == R.id.btnF0) {	//light
 			mTcpClient.setButton(0, ((ToggleButton) v).isChecked());
 		}
@@ -134,34 +143,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		else if(v.getId() == R.id.btnEmergency) {
 			mTcpClient.emergencyStop(((ToggleButton) v).isChecked());
 		}
-		else if(v.getId() == R.id.btnConnect) { //click on connect
-
-
-			//connect
-			if(((ToggleButton) v).isChecked()) {
-
-				Settings.consoleIp = pref.getString("ip", "");
-
-				try{
-					Settings.consolePort = Integer.parseInt(
-							pref.getString("port", Settings.CONSOLE_PORT+""));
-				}
-				catch(Exception e) {
-					Settings.consolePort = Settings.CONSOLE_PORT;
-				}
-
-				//connect, begin state machine
-				new connectTask().execute("");
-
-			}
-			else {	//disconnect
-
-				//TODO: disconnect
-				setStateButtons(false);
-				setStateEmergency(false);
-				setStateList(false);
-			}
-
+		else if(v.getId() == R.id.btnConnect) {
+			connectToStation(((ToggleButton) v).isChecked());
 		} 
 		else if(v.getId() == R.id.tbControl) {
 			if(((ToggleButton) v).isChecked()) {
@@ -245,6 +228,26 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		((ToggleButton) findViewById(R.id.btnF7)).setEnabled(isEnabled);
 	}
 
+	public void setStateButtons(boolean state) {
+		sbSpeed.setEnabled(state);
+		cbReverse.setEnabled(state);
+		sbSpeed.setEnabled(state);
+		setFnButtons(state);
+	}
+	
+	public void setStateControl(boolean state) {
+		btnControl.setEnabled(state);
+	}
+	
+	public void setStateEmergency(boolean state) {
+
+		btnEmergency.setEnabled(state);
+	}
+
+	public void setStateList(boolean state) {
+		sTrainId.setEnabled(state);
+	}
+	
 	@Override
 	protected void onStop() {
 		super.onStop();
@@ -268,20 +271,19 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 
 		setStateButtons(false);
 
+		//release old train
 		if(Settings.trainId != -1) {
 			mTcpClient.releaseViewTrain();
 			mTcpClient.releaseControl();
 		}
 
+		//get train and take control
 		String value = ((Train)parent.getItemAtPosition(pos)).getId();
 		Settings.trainId = Integer.parseInt(value);
 
 		mTcpClient.takeControl();
-		ToggleButton tbControl = (ToggleButton) findViewById(R.id.tbControl);
-		tbControl.setChecked(true);
-
+		btnControl.setChecked(true);
 		mTcpClient.takeViewTrain();
-		
 		Settings.state = Settings.State.GET_TRAIN_MAIN_STATE;
 		mTcpClient.getTrainMainState();
 	}
@@ -290,33 +292,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 	public void onNothingSelected(AdapterView<?> arg0) {
 	}
 
-	public void setStateButtons(boolean state) {
-		CheckBox cbReverse = (CheckBox) findViewById(R.id.cbReverse);
-		SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
-		
-		sbSpeed.setEnabled(state);
-		setFnButtons(state);
-		cbReverse.setEnabled(state);
-		sbSpeed.setEnabled(state);
-		
-	}
-	
-	public void setStateControl(boolean state) {
-		ToggleButton tbControl = (ToggleButton) findViewById(R.id.tbControl);
-		tbControl.setEnabled(state);
-	}
-	
-	public void setStateEmergency(boolean state) {
-		ToggleButton btnEmergency = (ToggleButton) findViewById(R.id.btnEmergency);
-		btnEmergency.setEnabled(state);
-	}
 
-	public void setStateList(boolean state) {
-		Spinner sTrainId = (Spinner) findViewById(R.id.sTrainId);
-		sTrainId.setEnabled(state);
-	}
 	
-
 	/**
 	 * 
 	 * AsyncTask for TCPClient creation
@@ -359,21 +336,20 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 					mTcpClient.viewConsole();
 
 					tvState.setText("Connected");
-					((ToggleButton) findViewById(R.id.btnConnect)).setChecked(true);
+					btnConnect.setChecked(true);
 
 					Settings.state = Settings.State.INIT_GET_EMERGENCY;
 					mTcpClient.getEmergencyState();
 				}
 				else {
 					tvState.setText(getApplicationContext().getString(R.string.tv_state) + " " + values[0]);
-					((ToggleButton) findViewById(R.id.btnConnect)).setChecked(false);
+					btnConnect.setChecked(false);
 				}
 			}
 			else if(Settings.state == Settings.State.INIT_GET_EMERGENCY) {
 				if(respLine[0].equals("<REPLY get(1, status)>")) {
 					Settings.state = Settings.State.INIT_GET_TRAINS;
 					boolean isEmergency = getEmergencyState(values[0]);
-					ToggleButton btnEmergency = (ToggleButton) findViewById(R.id.btnEmergency);
 					btnEmergency.setChecked(isEmergency);	
 					mTcpClient.getAllTrains();
 				}
@@ -381,7 +357,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 			else if(Settings.state == Settings.State.INIT_GET_TRAINS) {
 				if(respLine[0].equals("<REPLY queryObjects(10, name, addr)>")) {
 					Settings.state = Settings.State.GET_TRAIN_MAIN_STATE;
-					Spinner sTrainId = (Spinner) findViewById(R.id.sTrainId);
 					SpinAdapter dataAdapter = new SpinAdapter(getApplicationContext(),
 							android.R.layout.simple_spinner_item, getAllTrains(values[0]));
 					dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -417,7 +392,31 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		}
 	}
 
+	public void connectToStation(boolean state) {
+		//connect
+		if(state) {
+			Settings.consoleIp = pref.getString("ip", "");
 
+			try{
+				Settings.consolePort = Integer.parseInt(
+						pref.getString("port", Settings.CONSOLE_PORT+""));
+			}
+			catch(Exception e) {
+				Settings.consolePort = Settings.CONSOLE_PORT;
+			}
+
+			//connect, begin state machine
+			Settings.state = Settings.State.NONE;
+			new connectTask().execute("");
+
+		}
+		else {	//disconnect
+			mTcpClient.stopClient();
+			setStateButtons(false);
+			setStateEmergency(false);
+			setStateList(false);
+		}
+	}
 
 	/**
 	 * 
@@ -485,8 +484,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		catch(Exception s) {
 
 		}
-		TextView tvSpeed = (TextView) findViewById(R.id.tvSpeed);
-		SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
 		sbSpeed.setProgress(speed);
 		tvSpeed.setText(this.getString(R.string.tv_speed) + speed);
 
@@ -515,7 +512,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 	public void getTrainButtonState(String result) {
 
 		String list[] = result.split("\n");
-
 
 		List<Boolean> state = new ArrayList<Boolean>();
 
@@ -567,8 +563,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 				speed = m.group(2).trim();
 
 				if(iid == Settings.trainId) {
-					TextView tvSpeed = (TextView) findViewById(R.id.tvSpeed);
-					SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
 					int ispeed = Integer.parseInt(speed);
 					sbSpeed.setProgress(ispeed);
 					tvSpeed.setText(getApplicationContext().getString(R.string.tv_speed) + speed);
@@ -670,7 +664,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 					catch(Exception s) {
 					}
 
-					CheckBox cbReverse = (CheckBox) findViewById(R.id.cbReverse);
 					cbReverse.setChecked(!idir);
 				}
 			}
@@ -680,7 +673,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 	public void parseEventEmergency(String[] list) {
 		Pattern p = Pattern.compile("(.*) status\\[(.*)\\]");
 		String state = "";
-		ToggleButton btnEmergency = (ToggleButton) findViewById(R.id.btnEmergency);
 		
 		for(int i=1; i<list.length-1; i++) {
 			Matcher m = p.matcher(list[i]);
@@ -711,8 +703,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 				event = m.group(2).trim();
 				
 				if(event.equals("CONTROL_LOST")) {
-					ToggleButton tbControl = (ToggleButton) findViewById(R.id.tbControl);
-					tbControl.setChecked(false);
+					btnControl.setChecked(false);
 					setStateButtons(false);
 				}
 			}

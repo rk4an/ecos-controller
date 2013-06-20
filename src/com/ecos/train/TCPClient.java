@@ -1,6 +1,7 @@
 package com.ecos.train;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -14,9 +15,10 @@ public class TCPClient {
 	private OnMessageReceived mMessageListener = null;
 	private boolean mRun = false;
 
+	Socket socket;
 	PrintWriter out;
 	BufferedReader in;
-
+	
 	/**
 	 *  Constructor of the class. OnMessagedReceived listens for the messages received from server
 	 */
@@ -37,6 +39,13 @@ public class TCPClient {
 
 	public void stopClient(){
 		mRun = false;
+		try {
+			socket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 	public void run() {
@@ -45,10 +54,9 @@ public class TCPClient {
 
 		try {
 			InetAddress serverAddr = InetAddress.getByName(Settings.consoleIp);
-			Socket socket = new Socket(serverAddr, Settings.consolePort);
+			socket = new Socket(serverAddr, Settings.consolePort);
 
 			try {
-
 				//send the message to the server
 				out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
 
@@ -79,6 +87,7 @@ public class TCPClient {
 						sb.append(serverMessage).append("\n");
 					}
 				}
+				
 			} catch (Exception e) {
 				mMessageListener.messageReceived("ERROR: " + e.toString());
 			} finally {
