@@ -412,7 +412,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		}
 		else {	//disconnect
 			mTcpClient.stopClient();
+			tvState.setText("Not connected");
 			setStateButtons(false);
+			setStateControl(false);
 			setStateEmergency(false);
 			setStateList(false);
 		}
