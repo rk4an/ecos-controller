@@ -72,6 +72,22 @@
 	    </LinearLayout>
 
 	    <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="1"
+	        android:orientation="vertical" >
+
+	        <ToggleButton
+	            android:id="@+id/tbControl"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:text="@string/tv_take"
+	            android:textOff="@string/tv_take"
+	            android:textOn="@string/tv_take" />
+
+	    </LinearLayout>
+
+	    <LinearLayout
 	        android:id="@+id/linearLayout1"
 	        android:layout_width="match_parent"
 	        android:layout_height="0dp"

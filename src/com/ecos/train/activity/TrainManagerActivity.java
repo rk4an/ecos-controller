@@ -77,6 +77,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		tvState = (TextView) findViewById(R.id.tvState);
 
 		setStateButtons(false);
+		setStateEmergency(false);
+		setStateList(false);
+		setStateControl(false);
 
 		//add listeners
 		btnControl.setOnClickListener(this);
@@ -94,6 +97,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 
 		Spinner sTrainId = (Spinner) findViewById(R.id.sTrainId);
 		sTrainId.setOnItemSelectedListener(this);
+		
+		ToggleButton tbControl = (ToggleButton) findViewById(R.id.tbControl);
+		tbControl.setOnClickListener(this);
+		
 	}
 
 	@Override
@@ -150,10 +157,21 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 			else {	//disconnect
 
 				//TODO: disconnect
-
 				setStateButtons(false);
+				setStateEmergency(false);
+				setStateList(false);
 			}
 
+		} 
+		else if(v.getId() == R.id.tbControl) {
+			if(((ToggleButton) v).isChecked()) {
+				mTcpClient.takeControl();
+				setStateButtons(true);
+			}
+			else {
+				mTcpClient.releaseControl();
+				setStateButtons(false);
+			}
 		}
 	}
 
@@ -259,8 +277,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		Settings.trainId = Integer.parseInt(value);
 
 		mTcpClient.takeControl();
-		mTcpClient.takeViewTrain();
+		ToggleButton tbControl = (ToggleButton) findViewById(R.id.tbControl);
+		tbControl.setChecked(true);
 
+		mTcpClient.takeViewTrain();
+		
 		Settings.state = Settings.State.GET_TRAIN_MAIN_STATE;
 		mTcpClient.getTrainMainState();
 	}
@@ -270,30 +291,31 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 	}
 
 	public void setStateButtons(boolean state) {
-		//get elements
-
-		TextView tvState = (TextView) findViewById(R.id.tvState);
 		CheckBox cbReverse = (CheckBox) findViewById(R.id.cbReverse);
-		TextView tvSpeed = (TextView) findViewById(R.id.tvSpeed);
 		SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
-		ToggleButton btnEmergency = (ToggleButton) findViewById(R.id.btnEmergency);
-		Spinner sTrainId = (Spinner) findViewById(R.id.sTrainId);
-
-		//default values
-		if(!state) {
-			tvSpeed.setText(this.getString(R.string.tv_speed) + " 0");
-			tvState.setText(this.getString(R.string.tv_state) + " " + this.getString(R.string.tv_disconnect));
-		}
-
+		
 		sbSpeed.setEnabled(state);
 		setFnButtons(state);
 		cbReverse.setEnabled(state);
 		sbSpeed.setEnabled(state);
+		
+	}
+	
+	public void setStateControl(boolean state) {
+		ToggleButton tbControl = (ToggleButton) findViewById(R.id.tbControl);
+		tbControl.setEnabled(state);
+	}
+	
+	public void setStateEmergency(boolean state) {
+		ToggleButton btnEmergency = (ToggleButton) findViewById(R.id.btnEmergency);
 		btnEmergency.setEnabled(state);
-		sTrainId.setEnabled(state);
-
 	}
 
+	public void setStateList(boolean state) {
+		Spinner sTrainId = (Spinner) findViewById(R.id.sTrainId);
+		sTrainId.setEnabled(state);
+	}
+	
 
 	/**
 	 * 
@@ -332,7 +354,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 			//state machine
 			if(Settings.state == Settings.State.NONE) {
 				if(values[0].equals("READY")) {
-					//mTcpClient.viewConsole();
+					setStateList(true);
+					setStateEmergency(true);
+					mTcpClient.viewConsole();
 
 					tvState.setText("Connected");
 					((ToggleButton) findViewById(R.id.btnConnect)).setChecked(true);
@@ -383,94 +407,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 
 					String list[] = values[0].split("\n");
 
-					//check speed event
-					Pattern p = Pattern.compile("(.*) speed\\[(.*)\\]");
-					String id = "";
-					int iid = 0;
-
-					String speed = "";
-
-					for(int i=1; i<list.length-1; i++) {
-						Matcher m = p.matcher(list[i]);
-
-						while (m.find() == true) {
-							id = m.group(1).trim();
-							try {
-								iid = Integer.parseInt(id);
-							}
-							catch(Exception e) {	
-							}
-							speed = m.group(2).trim();
-
-							if(iid == Settings.trainId) {
-								TextView tvSpeed = (TextView) findViewById(R.id.tvSpeed);
-								SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
-								int ispeed = Integer.parseInt(speed);
-								sbSpeed.setProgress(ispeed);
-								tvSpeed.setText(getApplicationContext().getString(R.string.tv_speed) + speed);
-							}
-						}
-					}
-
-					//check button event
-					p = Pattern.compile("(.*) func\\[(.*),(.*)\\]");
-					String btn = "";
-					String state = "";
-
-					for(int i=1; i<list.length-1; i++) {
-						Matcher m = p.matcher(list[i]);
-
-						while (m.find() == true) {
-							id = m.group(1).trim();
-							btn = m.group(2).trim();
-							state = m.group(3).trim();
-							try {
-								iid = Integer.parseInt(id);
-							}
-							catch(Exception e) {		
-							}
-
-							if(iid == Settings.trainId) {
-								int ibtn = -1;
-								try {
-									ibtn = Integer.parseInt(btn);
-								}
-								catch(Exception e) {	
-								}
-
-								boolean istate = false;
-								if(state.equals("1")) {
-									istate = true;
-								}
-
-								if(ibtn == 0) {
-									((ToggleButton) findViewById(R.id.btnF0)).setChecked(istate);
-								}
-								else if(ibtn == 1) {
-									((ToggleButton) findViewById(R.id.btnF1)).setChecked(istate);
-								}
-								else if(ibtn == 2) {
-									((ToggleButton) findViewById(R.id.btnF2)).setChecked(istate);
-								}
-								else if(ibtn == 3) {
-									((ToggleButton) findViewById(R.id.btnF3)).setChecked(istate);
-								}
-								else if(ibtn == 4) {
-									((ToggleButton) findViewById(R.id.btnF4)).setChecked(istate);
-								}
-								else if(ibtn == 5) {
-									((ToggleButton) findViewById(R.id.btnF5)).setChecked(istate);
-								}
-								else if(ibtn == 6) {
-									((ToggleButton) findViewById(R.id.btnF6)).setChecked(istate);
-								}
-								else if(ibtn == 7) {
-									((ToggleButton) findViewById(R.id.btnF7)).setChecked(istate);
-								}
-							}
-						}
-
-					}
+					parseEventSpeed(list);
+					parseEventButtons(list);
+					parseEventDir(list);
+					parseEventEmergency(list);
+					parseEventLostControl(list);
 				}
 			}
 		}
@@ -602,6 +543,181 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 
 		//activate button
 		setStateButtons(true);
+		setStateList(true);
+		setStateControl(true);
+	}
+	
+	public void parseEventSpeed(String[] list) {
+		Pattern p = Pattern.compile("(.*) speed\\[(.*)\\]");
+		String id = "";
+		int iid = 0;
+
+		String speed = "";
+
+		for(int i=1; i<list.length-1; i++) {
+			Matcher m = p.matcher(list[i]);
+
+			while (m.find() == true) {
+				id = m.group(1).trim();
+				try {
+					iid = Integer.parseInt(id);
+				}
+				catch(Exception e) {	
+				}
+				speed = m.group(2).trim();
+
+				if(iid == Settings.trainId) {
+					TextView tvSpeed = (TextView) findViewById(R.id.tvSpeed);
+					SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
+					int ispeed = Integer.parseInt(speed);
+					sbSpeed.setProgress(ispeed);
+					tvSpeed.setText(getApplicationContext().getString(R.string.tv_speed) + speed);
+				}
+			}
+		}
+	}
+	
+	public void parseEventButtons(String[] list) {
+		Pattern p = Pattern.compile("(.*) func\\[(.*),(.*)\\]");
+		String id = "";
+		int iid = 0;
+		
+		String btn = "";
+		int ibtn = -1;
+		String state = "";
+		boolean istate = false;
+
+		for(int i=1; i<list.length-1; i++) {
+			Matcher m = p.matcher(list[i]);
+
+			while (m.find() == true) {
+				id = m.group(1).trim();
+				btn = m.group(2).trim();
+				state = m.group(3).trim();
+				try {
+					iid = Integer.parseInt(id);
+				}
+				catch(Exception e) {		
+				}
+
+				if(iid == Settings.trainId) {
+					ibtn = -1;
+					try {
+						ibtn = Integer.parseInt(btn);
+					}
+					catch(Exception e) {	
+					}
+
+					istate = false;
+					if(state.equals("1")) {
+						istate = true;
+					}
+
+					if(ibtn == 0) {
+						((ToggleButton) findViewById(R.id.btnF0)).setChecked(istate);
+					}
+					else if(ibtn == 1) {
+						((ToggleButton) findViewById(R.id.btnF1)).setChecked(istate);
+					}
+					else if(ibtn == 2) {
+						((ToggleButton) findViewById(R.id.btnF2)).setChecked(istate);
+					}
+					else if(ibtn == 3) {
+						((ToggleButton) findViewById(R.id.btnF3)).setChecked(istate);
+					}
+					else if(ibtn == 4) {
+						((ToggleButton) findViewById(R.id.btnF4)).setChecked(istate);
+					}
+					else if(ibtn == 5) {
+						((ToggleButton) findViewById(R.id.btnF5)).setChecked(istate);
+					}
+					else if(ibtn == 6) {
+						((ToggleButton) findViewById(R.id.btnF6)).setChecked(istate);
+					}
+					else if(ibtn == 7) {
+						((ToggleButton) findViewById(R.id.btnF7)).setChecked(istate);
+					}
+				}
+			}
+		}
+	}
+	
+	public void parseEventDir(String[] list) {
+		Pattern p = Pattern.compile("(.*) dir\\[(.*)\\]");
+		String id = "";
+		int iid = 0;
+
+		String dir = "";
+		boolean idir = true;
+
+		for(int i=1; i<list.length-1; i++) {
+			Matcher m = p.matcher(list[i]);
+
+			while (m.find() == true) {
+				id = m.group(1).trim();
+				try {
+					iid = Integer.parseInt(id);
+				}
+				catch(Exception e) {	
+				}
+				dir = m.group(2).trim();
+
+				if(iid == Settings.trainId) {
+					
+					try {
+						idir = Integer.parseInt(dir) == 0 ? true : false;
+					}
+					catch(Exception s) {
+					}
+
+					CheckBox cbReverse = (CheckBox) findViewById(R.id.cbReverse);
+					cbReverse.setChecked(!idir);
+				}
+			}
+		}
+	}
+	
+	public void parseEventEmergency(String[] list) {
+		Pattern p = Pattern.compile("(.*) status\\[(.*)\\]");
+		String state = "";
+		ToggleButton btnEmergency = (ToggleButton) findViewById(R.id.btnEmergency);
+		
+		for(int i=1; i<list.length-1; i++) {
+			Matcher m = p.matcher(list[i]);
+			while (m.find() == true) {
+				state = m.group(2).trim();
+				
+				if(state.equals("GO")) {
+					btnEmergency.setChecked(false);
+					//setStateButtons(true);
+					//setStateControl(true);
+				}
+				else {
+					btnEmergency.setChecked(true);
+					//setStateButtons(false);
+					//setStateControl(false);
+				}
+			}
+		}
+	}
+	
+	public void parseEventLostControl(String[] list) {
+		Pattern p = Pattern.compile("(.*) msg\\[(.*)\\]");
+		String event = "";
+		
+		for(int i=1; i<list.length-1; i++) {
+			Matcher m = p.matcher(list[i]);
+			while (m.find() == true) {
+				event = m.group(2).trim();
+				
+				if(event.equals("CONTROL_LOST")) {
+					ToggleButton tbControl = (ToggleButton) findViewById(R.id.tbControl);
+					tbControl.setChecked(false);
+					setStateButtons(false);
+				}
+			}
+		}
+		
 	}
 
 }
