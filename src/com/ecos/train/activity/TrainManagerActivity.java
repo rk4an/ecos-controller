@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.acra.ACRA;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -77,7 +75,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		//get elements
+		//get elements.
 		setContentView(R.layout.main);
 		btnConnect = (ToggleButton) findViewById(R.id.btnConnect);
 		cbReverse = (CheckBox) findViewById(R.id.cbReverse);
@@ -169,7 +167,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 	@Override
 	public void onStopTrackingTouch(SeekBar sb) {
 		mTcpClient.setSpeed(sb.getProgress());
-		((TextView) findViewById(R.id.tvSpeed)).setText(this.getString(R.string.tv_speed) + " " + sb.getProgress());
+		tvSpeed.setText(this.getString(R.string.tv_speed) + " " + sb.getProgress());
 	}
 
 	@Override
@@ -205,7 +203,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 
 			return true;
 		case R.id.iReport:
-			ACRA.getErrorReporter().handleException(null);
+			//ACRA.getErrorReporter().handleException(null);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -502,7 +500,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		catch(Exception s) {
 		}
 
-		CheckBox cbReverse = (CheckBox) findViewById(R.id.cbReverse);
 		cbReverse.setChecked(!dir);
 	}
 
