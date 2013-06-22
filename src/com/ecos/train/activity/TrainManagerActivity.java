@@ -202,9 +202,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 			}
 
 			return true;
-		case R.id.iReport:
-			//ACRA.getErrorReporter().handleException(null);
-			return true;
+		/*case R.id.iReport:
+			ACRA.getErrorReporter().handleException(null);
+			return true;*/
 		default:
 			return super.onOptionsItemSelected(item);
 		}

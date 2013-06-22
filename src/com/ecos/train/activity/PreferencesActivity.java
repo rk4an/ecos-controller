@@ -19,11 +19,10 @@
 
 package com.ecos.train.activity;
 
-import com.ecos.train.R;
-import com.ecos.train.R.xml;
-
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+
+import com.ecos.train.R;
 
 public class PreferencesActivity extends PreferenceActivity {
 

@@ -4,6 +4,4 @@
 		android:icon="@drawable/settings" android:alphabeticShortcut="s" />
 	<item android:id="@+id/iAbout" android:title="@string/btn_about"
 		android:icon="@drawable/about" android:alphabeticShortcut="a" />
-	   <item android:id="@+id/iReport" android:title="@string/btn_report"
-        android:alphabeticShortcut="r" />
 </menu> 
