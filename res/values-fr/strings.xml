@@ -24,6 +24,4 @@
 	<string name="tv_port">Port (15471)</string>
 	<string name="tv_id_available">Trains:</string>
 	<string name="btn_emergency">Urgence</string>
-	<string name="btn_report">Envoyer Rapport</string>
-    <string name="crash_toast_text">Envoyer ce rapport svp</string>
 </resources>

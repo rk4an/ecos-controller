@@ -1,7 +1,6 @@
 package com.ecos.train;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -20,7 +19,8 @@ public class TCPClient {
 	BufferedReader in;
 	
 	/**
-	 *  Constructor of the class. OnMessagedReceived listens for the messages received from server
+	 *  Constructor of the class. 
+	 *  OnMessagedReceived listens for the messages received from server
 	 */
 	public TCPClient(OnMessageReceived listener) {
 		mMessageListener = listener;
@@ -56,7 +56,8 @@ public class TCPClient {
 
 			try {
 				//send the message to the server
-				out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+				out = new PrintWriter(new BufferedWriter(
+						new OutputStreamWriter(socket.getOutputStream())), true);
 
 				//receive the message which the server sends back
 				in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -69,7 +70,8 @@ public class TCPClient {
 				while (mRun) {
 					serverMessage = in.readLine();
 
-					if (serverMessage.startsWith("<REPLY") || serverMessage.startsWith("<EVENT")) {
+					if (serverMessage.startsWith("<REPLY") || 
+							serverMessage.startsWith("<EVENT")) {
 						sb = new StringBuilder();
 						sb.append(serverMessage).append("\n");
 					}
@@ -100,7 +102,8 @@ public class TCPClient {
 
 	}
 
-	//Declare the interface. The method messageReceived(String message) will must be implemented in the MyActivity
+	//Declare the interface. The method messageReceived(String message) 
+	//will must be implemented in the MyActivity
 	//class at on asynckTask doInBackground
 	public interface OnMessageReceived {
 		public void messageReceived(String message);
