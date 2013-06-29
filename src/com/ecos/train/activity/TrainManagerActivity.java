@@ -155,16 +155,16 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 			mTcpClient.setButton(7, ((ToggleButton) v).isChecked());
 		}
 		else if(v.getId() == R.id.btnF8) {
-			mTcpClient.setButton(7, ((ToggleButton) v).isChecked());
+			mTcpClient.setButton(8, ((ToggleButton) v).isChecked());
 		}
 		else if(v.getId() == R.id.btnF9) {
-			mTcpClient.setButton(7, ((ToggleButton) v).isChecked());
+			mTcpClient.setButton(9, ((ToggleButton) v).isChecked());
 		}
 		else if(v.getId() == R.id.btnF10) {
-			mTcpClient.setButton(7, ((ToggleButton) v).isChecked());
+			mTcpClient.setButton(10, ((ToggleButton) v).isChecked());
 		}
 		else if(v.getId() == R.id.btnF11) {
-			mTcpClient.setButton(7, ((ToggleButton) v).isChecked());
+			mTcpClient.setButton(11, ((ToggleButton) v).isChecked());
 		}
 		else if(v.getId() == R.id.btnEmergency) {
 			mTcpClient.emergencyStop(((ToggleButton) v).isChecked());
