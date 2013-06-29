@@ -30,5 +30,6 @@
     <string name="tv_id_available">Trains:</string>
     <string name="btn_emergency">Urgence</string>
     <string name="lblMore">Autre bouttons</string>
+    <string name="btn_pack">Acheter Unlock</string>
 
 </resources>

@@ -8,6 +8,10 @@
         android:showAsAction="ifRoom"
         android:title="@string/btn_settings"/>
     <item
+        android:id="@+id/iPack"
+        android:alphabeticShortcut="p"
+        android:title="@string/btn_pack"/>
+    <item
         android:id="@+id/iAbout"
         android:alphabeticShortcut="a"
         android:title="@string/btn_about"/>

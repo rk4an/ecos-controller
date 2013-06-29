@@ -29,6 +29,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -62,6 +63,9 @@ public class TrainManagerActivity
 extends SherlockActivity 
 implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, OnItemSelectedListener {
 
+	public static final String LITE_PACKAGE = "com.ecos.train";  
+	public static final String FULL_PACKAGE = "com.ecos.train.unlock";
+	
 	SharedPreferences pref;
 	private TCPClient mTcpClient = null;
 
@@ -118,8 +122,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 
 		((TextView) findViewById(R.id.tvMore)).setOnClickListener(this);
 
-
 		pref = PreferenceManager.getDefaultSharedPreferences(this);
+		
+		Settings.fullVersion = checkSig(this);
 	}
 
 	@Override
@@ -224,6 +229,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 			Intent i = new Intent(this, PreferencesActivity.class);
 			startActivity(i);
 			return true;
+		case R.id.iPack:
+		    Intent intent = new Intent(Intent.ACTION_VIEW);
+		    intent.setData(Uri.parse("market://details?id="+FULL_PACKAGE));
+		    startActivity(intent);
+			return true;
 		case R.id.iAbout:
 			try {
 				PackageInfo manager = getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -262,7 +272,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		((ToggleButton) findViewById(R.id.btnF10)).setEnabled(isEnabled);
 		((ToggleButton) findViewById(R.id.btnF11)).setEnabled(isEnabled);
 
-		if(!checkSig(this)) {
+		if(!Settings.fullVersion) {
 			((ToggleButton) findViewById(R.id.btnF8)).setEnabled(false);
 			((ToggleButton) findViewById(R.id.btnF9)).setEnabled(false);
 			((ToggleButton) findViewById(R.id.btnF10)).setEnabled(false);
@@ -800,8 +810,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 
 	static boolean checkSig(Context context) {
 		boolean match = false;
-		if (context.getPackageManager().checkSignatures("com.ecos.train",
-				"com.ecos.train.plus") == PackageManager.SIGNATURE_MATCH)
+		if (context.getPackageManager().checkSignatures(
+				LITE_PACKAGE, FULL_PACKAGE) == PackageManager.SIGNATURE_MATCH)
 			match = true;
 		return match;
 	}

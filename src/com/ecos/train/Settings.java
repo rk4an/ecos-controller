@@ -10,6 +10,8 @@ public class Settings {
 	
 	public static State state = State.NONE;
 
+	public static boolean fullVersion = false;
+	
 	public enum State {
 		NONE, 
 		INIT_GET_EMERGENCY, 
