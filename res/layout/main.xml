@@ -7,6 +7,7 @@
     android:keepScreenOn="true">
 
 	<LinearLayout
+	    android:id="@+id/llMain"
 	    android:layout_width="fill_parent"
 	    android:layout_height="fill_parent"
 	    android:orientation="vertical"
@@ -31,6 +32,7 @@
 	    </ToggleButton>
 
 	    <LinearLayout
+	        android:id="@+id/llList"
 	        android:layout_width="match_parent"
 	        android:layout_height="0dp"
 	        android:layout_weight="1"
@@ -72,6 +74,7 @@
 	    </LinearLayout>
 
 	    <LinearLayout
+	        android:id="@+id/llControl"
 	        android:layout_width="match_parent"
 	        android:layout_height="0dp"
 	        android:layout_weight="1"
@@ -88,7 +91,7 @@
 	    </LinearLayout>
 
 	    <LinearLayout
-	        android:id="@+id/linearLayout1"
+	        android:id="@+id/llButtons1"
 	        android:layout_width="match_parent"
 	        android:layout_height="0dp"
 	        android:layout_weight="1" >
@@ -135,7 +138,7 @@
 	    </LinearLayout>
 
 	    <LinearLayout
-	        android:id="@+id/LinearLayout01"
+	        android:id="@+id/llButtons2"
 	        android:layout_width="match_parent"
 	        android:layout_height="0dp"
 	        android:layout_weight="1" >
@@ -182,6 +185,73 @@
 	    </LinearLayout>
 
 	    <TextView
+	        android:id="@+id/tvMore"
+	        android:layout_width="wrap_content"
+	        android:layout_height="0dp"
+	        android:layout_margin="5dp"
+	        android:layout_weight="1"
+	        android:background="#444242"
+	        android:padding="5dp"
+	        android:text="@string/lblMore" />
+
+	    <LinearLayout
+	        android:id="@+id/llButtonsExtras"
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="1"
+	        android:orientation="vertical"
+	        android:visibility="gone" >
+
+	        <LinearLayout
+	            android:id="@+id/llButtons3"
+	            android:layout_width="match_parent"
+	            android:layout_height="0dp"
+	            android:layout_weight="1" >
+
+	            <ToggleButton
+	                android:id="@+id/btnF8"
+	                android:layout_width="0dp"
+	                android:layout_height="wrap_content"
+	                android:layout_weight="1"
+	                android:state_enabled="false"
+	                android:text="@string/btn_light"
+	                android:textOff="@string/btn_f8"
+	                android:textOn="@string/btn_f8" />
+
+	            <ToggleButton
+	                android:id="@+id/btnF9"
+	                android:layout_width="0dp"
+	                android:layout_height="wrap_content"
+	                android:layout_weight="1"
+	                android:state_enabled="false"
+	                android:text="@string/btn_light"
+	                android:textOff="@string/btn_f9"
+	                android:textOn="@string/btn_f9" />
+
+	            <ToggleButton
+	                android:id="@+id/btnF10"
+	                android:layout_width="0dp"
+	                android:layout_height="wrap_content"
+	                android:layout_weight="1"
+	                android:state_enabled="false"
+	                android:text="@string/btn_light"
+	                android:textOff="@string/btn_f10"
+	                android:textOn="@string/btn_f10" />
+
+	            <ToggleButton
+	                android:id="@+id/btnF11"
+	                android:layout_width="0dp"
+	                android:layout_height="wrap_content"
+	                android:layout_weight="1"
+	                android:state_enabled="false"
+	                android:text="@string/btn_light"
+	                android:textOff="@string/btn_f11"
+	                android:textOn="@string/btn_f11" />
+	        </LinearLayout>
+
+	    </LinearLayout>
+
+	    <TextView
 	        android:id="@+id/tvSpeed"
 	        android:layout_width="fill_parent"
 	        android:layout_height="0dp"
@@ -207,6 +277,7 @@
 	        android:text="@string/cb_reverse" />
 
 	    <LinearLayout
+	        android:id="@+id/llEmergency"
 	        android:layout_width="match_parent"
 	        android:layout_height="0dp"
 	        android:layout_weight="1"

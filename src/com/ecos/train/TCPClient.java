@@ -128,6 +128,10 @@ public class TCPClient {
 				"func[4],func[5],func[6],func[7])");
 	}
 	
+	public void getTrainButtonStateExtra() {
+		sendMessage("get("+Settings.trainId+",func[8],func[9],func[10],func[11])");
+	}
+	
 	public void setButton(int i, boolean enabled) {
 		int value = (enabled) ? 1 : 0;
 		sendMessage("set("+Settings.trainId+", func["+i+", "+value+"])");
