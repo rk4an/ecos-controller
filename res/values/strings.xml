@@ -35,5 +35,8 @@
     <string name="btn_emergency">Emergency</string>
     <string name="lblMore">More buttons</string>
     <string name="btn_pack">Buy Unlock</string>
-
+    <string name="btn_edit">Edit</string>
+    <string name="lblSave">Save</string>
+    <string name="lblCancel">Cancel</string>
+    
 </resources>

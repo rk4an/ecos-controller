@@ -35,5 +35,8 @@
     <string name="btn_emergency">Urgence</string>
     <string name="lblMore">Autre bouttons</string>
     <string name="btn_pack">Acheter Unlock</string>
-
+    <string name="btn_edit">Modifier</string>
+    <string name="lblSave">Sauvegarder</string>
+    <string name="lblCancel">Annuler</string>
+    
 </resources>

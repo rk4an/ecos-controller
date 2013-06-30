@@ -175,4 +175,7 @@ public class TCPClient {
 		sendMessage("request(1, view)");
 	}
 	
+	public void setName(String name) {
+		sendMessage("set("+Settings.trainId+", name["+name+"]");
+	}
 }

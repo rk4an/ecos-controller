@@ -24,7 +24,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -34,6 +36,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -41,6 +44,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -65,7 +69,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 
 	public static final String LITE_PACKAGE = "com.ecos.train";  
 	public static final String FULL_PACKAGE = "com.ecos.train.unlock";
-	
+
 	SharedPreferences pref;
 	private TCPClient mTcpClient = null;
 
@@ -77,6 +81,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 	ToggleButton btnEmergency;
 	SeekBar sbSpeed;
 	TextView tvSpeed;
+
+	SpinAdapter dataAdapter;
+	private MenuItem editItem = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -121,13 +128,13 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		((ToggleButton) findViewById(R.id.btnF13)).setOnClickListener(this);
 		((ToggleButton) findViewById(R.id.btnF14)).setOnClickListener(this);
 		((ToggleButton) findViewById(R.id.btnF15)).setOnClickListener(this);
-		
+
 		((ToggleButton) findViewById(R.id.btnEmergency)).setOnClickListener(this);
 
 		((TextView) findViewById(R.id.tvMore)).setOnClickListener(this);
 
 		pref = PreferenceManager.getDefaultSharedPreferences(this);
-		
+
 		Settings.fullVersion = checkSig(this);
 	}
 
@@ -235,8 +242,22 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.menu, menu);
+
+		editItem = menu.getItem(2);
+
 		return true;
 	}   
+
+	@Override
+	public boolean onPrepareOptionsMenu (Menu menu) {
+		if(Settings.fullVersion) {
+			menu.getItem(1).setEnabled(false);
+		}
+		if(Settings.trainId == -1) {
+			menu.getItem(2).setEnabled(false);
+		}
+		return true;
+	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -246,9 +267,43 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 			startActivity(i);
 			return true;
 		case R.id.iPack:
-		    Intent intent = new Intent(Intent.ACTION_VIEW);
-		    intent.setData(Uri.parse("market://details?id="+FULL_PACKAGE));
-		    startActivity(intent);
+			Intent intent = new Intent(Intent.ACTION_VIEW);
+			intent.setData(Uri.parse("market://details?id="+FULL_PACKAGE));
+			startActivity(intent);
+			return true;
+		case R.id.iEdit:
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+			LayoutInflater inflater = getLayoutInflater();
+			final View dialogView = inflater.inflate(R.layout.edit_form, null);
+			final EditText edName = ((EditText)dialogView.findViewById(R.id.edName));
+			edName.setText(Settings.currentTrain.getName());
+
+			builder.setView( dialogView);
+			builder.setTitle(getString(R.string.btn_edit))
+			.setPositiveButton(R.string.lblSave, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+
+					String name = edName.getText().toString();
+					mTcpClient.setName(name);
+
+					for (Train t : Settings.allTrains) {
+						if(t.getId() == Settings.trainId) {
+							t.setName(name);
+						}
+					}
+					dataAdapter.notifyDataSetChanged();
+				}
+			})
+			.setNegativeButton(R.string.lblCancel, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+				}
+			}).show();
+
+
+
 			return true;
 		case R.id.iAbout:
 			try {
@@ -308,6 +363,14 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		sbSpeed.setEnabled(state);
 		cbReverse.setEnabled(state);
 		sbSpeed.setEnabled(state);
+
+		if(editItem != null) {
+			editItem.setEnabled(state);
+			if(!Settings.fullVersion) {
+				editItem.setEnabled(false);
+			}
+		}
+
 		setFnButtons(state);
 	}
 
@@ -354,8 +417,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		}
 
 		//get train and take control
-		String value = ((Train)parent.getItemAtPosition(pos)).getId();
-		Settings.trainId = Integer.parseInt(value);
+		int value = ((Train)parent.getItemAtPosition(pos)).getId();
+		Settings.trainId = value;
+		Settings.currentTrain = ((Train)parent.getItemAtPosition(pos));
 
 		mTcpClient.takeControl();
 		btnControl.setChecked(true);
@@ -434,8 +498,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 			else if(Settings.state == Settings.State.INIT_GET_TRAINS) {
 				if(respLine[0].equals("<REPLY queryObjects(10, name, addr)>")) {
 					Settings.state = Settings.State.GET_TRAIN_MAIN_STATE;
-					SpinAdapter dataAdapter = new SpinAdapter(getApplicationContext(),
-							android.R.layout.simple_spinner_item, getAllTrains(values[0]));
+					Settings.allTrains = getAllTrains(values[0]);
+					dataAdapter = new SpinAdapter(getApplicationContext(),
+							android.R.layout.simple_spinner_item, Settings.allTrains);
 					dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 					sTrainId.setAdapter(dataAdapter);
 				}
@@ -548,7 +613,15 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 				addr = m.group(3).trim();
 			}
 
-			trainId.add(new Train(id, name, addr));
+			int idd = -1;
+			try {
+				idd = Integer.parseInt(id);
+			}
+			catch(Exception e) {
+
+			}
+
+			trainId.add(new Train(idd, name, addr));
 		}
 		return trainId;
 	}
