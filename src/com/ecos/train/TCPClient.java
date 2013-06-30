@@ -129,7 +129,8 @@ public class TCPClient {
 	}
 	
 	public void getTrainButtonStateExtra() {
-		sendMessage("get("+Settings.trainId+",func[8],func[9],func[10],func[11])");
+		sendMessage("get("+Settings.trainId+",func[8],func[9],func[10],func[11]," +
+				"func[12],func[13],func[14],func[15])");
 	}
 	
 	public void setButton(int i, boolean enabled) {

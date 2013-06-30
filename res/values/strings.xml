@@ -15,6 +15,10 @@
     <string name="btn_f9">F9</string>
     <string name="btn_f10">F10</string>
     <string name="btn_f11">F11</string>
+    <string name="btn_f12">F12</string>
+    <string name="btn_f13">F13</string>
+    <string name="btn_f14">F14</string>
+    <string name="btn_f15">F15</string>
     <string name="tv_state">State:</string>
     <string name="tv_take">Control</string>
     <string name="tv_name">Name:</string>

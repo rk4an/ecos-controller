@@ -82,7 +82,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		//get elements.
+		//get elements
 		setContentView(R.layout.main);
 		btnConnect = (ToggleButton) findViewById(R.id.btnConnect);
 		cbReverse = (CheckBox) findViewById(R.id.cbReverse);
@@ -117,7 +117,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		((ToggleButton) findViewById(R.id.btnF9)).setOnClickListener(this);
 		((ToggleButton) findViewById(R.id.btnF10)).setOnClickListener(this);
 		((ToggleButton) findViewById(R.id.btnF11)).setOnClickListener(this);
-
+		((ToggleButton) findViewById(R.id.btnF12)).setOnClickListener(this);
+		((ToggleButton) findViewById(R.id.btnF13)).setOnClickListener(this);
+		((ToggleButton) findViewById(R.id.btnF14)).setOnClickListener(this);
+		((ToggleButton) findViewById(R.id.btnF15)).setOnClickListener(this);
+		
 		((ToggleButton) findViewById(R.id.btnEmergency)).setOnClickListener(this);
 
 		((TextView) findViewById(R.id.tvMore)).setOnClickListener(this);
@@ -165,6 +169,18 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		}
 		else if(v.getId() == R.id.btnF11) {
 			mTcpClient.setButton(11, ((ToggleButton) v).isChecked());
+		}
+		else if(v.getId() == R.id.btnF12) {
+			mTcpClient.setButton(12, ((ToggleButton) v).isChecked());
+		}
+		else if(v.getId() == R.id.btnF13) {
+			mTcpClient.setButton(13, ((ToggleButton) v).isChecked());
+		}
+		else if(v.getId() == R.id.btnF14) {
+			mTcpClient.setButton(14, ((ToggleButton) v).isChecked());
+		}
+		else if(v.getId() == R.id.btnF15) {
+			mTcpClient.setButton(15, ((ToggleButton) v).isChecked());
 		}
 		else if(v.getId() == R.id.btnEmergency) {
 			mTcpClient.emergencyStop(((ToggleButton) v).isChecked());
@@ -271,12 +287,19 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		((ToggleButton) findViewById(R.id.btnF9)).setEnabled(isEnabled);
 		((ToggleButton) findViewById(R.id.btnF10)).setEnabled(isEnabled);
 		((ToggleButton) findViewById(R.id.btnF11)).setEnabled(isEnabled);
-
+		((ToggleButton) findViewById(R.id.btnF12)).setEnabled(isEnabled);
+		((ToggleButton) findViewById(R.id.btnF13)).setEnabled(isEnabled);
+		((ToggleButton) findViewById(R.id.btnF14)).setEnabled(isEnabled);
+		((ToggleButton) findViewById(R.id.btnF15)).setEnabled(isEnabled);
 		if(!Settings.fullVersion) {
 			((ToggleButton) findViewById(R.id.btnF8)).setEnabled(false);
 			((ToggleButton) findViewById(R.id.btnF9)).setEnabled(false);
 			((ToggleButton) findViewById(R.id.btnF10)).setEnabled(false);
 			((ToggleButton) findViewById(R.id.btnF11)).setEnabled(false);
+			((ToggleButton) findViewById(R.id.btnF12)).setEnabled(false);
+			((ToggleButton) findViewById(R.id.btnF13)).setEnabled(false);
+			((ToggleButton) findViewById(R.id.btnF14)).setEnabled(false);
+			((ToggleButton) findViewById(R.id.btnF15)).setEnabled(false);
 		}
 
 	}
@@ -388,7 +411,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 					setStateEmergency(true);
 					mTcpClient.viewConsole();
 
-					tvState.setText("Connected");
+					tvState.setText(getApplicationContext().getString(R.string.tv_state) + " " + 
+							getApplicationContext().getString(R.string.tv_connect));
 					btnConnect.setChecked(true);
 
 					Settings.state = Settings.State.INIT_GET_EMERGENCY;
@@ -432,7 +456,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 				}
 			}
 			else if(Settings.state == Settings.State.GET_TRAIN_BUTTON_STATE_EXTRA) {
-				if(respLine[0].equals("<REPLY get("+Settings.trainId+",func[8],func[9],func[10],func[11])>")) {
+				if(respLine[0].equals("<REPLY get("+Settings.trainId+",func[8],func[9],func[10],func[11]," +
+						"func[12],func[13],func[14],func[15])>")) {
 					Settings.state = Settings.State.IDLE;
 					getTrainButtonStateExtra(values[0]);
 				}
@@ -472,7 +497,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		}
 		else {	//disconnect
 			mTcpClient.stopClient();
-			tvState.setText("Not connected");
+			tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.tv_disconnect));
 			setStateButtons(false);
 			setStateControl(false);
 			setStateEmergency(false);
@@ -604,7 +629,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 
 		List<Boolean> state = new ArrayList<Boolean>();
 
-		for(int i=1;i<5;i++) {
+		for(int i=1;i<9;i++) {
 			int index1 = list[i].lastIndexOf(' ');
 			int index2 = list[i].lastIndexOf(']');
 			boolean s = false;
@@ -621,6 +646,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		((ToggleButton) findViewById(R.id.btnF9)).setChecked(state.get(1));
 		((ToggleButton) findViewById(R.id.btnF10)).setChecked(state.get(2));
 		((ToggleButton) findViewById(R.id.btnF11)).setChecked(state.get(3));
+		((ToggleButton) findViewById(R.id.btnF12)).setChecked(state.get(4));
+		((ToggleButton) findViewById(R.id.btnF13)).setChecked(state.get(5));
+		((ToggleButton) findViewById(R.id.btnF14)).setChecked(state.get(6));
+		((ToggleButton) findViewById(R.id.btnF15)).setChecked(state.get(7));
 
 		//activate button
 		setStateButtons(true);

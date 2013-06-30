@@ -249,6 +249,53 @@
 	                android:textOn="@string/btn_f11" />
 	        </LinearLayout>
 
+	        <LinearLayout
+	            android:id="@+id/llButtons4"
+	            android:layout_width="match_parent"
+	            android:layout_height="0dp"
+	            android:layout_weight="1" >
+
+	            <ToggleButton
+	                android:id="@+id/btnF12"
+	                android:layout_width="0dp"
+	                android:layout_height="wrap_content"
+	                android:layout_weight="1"
+	                android:state_enabled="false"
+	                android:text="@string/btn_light"
+	                android:textOff="@string/btn_f12"
+	                android:textOn="@string/btn_f12" />
+
+	            <ToggleButton
+	                android:id="@+id/btnF13"
+	                android:layout_width="0dp"
+	                android:layout_height="wrap_content"
+	                android:layout_weight="1"
+	                android:state_enabled="false"
+	                android:text="@string/btn_light"
+	                android:textOff="@string/btn_f13"
+	                android:textOn="@string/btn_f13" />
+
+	            <ToggleButton
+	                android:id="@+id/btnF14"
+	                android:layout_width="0dp"
+	                android:layout_height="wrap_content"
+	                android:layout_weight="1"
+	                android:state_enabled="false"
+	                android:text="@string/btn_light"
+	                android:textOff="@string/btn_f14"
+	                android:textOn="@string/btn_f14" />
+
+	            <ToggleButton
+	                android:id="@+id/btnF15"
+	                android:layout_width="0dp"
+	                android:layout_height="wrap_content"
+	                android:layout_weight="1"
+	                android:state_enabled="false"
+	                android:text="@string/btn_light"
+	                android:textOff="@string/btn_f15"
+	                android:textOn="@string/btn_f15" />
+	        </LinearLayout>
+
 	    </LinearLayout>
 
 	    <TextView
