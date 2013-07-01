@@ -176,6 +176,6 @@ public class TCPClient {
 	}
 	
 	public void setName(String name) {
-		sendMessage("set("+Settings.trainId+", name["+name+"]");
+		sendMessage("set("+Settings.trainId+", name[\""+name+"\"])");
 	}
 }
