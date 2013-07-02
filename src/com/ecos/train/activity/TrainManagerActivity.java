@@ -277,11 +277,15 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 			LayoutInflater inflater = getLayoutInflater();
 			final View dialogView = inflater.inflate(R.layout.edit_form, null);
 			final EditText edName = ((EditText)dialogView.findViewById(R.id.edName));
+			final TextView edId = ((TextView)dialogView.findViewById(R.id.tv_id));
+			final TextView edAddress = ((TextView)dialogView.findViewById(R.id.tv_address));
 			edName.setText(Settings.currentTrain.getName());
+			edId.setText(Settings.currentTrain.getId()+"");
+			edAddress.setText(Settings.currentTrain.getAddress());
 
 			builder.setView( dialogView);
 			builder.setTitle(getString(R.string.btn_edit))
-			.setPositiveButton(R.string.lblSave, new DialogInterface.OnClickListener() {
+			.setPositiveButton(R.string.tv_save, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 
@@ -296,7 +300,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 					dataAdapter.notifyDataSetChanged();
 				}
 			})
-			.setNegativeButton(R.string.lblCancel, new DialogInterface.OnClickListener() {
+			.setNegativeButton(R.string.tv_cancel, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 				}

@@ -24,6 +24,7 @@
     <string name="tv_speed">Vitesse:</string>
     <string name="tv_name">Nom:</string>
     <string name="tv_idd">Id:</string>
+    <string name="tv_address">Adresse:</string>
     <string name="btn_about">A propos</string>
     <string name="btn_settings">Paramètres</string>
     <string name="cb_reverse">Inverser</string>
@@ -33,10 +34,10 @@
     <string name="tv_port">Port (15471)</string>
     <string name="tv_id_available">Trains:</string>
     <string name="btn_emergency">Urgence</string>
-    <string name="lblMore">Autre bouttons</string>
+    <string name="tv_more">Autre bouttons</string>
     <string name="btn_pack">Acheter Unlock</string>
     <string name="btn_edit">Modifier</string>
-    <string name="lblSave">Sauvegarder</string>
-    <string name="lblCancel">Annuler</string>
+    <string name="tv_save">Sauvegarder</string>
+    <string name="tv_cancel">Annuler</string>
     
 </resources>

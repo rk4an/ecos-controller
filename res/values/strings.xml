@@ -23,6 +23,7 @@
     <string name="tv_take">Control</string>
     <string name="tv_name">Name:</string>
     <string name="tv_idd">Id:</string>
+    <string name="tv_address">Address:</string>
     <string name="tv_speed">Speed:</string>
     <string name="btn_about">About</string>
     <string name="btn_settings">Settings</string>
@@ -33,10 +34,10 @@
     <string name="tv_port">Port (15471)</string>
     <string name="tv_id_available">Trains:</string>
     <string name="btn_emergency">Emergency</string>
-    <string name="lblMore">More buttons</string>
+    <string name="tv_more">More buttons</string>
     <string name="btn_pack">Buy Unlock</string>
     <string name="btn_edit">Edit</string>
-    <string name="lblSave">Save</string>
-    <string name="lblCancel">Cancel</string>
+    <string name="tv_save">Save</string>
+    <string name="tv_cancel">Cancel</string>
     
 </resources>
