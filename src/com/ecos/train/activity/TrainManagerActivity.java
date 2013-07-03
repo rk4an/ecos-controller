@@ -835,6 +835,18 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 					else if(ibtn == 11) {
 						((ToggleButton) findViewById(R.id.btnF11)).setChecked(istate);
 					}
+					else if(ibtn == 12) {
+						((ToggleButton) findViewById(R.id.btnF12)).setChecked(istate);
+					}
+					else if(ibtn == 13) {
+						((ToggleButton) findViewById(R.id.btnF13)).setChecked(istate);
+					}
+					else if(ibtn == 14) {
+						((ToggleButton) findViewById(R.id.btnF14)).setChecked(istate);
+					}
+					else if(ibtn == 15) {
+						((ToggleButton) findViewById(R.id.btnF15)).setChecked(istate);
+					}
 				}
 			}
 		}
