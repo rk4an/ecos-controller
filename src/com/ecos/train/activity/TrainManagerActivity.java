@@ -36,6 +36,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -306,7 +307,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 				}
 			}).show();
 
-
+			return true;
+		case R.id.iContact:
+			Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+					"mailto","erkan2005+ecos@gmail.com", null));
+			emailIntent.putExtra(Intent.EXTRA_SUBJECT, "ECoS Controller Feedback");
+			startActivity(Intent.createChooser(emailIntent, "Send email..."));
 
 			return true;
 		case R.id.iAbout:
@@ -934,4 +940,59 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		return match;
 	}
 
+	
+	/**************************************************************************/
+	/** Change speed with volume button **/
+	/**************************************************************************/
+	
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent event) {
+		int action = event.getAction();
+		int keyCode = event.getKeyCode();
+		switch (keyCode) {
+		case KeyEvent.KEYCODE_VOLUME_UP:
+			if (action == KeyEvent.ACTION_UP) {
+				changeSpeed(true);
+			}
+			return true;
+		case KeyEvent.KEYCODE_VOLUME_DOWN:
+			if (action == KeyEvent.ACTION_DOWN) {
+				changeSpeed(false);
+			}
+			return true;
+		default:
+			return super.dispatchKeyEvent(event);
+		}
+	}
+
+	public void changeSpeed(boolean increase) {
+		
+		if(!Settings.fullVersion) {
+			return;
+		}
+		
+		if(sbSpeed.isEnabled()) {
+			int current_value = sbSpeed.getProgress();
+			int new_value = current_value;
+			int step = 10;
+			
+			if(increase) {
+				new_value = current_value + step;
+				if(new_value > 127) {
+					new_value = 127;
+				}
+				sbSpeed.setProgress(new_value);
+			}
+			else {
+				new_value = current_value - step;
+				if(new_value < 0) {
+					new_value = 0;
+				}
+				sbSpeed.setProgress(new_value);
+
+			}
+			mTcpClient.setSpeed(sbSpeed.getProgress());
+			tvSpeed.setText(this.getString(R.string.tv_speed) + " " + sbSpeed.getProgress());
+		}
+	}
 }

@@ -19,7 +19,7 @@
     <string name="btn_f13">F13</string>
     <string name="btn_f14">F14</string>
     <string name="btn_f15">F15</string>
-    <string name="tv_state">État:</string>
+    <string name="tv_state">Console:</string>
     <string name="tv_take">Contrôle</string>
     <string name="tv_speed">Vitesse:</string>
     <string name="tv_name">Nom:</string>
@@ -39,5 +39,8 @@
     <string name="btn_edit">Modifier</string>
     <string name="tv_save">Sauvegarder</string>
     <string name="tv_cancel">Annuler</string>
+    <string name="btn_contact">Contact</string>
+    <string name="tv_network">Réseau Console</string>
+    <string name="tv_console">Paramètres</string>
     
 </resources>

@@ -13,23 +13,54 @@
 	    android:orientation="vertical"
 	    android:padding="10dip" >
 
-	    <TextView
-	        android:id="@+id/tvState"
-	        android:layout_width="fill_parent"
-	        android:layout_height="0dp"
-	        android:layout_weight="1"
-	        android:text="@string/tv_state" >
-	    </TextView>
+		<LinearLayout
+		    android:id="@+id/llConsole"
+		    android:layout_width="match_parent"
+		    android:layout_height="0dp"
+		    android:layout_weight="1"
+		    android:orientation="vertical" >
 
-	    <ToggleButton
-	        android:id="@+id/btnConnect"
-	        android:layout_width="fill_parent"
-	        android:layout_height="0dp"
-	        android:layout_weight="1"
-	        android:text="@string/btn_control"
-	        android:textOff="@string/btn_control"
-	        android:textOn="@string/btn_control" >
-	    </ToggleButton>
+		    <LinearLayout
+		        android:id="@+id/llConsoleState"
+		        android:layout_width="match_parent"
+		        android:layout_height="0dp"
+		        android:layout_weight="1"
+		        android:orientation="vertical" >
+
+		        <TextView
+		            android:id="@+id/tvState"
+		            android:layout_width="fill_parent"
+		            android:layout_height="0dp"
+		            android:layout_weight="1"
+		            android:text="@string/tv_state" />
+		    </LinearLayout>
+
+		    <LinearLayout
+		        android:id="@+id/llConsoleButtons"
+		        android:layout_width="match_parent"
+		        android:layout_height="0dp"
+		        android:layout_weight="1"
+		        android:orientation="horizontal" >
+
+		        <ToggleButton
+		            android:id="@+id/btnConnect"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_weight="1"
+		            android:text="@string/btn_control"
+		            android:textOff="@string/btn_control"
+		            android:textOn="@string/btn_control" />
+
+		        <ToggleButton
+		            android:id="@+id/btnEmergency"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_weight="1"
+		            android:text="@string/btn_emergency"
+		            android:textOff="@string/btn_emergency"
+		            android:textOn="@string/btn_emergency" />
+		    </LinearLayout>
+		</LinearLayout>
 
 	    <LinearLayout
 	        android:id="@+id/llList"
@@ -329,15 +360,6 @@
 	        android:layout_height="0dp"
 	        android:layout_weight="1"
 	        android:orientation="vertical" >
-
-	        <ToggleButton
-	            android:id="@+id/btnEmergency"
-	            android:layout_width="fill_parent"
-	            android:layout_height="0dp"
-	            android:layout_weight="1"
-	            android:text="@string/btn_emergency"
-	            android:textOff="@string/btn_emergency"
-	            android:textOn="@string/btn_emergency" />
 
 	    </LinearLayout>
 	</LinearLayout>

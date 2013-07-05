@@ -16,6 +16,10 @@
         android:alphabeticShortcut="e"
         android:title="@string/btn_edit"/>
     <item
+        android:id="@+id/iContact"
+        android:alphabeticShortcut="c"
+        android:title="@string/btn_contact"/>
+    <item
         android:id="@+id/iAbout"
         android:alphabeticShortcut="a"
         android:title="@string/btn_about"/>

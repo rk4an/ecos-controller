@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <PreferenceCategory android:title="Network" >
+    <PreferenceCategory android:title="@string/tv_network" >
         <EditTextPreference
             android:key="ip"
-            android:title="@string/tv_ip">
+            android:title="@string/tv_ip" >
         </EditTextPreference>
         <EditTextPreference
+            android:inputType="number"
             android:key="port"
-            android:title="@string/tv_port"
-            android:inputType="number">
+            android:title="@string/tv_port" >
         </EditTextPreference>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/tv_console" >
     </PreferenceCategory>
 
 </PreferenceScreen>
