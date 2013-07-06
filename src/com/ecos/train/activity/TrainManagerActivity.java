@@ -29,7 +29,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -42,9 +41,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -66,17 +62,18 @@ import com.ecos.train.ui.SpinAdapter;
 
 public class TrainManagerActivity 
 extends SherlockActivity 
-implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, OnItemSelectedListener {
+implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 	public static final String LITE_PACKAGE = "com.ecos.train";  
 	public static final String FULL_PACKAGE = "com.ecos.train.unlock";
+	public static final String CONTACT = "erkan2005+ecos@gmail.com";
 
 	SharedPreferences pref;
 	private TCPClient mTcpClient = null;
 
 	TextView tvState;
 	ToggleButton btnConnect;
-	CheckBox cbReverse;
+	ToggleButton cbReverse;
 	Spinner sTrainId;
 	ToggleButton btnControl;
 	ToggleButton btnEmergency;
@@ -93,7 +90,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		//get elements
 		setContentView(R.layout.main);
 		btnConnect = (ToggleButton) findViewById(R.id.btnConnect);
-		cbReverse = (CheckBox) findViewById(R.id.cbReverse);
+		cbReverse = (ToggleButton) findViewById(R.id.cbReverse);
 		sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
 		sTrainId = (Spinner) findViewById(R.id.sTrainId);
 		btnControl = (ToggleButton) findViewById(R.id.tbControl);
@@ -109,7 +106,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 
 		//add listeners
 		btnConnect.setOnClickListener(this);
-		cbReverse.setOnCheckedChangeListener(this);
+		cbReverse.setOnClickListener(this);
 		sbSpeed.setOnSeekBarChangeListener(this);
 		sTrainId.setOnItemSelectedListener(this);
 		btnControl.setOnClickListener(this);
@@ -215,6 +212,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 				l.setVisibility(LinearLayout.VISIBLE);
 			}
 		}
+		if(v.getId() == R.id.cbReverse) {
+			mTcpClient.setDir(((ToggleButton) v).isChecked()?1:0);
+		}
 	}
 
 
@@ -232,12 +232,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		tvSpeed.setText(this.getString(R.string.tv_speed) + " " + sb.getProgress());
 	}
 
-	@Override
-	public void onCheckedChanged(CompoundButton cb, boolean state) {
-		if(cb.getId() == R.id.cbReverse) {
-			mTcpClient.setDir(((CheckBox) cb).isChecked()?1:0);
-		}
-	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -254,7 +248,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		if(Settings.fullVersion) {
 			menu.getItem(1).setEnabled(false);
 		}
-		if(Settings.trainId == -1) {
+		if(Settings.currentTrain.getId() == -1) {
 			menu.getItem(2).setEnabled(false);
 		}
 		return true;
@@ -294,7 +288,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 					mTcpClient.setName(name);
 
 					for (Train t : Settings.allTrains) {
-						if(t.getId() == Settings.trainId) {
+						if(t.getId() == Settings.currentTrain.getId()) {
 							t.setName(name);
 						}
 					}
@@ -310,23 +304,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 			return true;
 		case R.id.iContact:
 			Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-					"mailto","erkan2005+ecos@gmail.com", null));
+					"mailto", TrainManagerActivity.CONTACT, null));
 			emailIntent.putExtra(Intent.EXTRA_SUBJECT, "ECoS Controller Feedback");
 			startActivity(Intent.createChooser(emailIntent, "Send email..."));
 
 			return true;
-		case R.id.iAbout:
-			try {
-				PackageInfo manager = getPackageManager().getPackageInfo(getPackageName(), 0);
-				Toast toast = Toast.makeText(
-						this, this.getString(R.string.app_name) + " " + manager.versionName , Toast.LENGTH_SHORT);
-				toast.show();
-			} catch (Exception e) {
-				//
-			}
-
-			return true;
-			/*case R.id.iReport:
+		/*case R.id.iReport:
 			ACRA.getErrorReporter().handleException(null);
 			return true;*/
 		default:
@@ -421,14 +404,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		setStateButtons(false);
 
 		//release old train
-		if(Settings.trainId != -1) {
+		if(Settings.currentTrain.getId() != -1) {
 			mTcpClient.releaseViewTrain();
 			mTcpClient.releaseControl();
 		}
 
 		//get train and take control
-		int value = ((Train)parent.getItemAtPosition(pos)).getId();
-		Settings.trainId = value;
 		Settings.currentTrain = ((Train)parent.getItemAtPosition(pos));
 
 		mTcpClient.takeControl();
@@ -516,14 +497,14 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 				}
 			}
 			else if(Settings.state == Settings.State.GET_TRAIN_MAIN_STATE) {
-				if(respLine[0].equals("<REPLY get("+Settings.trainId+",name,speed,dir)>")) {
+				if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",name,speed,dir)>")) {
 					Settings.state = Settings.State.GET_TRAIN_BUTTON_STATE;
 					getTrainMainState(values[0]);
 					mTcpClient.getTrainButtonState();
 				}
 			}
 			else if(Settings.state == Settings.State.GET_TRAIN_BUTTON_STATE) {
-				if(respLine[0].equals("<REPLY get("+Settings.trainId+",func[0],func[1],func[2],func[3]," +
+				if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[0],func[1],func[2],func[3]," +
 						"func[4],func[5],func[6],func[7])>")) {
 					Settings.state = Settings.State.GET_TRAIN_BUTTON_STATE_EXTRA;
 					getTrainButtonState(values[0]);
@@ -531,7 +512,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 				}
 			}
 			else if(Settings.state == Settings.State.GET_TRAIN_BUTTON_STATE_EXTRA) {
-				if(respLine[0].equals("<REPLY get("+Settings.trainId+",func[8],func[9],func[10],func[11]," +
+				if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[8],func[9],func[10],func[11]," +
 						"func[12],func[13],func[14],func[15])>")) {
 					Settings.state = Settings.State.IDLE;
 					getTrainButtonStateExtra(values[0]);
@@ -760,7 +741,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 				}
 				speed = m.group(2).trim();
 
-				if(iid == Settings.trainId) {
+				if(iid == Settings.currentTrain.getId()) {
 					int ispeed = Integer.parseInt(speed);
 					sbSpeed.setProgress(ispeed);
 					tvSpeed.setText(getApplicationContext().getString(R.string.tv_speed) + speed);
@@ -792,7 +773,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 				catch(Exception e) {		
 				}
 
-				if(iid == Settings.trainId) {
+				if(iid == Settings.currentTrain.getId()) {
 					ibtn = -1;
 					try {
 						ibtn = Integer.parseInt(btn);
@@ -878,7 +859,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 				}
 				dir = m.group(2).trim();
 
-				if(iid == Settings.trainId) {
+				if(iid == Settings.currentTrain.getId()) {
 
 					try {
 						idir = Integer.parseInt(dir) == 0 ? true : false;
@@ -940,11 +921,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 		return match;
 	}
 
-	
+
 	/**************************************************************************/
 	/** Change speed with volume button **/
 	/**************************************************************************/
-	
+
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent event) {
 		int action = event.getAction();
@@ -966,27 +947,27 @@ implements OnClickListener, OnSeekBarChangeListener, OnCheckedChangeListener, On
 	}
 
 	public void changeSpeed(boolean increase) {
-		
+
 		if(!Settings.fullVersion) {
 			return;
 		}
-		
+
 		if(sbSpeed.isEnabled()) {
 			int current_value = sbSpeed.getProgress();
 			int new_value = current_value;
-			int step = 10;
-			
+			int step = Settings.SPEED_STEP;
+
 			if(increase) {
 				new_value = current_value + step;
-				if(new_value > 127) {
-					new_value = 127;
+				if(new_value > Settings.SPEED_MAX) {
+					new_value = Settings.SPEED_MAX;
 				}
 				sbSpeed.setProgress(new_value);
 			}
 			else {
 				new_value = current_value - step;
-				if(new_value < 0) {
-					new_value = 0;
+				if(new_value < Settings.SPEED_MIN) {
+					new_value = Settings.SPEED_MIN;
 				}
 				sbSpeed.setProgress(new_value);
 

@@ -120,22 +120,22 @@ public class TCPClient {
 	}
 	
 	public void getTrainMainState() {
-		sendMessage("get("+Settings.trainId+",name,speed,dir)");
+		sendMessage("get("+Settings.currentTrain.getId()+",name,speed,dir)");
 	}
 	
 	public void getTrainButtonState() {
-		sendMessage("get("+Settings.trainId+",func[0],func[1],func[2],func[3]," +
+		sendMessage("get("+Settings.currentTrain.getId()+",func[0],func[1],func[2],func[3]," +
 				"func[4],func[5],func[6],func[7])");
 	}
 	
 	public void getTrainButtonStateExtra() {
-		sendMessage("get("+Settings.trainId+",func[8],func[9],func[10],func[11]," +
+		sendMessage("get("+Settings.currentTrain.getId()+",func[8],func[9],func[10],func[11]," +
 				"func[12],func[13],func[14],func[15])");
 	}
 	
 	public void setButton(int i, boolean enabled) {
 		int value = (enabled) ? 1 : 0;
-		sendMessage("set("+Settings.trainId+", func["+i+", "+value+"])");
+		sendMessage("set("+Settings.currentTrain.getId()+", func["+i+", "+value+"])");
 	}
 	
 	public void emergencyStop(boolean state) {
@@ -148,27 +148,27 @@ public class TCPClient {
 	}
 	
 	public void setSpeed(int speed) {
-		sendMessage("set("+Settings.trainId+", speed["+speed+"])");
+		sendMessage("set("+Settings.currentTrain.getId()+", speed["+speed+"])");
 	}
 	
 	public void setDir(int dir) {
-		sendMessage("set("+Settings.trainId+", dir["+dir+"])");
+		sendMessage("set("+Settings.currentTrain.getId()+", dir["+dir+"])");
 	}
 	
 	public void takeControl() {
-		sendMessage("request("+Settings.trainId+", control, force)");
+		sendMessage("request("+Settings.currentTrain.getId()+", control, force)");
 	}
 	
 	public void releaseControl() {
-		sendMessage("release("+Settings.trainId+", control)");
+		sendMessage("release("+Settings.currentTrain.getId()+", control)");
 	}
 
 	public void takeViewTrain() {
-		sendMessage("request("+Settings.trainId+", view)");
+		sendMessage("request("+Settings.currentTrain.getId()+", view)");
 	}
 	
 	public void releaseViewTrain() {
-		sendMessage("release("+Settings.trainId+", view)");
+		sendMessage("release("+Settings.currentTrain.getId()+", view)");
 	}
 	
 	public void viewConsole() {
@@ -176,6 +176,6 @@ public class TCPClient {
 	}
 	
 	public void setName(String name) {
-		sendMessage("set("+Settings.trainId+", name[\""+name+"\"])");
+		sendMessage("set("+Settings.currentTrain.getId()+", name[\""+name+"\"])");
 	}
 }

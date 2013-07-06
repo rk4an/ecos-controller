@@ -34,13 +34,13 @@
     <string name="tv_port">Port (15471)</string>
     <string name="tv_id_available">Trains:</string>
     <string name="btn_emergency">Emergency</string>
-    <string name="tv_more">More buttons</string>
+    <string name="tv_more">...</string>
     <string name="btn_pack">Buy Unlock</string>
     <string name="btn_edit">Edit</string>
     <string name="tv_save">Save</string>
     <string name="tv_cancel">Cancel</string>
     <string name="btn_contact">Contact</string>
-    <string name="tv_network">Network Console</string>
+    <string name="tv_network">Network</string>
     <string name="tv_console">Settings</string>
     
 </resources>
