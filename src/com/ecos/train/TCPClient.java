@@ -178,4 +178,8 @@ public class TCPClient {
 	public void setName(String name) {
 		sendMessage("set("+Settings.currentTrain.getId()+", name[\""+name+"\"])");
 	}
+	
+	public void getInfo() {
+		sendMessage("get(1, info)");
+	}
 }

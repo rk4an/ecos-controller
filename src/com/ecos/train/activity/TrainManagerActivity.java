@@ -25,10 +25,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -82,7 +84,16 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 	SpinAdapter dataAdapter;
 	private MenuItem editItem = null;
+	private MenuItem infoItem = null;
 
+	Dialog infoDialog;
+	TextView protocolVersion;
+	TextView applicationVersion;
+	TextView hardwareVersion;
+	TextView ecosVersion;
+	
+	
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -134,6 +145,19 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		pref = PreferenceManager.getDefaultSharedPreferences(this);
 
 		Settings.fullVersion = checkSig(this);
+		
+		//info dialog
+		infoDialog = new Dialog(this);
+		LayoutInflater inflater = getLayoutInflater();
+		final View infoView = inflater.inflate(R.layout.info_dialog, null);
+		infoDialog.setContentView(infoView);
+		infoDialog.setTitle(getString(R.string.app_name));
+		
+		protocolVersion = ((TextView) infoView.findViewById(R.id.tvProtocolVersion));
+		applicationVersion = ((TextView) infoView.findViewById(R.id.tvApplicationVersion));
+		hardwareVersion = ((TextView) infoView.findViewById(R.id.tvHardwareVersion));
+		ecosVersion = ((TextView) infoView.findViewById(R.id.tvEcosVersion));
+		
 	}
 
 	@Override
@@ -239,6 +263,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		inflater.inflate(R.menu.menu, menu);
 
 		editItem = menu.getItem(2);
+		infoItem = menu.getItem(3);
 
 		return true;
 	}   
@@ -250,6 +275,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		}
 		if(Settings.currentTrain.getId() == -1) {
 			menu.getItem(2).setEnabled(false);
+			menu.getItem(3).setEnabled(false);
+		}
+		if(Settings.state == Settings.State.IDLE) {
+			menu.getItem(3).setEnabled(true);
 		}
 		return true;
 	}
@@ -301,6 +330,17 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				}
 			}).show();
 
+			return true;
+		case R.id.iInfo:
+			infoDialog.show();
+			
+			try {
+				PackageInfo manager = getPackageManager().getPackageInfo(getPackageName(), 0);
+	            ecosVersion.setText(manager.versionName);
+			} catch (Exception e) { }
+		
+			mTcpClient.getInfo();
+			
 			return true;
 		case R.id.iContact:
 			Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
@@ -359,6 +399,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 		if(editItem != null) {
 			editItem.setEnabled(state);
+			
 			if(!Settings.fullVersion) {
 				editItem.setEnabled(false);
 			}
@@ -464,6 +505,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				if(values[0].equals("READY")) {
 					setStateList(true);
 					setStateEmergency(true);
+					
 					mTcpClient.viewConsole();
 
 					tvState.setText(getApplicationContext().getString(R.string.tv_state) + " " + 
@@ -529,10 +571,49 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 					parseEventEmergency(list);
 					parseEventLostControl(list);
 				}
+				else if(respLine[0].equals("<REPLY get(1, info)>")) {
+					getInfo(values[0]);
+				}
 			}
 		}
 	}
 
+	public void getInfo(String result) {
+		
+		String list[] = result.split("\n");
+		
+		Pattern p = Pattern.compile("(.*) ProtocolVersion\\[(.*)\\]");
+		
+		for(int i=1; i<list.length-1; i++) {
+			Matcher m = p.matcher(list[i]);
+
+			while (m.find() == true) {
+				protocolVersion.setText(m.group(2).trim());
+			}
+		}
+	
+		p = Pattern.compile("(.*) ApplicationVersion\\[(.*)\\]");
+		
+		for(int i=1; i<list.length-1; i++) {
+			Matcher m = p.matcher(list[i]);
+
+			while (m.find() == true) {
+				applicationVersion.setText(m.group(2).trim());
+			}
+		}
+		
+		p = Pattern.compile("(.*) HardwareVersion\\[(.*)\\]");
+		
+		for(int i=1; i<list.length-1; i++) {
+			Matcher m = p.matcher(list[i]);
+
+			while (m.find() == true) {
+				hardwareVersion.setText(m.group(2).trim());
+			}
+		}
+	}
+	
+	
 	public void connectToStation(boolean state) {
 		//connect
 		if(state) {
@@ -548,8 +629,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 			//connect, begin state machine
 			Settings.state = Settings.State.NONE;
+			
 			new connectTask().execute("");
-
 		}
 		else {	//disconnect
 			mTcpClient.stopClient();
@@ -558,6 +639,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			setStateControl(false);
 			setStateEmergency(false);
 			setStateList(false);
+			infoItem.setEnabled(false);
+			Settings.state = Settings.State.NONE;
 		}
 	}
 

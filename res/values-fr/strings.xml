@@ -42,5 +42,10 @@
     <string name="btn_contact">Contact</string>
     <string name="tv_network">Réseau</string>
     <string name="tv_console">Paramètres</string>
-    
+    <string name="btn_info">Console Info</string>
+    <string name="tv_protocol_version">Version Protocole:</string>
+    <string name="tv_application_version">Version Application:</string>
+    <string name="tv_hardware_version">Version Hardware:</string>
+    <string name="tv_ecos_version">Version ECoS Controller:</string>
+      
 </resources>
