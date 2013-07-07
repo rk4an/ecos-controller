@@ -5,7 +5,8 @@
 ## Features:
 
  * Multi trains selection
- * 8 buttons 
- * Speed control
+ * 8 buttons (8 more buttons with unlock)
+ * Speed control (with volume button with unlock)
  * Reverse direction
+ * Edit train name (with unlock)
 
