@@ -34,7 +34,7 @@
     <string name="tv_port">Port (15471)</string>
     <string name="tv_id_available">Trains:</string>
     <string name="btn_emergency">Urgence</string>
-    <string name="tv_more">...</string>
+    <string name="tv_more">F8...F15</string>
     <string name="btn_pack">Acheter Unlock</string>
     <string name="btn_edit">Modifier</string>
     <string name="tv_save">Sauvegarder</string>
