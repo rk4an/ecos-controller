@@ -47,5 +47,6 @@
     <string name="tv_application_version">Version Application:</string>
     <string name="tv_hardware_version">Version Hardware:</string>
     <string name="tv_ecos_version">Version ECoS Controller:</string>
-      
+    <string name="tv_switch">Switch</string>
+    
 </resources>

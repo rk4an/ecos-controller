@@ -89,7 +89,7 @@ public class TCPClient {
 				}
 				
 			} catch (Exception e) {
-				mMessageListener.messageReceived("ERROR: " + e.toString());
+				mMessageListener.messageReceived("DISCONNECT");
 			} finally {
 				//the socket must be closed. It is not possible to reconnect to this socket
 				// after it is closed, which means a new socket instance has to be created.
@@ -97,7 +97,7 @@ public class TCPClient {
 			}
 
 		} catch (Exception e) {
-			mMessageListener.messageReceived("ERROR: " + e.toString());
+			mMessageListener.messageReceived("DISCONNECT");
 		}
 
 	}
@@ -181,5 +181,29 @@ public class TCPClient {
 	
 	public void getInfo() {
 		sendMessage("get(1, info)");
+	}
+	
+	//Objects
+	public void getAllObject() {
+		sendMessage("queryObjects(11, name1, name2)");
+	}
+	
+	public void takeViewObject() {
+		sendMessage("request(11, view)");
+	}
+	
+	public void releaseViewObject() {
+		sendMessage("release(11, view)");
+	}
+	
+	public void getState(int id) {
+		sendMessage("request("+id+",view)");
+		sendMessage("get("+id+", state)");
+	}
+	
+	public void changeState(int id, int val) {
+		sendMessage("request("+id+",control)");
+		sendMessage("set("+id+", state["+val+"])");
+		sendMessage("release("+id+",control)");
 	}
 }

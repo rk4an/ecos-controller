@@ -353,13 +353,25 @@
 	        android:max="127"
 	        android:padding="20dip" />
 
+	    <TextView
+	        android:id="@+id/tvSwitch"
+	        android:layout_width="wrap_content"
+	        android:layout_height="0dp"
+	        android:layout_margin="5dp"
+	        android:layout_weight="1"
+	        android:background="#444242"
+	        android:padding="5dp"
+	        android:text="@string/tv_switch" />
+
 	    <LinearLayout
-	        android:id="@+id/llEmergency"
+	        android:id="@+id/llSwitch"
 	        android:layout_width="match_parent"
 	        android:layout_height="0dp"
 	        android:layout_weight="1"
 	        android:orientation="vertical" >
+
 	    </LinearLayout>
+
 	</LinearLayout>
 
 </ScrollView>

@@ -91,9 +91,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	TextView applicationVersion;
 	TextView hardwareVersion;
 	TextView ecosVersion;
-	
-	
-	
+
+	TextView tvSwitching;
+	LinearLayout llSwitch;
+	List<ToggleButton> listSwitch = new ArrayList<ToggleButton>();
+	List<ToggleButton> listButtons = new ArrayList<ToggleButton>();
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -121,97 +124,67 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		sbSpeed.setOnSeekBarChangeListener(this);
 		sTrainId.setOnItemSelectedListener(this);
 		btnControl.setOnClickListener(this);
-		((ToggleButton) findViewById(R.id.btnF0)).setOnClickListener(this);
-		((ToggleButton) findViewById(R.id.btnF1)).setOnClickListener(this);
-		((ToggleButton) findViewById(R.id.btnF2)).setOnClickListener(this);
-		((ToggleButton) findViewById(R.id.btnF3)).setOnClickListener(this);
-		((ToggleButton) findViewById(R.id.btnF4)).setOnClickListener(this);
-		((ToggleButton) findViewById(R.id.btnF5)).setOnClickListener(this);
-		((ToggleButton) findViewById(R.id.btnF6)).setOnClickListener(this);
-		((ToggleButton) findViewById(R.id.btnF7)).setOnClickListener(this);
-		((ToggleButton) findViewById(R.id.btnF8)).setOnClickListener(this);
-		((ToggleButton) findViewById(R.id.btnF9)).setOnClickListener(this);
-		((ToggleButton) findViewById(R.id.btnF10)).setOnClickListener(this);
-		((ToggleButton) findViewById(R.id.btnF11)).setOnClickListener(this);
-		((ToggleButton) findViewById(R.id.btnF12)).setOnClickListener(this);
-		((ToggleButton) findViewById(R.id.btnF13)).setOnClickListener(this);
-		((ToggleButton) findViewById(R.id.btnF14)).setOnClickListener(this);
-		((ToggleButton) findViewById(R.id.btnF15)).setOnClickListener(this);
 
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF0)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF1)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF2)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF3)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF4)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF5)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF6)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF7)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF8)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF9)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF10)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF11)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF12)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF13)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF14)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF15)));
+
+		for(int i=0; i<listButtons.size(); i++) {
+			listButtons.get(i).setOnClickListener(this);
+			listButtons.get(i).setTag("btn;"+i);
+		}
 		((ToggleButton) findViewById(R.id.btnEmergency)).setOnClickListener(this);
 
 		((TextView) findViewById(R.id.tvMore)).setOnClickListener(this);
 
 		pref = PreferenceManager.getDefaultSharedPreferences(this);
-
 		Settings.fullVersion = checkSig(this);
-		
+
 		//info dialog
 		infoDialog = new Dialog(this);
 		LayoutInflater inflater = getLayoutInflater();
 		final View infoView = inflater.inflate(R.layout.info_dialog, null);
 		infoDialog.setContentView(infoView);
 		infoDialog.setTitle(getString(R.string.app_name));
-		
+
 		protocolVersion = ((TextView) infoView.findViewById(R.id.tvProtocolVersion));
 		applicationVersion = ((TextView) infoView.findViewById(R.id.tvApplicationVersion));
 		hardwareVersion = ((TextView) infoView.findViewById(R.id.tvHardwareVersion));
 		ecosVersion = ((TextView) infoView.findViewById(R.id.tvEcosVersion));
-		
+
+		tvSwitching = ((TextView) infoView.findViewById(R.id.tvSwitch));
+		((TextView) findViewById(R.id.tvSwitch)).setOnClickListener(this);
+		llSwitch = ((LinearLayout) findViewById(R.id.llSwitch));
+		llSwitch.setVisibility(LinearLayout.GONE);
 	}
 
 	@Override
 	public void onClick(View v) {
 
-		if(v.getId() == R.id.btnF0) {	//light
-			mTcpClient.setButton(0, ((ToggleButton) v).isChecked());
+		//function buttons
+		if(v.getTag() != null) {
+			if(v.getTag().toString().startsWith("btn")) {
+			 	String token[] = v.getTag().toString().split(";");
+				mTcpClient.setButton(Integer.parseInt(
+						token[1]), ((ToggleButton) v).isChecked());
+				return;
+			}
 		}
-		else if(v.getId() == R.id.btnF1) {
-			mTcpClient.setButton(1, ((ToggleButton) v).isChecked());
-		}
-		else if(v.getId() == R.id.btnF2) {
-			mTcpClient.setButton(2, ((ToggleButton) v).isChecked());
-		}
-		else if(v.getId() == R.id.btnF3) {
-			mTcpClient.setButton(3, ((ToggleButton) v).isChecked());
-		}
-		else if(v.getId() == R.id.btnF4) {
-			mTcpClient.setButton(4, ((ToggleButton) v).isChecked());
-		}
-		else if(v.getId() == R.id.btnF5) {
-			mTcpClient.setButton(5, ((ToggleButton) v).isChecked());
-		}
-		else if(v.getId() == R.id.btnF6) {
-			mTcpClient.setButton(6, ((ToggleButton) v).isChecked());
-		}
-		else if(v.getId() == R.id.btnF7) {
-			mTcpClient.setButton(7, ((ToggleButton) v).isChecked());
-		}
-		else if(v.getId() == R.id.btnF8) {
-			mTcpClient.setButton(8, ((ToggleButton) v).isChecked());
-		}
-		else if(v.getId() == R.id.btnF9) {
-			mTcpClient.setButton(9, ((ToggleButton) v).isChecked());
-		}
-		else if(v.getId() == R.id.btnF10) {
-			mTcpClient.setButton(10, ((ToggleButton) v).isChecked());
-		}
-		else if(v.getId() == R.id.btnF11) {
-			mTcpClient.setButton(11, ((ToggleButton) v).isChecked());
-		}
-		else if(v.getId() == R.id.btnF12) {
-			mTcpClient.setButton(12, ((ToggleButton) v).isChecked());
-		}
-		else if(v.getId() == R.id.btnF13) {
-			mTcpClient.setButton(13, ((ToggleButton) v).isChecked());
-		}
-		else if(v.getId() == R.id.btnF14) {
-			mTcpClient.setButton(14, ((ToggleButton) v).isChecked());
-		}
-		else if(v.getId() == R.id.btnF15) {
-			mTcpClient.setButton(15, ((ToggleButton) v).isChecked());
-		}
-		else if(v.getId() == R.id.btnEmergency) {
+
+		if(v.getId() == R.id.btnEmergency) {
 			mTcpClient.emergencyStop(((ToggleButton) v).isChecked());
 		}
 		else if(v.getId() == R.id.btnConnect) {
@@ -236,8 +209,24 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				l.setVisibility(LinearLayout.VISIBLE);
 			}
 		}
-		if(v.getId() == R.id.cbReverse) {
+		else if(v.getId() == R.id.cbReverse) {
 			mTcpClient.setDir(((ToggleButton) v).isChecked()?1:0);
+		}
+		else if(v.getId() == R.id.tvSwitch) {
+
+			if(llSwitch.getVisibility() == LinearLayout.VISIBLE) {
+				llSwitch.setVisibility(LinearLayout.GONE);
+				return;
+			}
+			else {
+				llSwitch.setVisibility(LinearLayout.VISIBLE);
+				if(Settings.fullVersion && Settings.state == Settings.State.IDLE) {
+					mTcpClient.getAllObject();
+				}
+			}
+		}
+		else {
+			mTcpClient.changeState(Integer.parseInt(v.getTag().toString()), ((ToggleButton) v).isChecked()?1 :0);
 		}
 	}
 
@@ -333,14 +322,14 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			return true;
 		case R.id.iInfo:
 			infoDialog.show();
-			
+
 			try {
 				PackageInfo manager = getPackageManager().getPackageInfo(getPackageName(), 0);
-	            ecosVersion.setText(manager.versionName);
+				ecosVersion.setText(manager.versionName);
 			} catch (Exception e) { }
-		
+
 			mTcpClient.getInfo();
-			
+
 			return true;
 		case R.id.iContact:
 			Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
@@ -349,7 +338,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			startActivity(Intent.createChooser(emailIntent, "Send email..."));
 
 			return true;
-		/*case R.id.iReport:
+			/*case R.id.iReport:
 			ACRA.getErrorReporter().handleException(null);
 			return true;*/
 		default:
@@ -363,22 +352,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	 * @param isEnabled
 	 */
 	private void setFnButtons(boolean isEnabled) {
-		((ToggleButton) findViewById(R.id.btnF0)).setEnabled(isEnabled);
-		((ToggleButton) findViewById(R.id.btnF1)).setEnabled(isEnabled);
-		((ToggleButton) findViewById(R.id.btnF2)).setEnabled(isEnabled);
-		((ToggleButton) findViewById(R.id.btnF3)).setEnabled(isEnabled);
-		((ToggleButton) findViewById(R.id.btnF4)).setEnabled(isEnabled);
-		((ToggleButton) findViewById(R.id.btnF5)).setEnabled(isEnabled);
-		((ToggleButton) findViewById(R.id.btnF6)).setEnabled(isEnabled);
-		((ToggleButton) findViewById(R.id.btnF7)).setEnabled(isEnabled);
-		((ToggleButton) findViewById(R.id.btnF8)).setEnabled(isEnabled);
-		((ToggleButton) findViewById(R.id.btnF9)).setEnabled(isEnabled);
-		((ToggleButton) findViewById(R.id.btnF10)).setEnabled(isEnabled);
-		((ToggleButton) findViewById(R.id.btnF11)).setEnabled(isEnabled);
-		((ToggleButton) findViewById(R.id.btnF12)).setEnabled(isEnabled);
-		((ToggleButton) findViewById(R.id.btnF13)).setEnabled(isEnabled);
-		((ToggleButton) findViewById(R.id.btnF14)).setEnabled(isEnabled);
-		((ToggleButton) findViewById(R.id.btnF15)).setEnabled(isEnabled);
+
+		for(ToggleButton t: listButtons) {
+			t.setEnabled(isEnabled);
+		}
+
 		if(!Settings.fullVersion) {
 			((ToggleButton) findViewById(R.id.btnF8)).setEnabled(false);
 			((ToggleButton) findViewById(R.id.btnF9)).setEnabled(false);
@@ -399,7 +377,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 		if(editItem != null) {
 			editItem.setEnabled(state);
-			
+
 			if(!Settings.fullVersion) {
 				editItem.setEnabled(false);
 			}
@@ -500,12 +478,26 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 			String respLine[] = values[0].split("\n");
 
+			//check command result before
+			String cmd_result = respLine[respLine.length-1];
+			if(cmd_result.equals("DISCONNECT")) {
+				disconnect();
+			}
+			else if(cmd_result.equals("READY")) {
+			}
+			else {
+				if(!cmd_result.equals("<END 0 (OK)>")) {
+					Toast.makeText(getApplicationContext(), cmd_result, Toast.LENGTH_SHORT).show();
+					return;
+				}
+			}
+
 			//state machine
 			if(Settings.state == Settings.State.NONE) {
 				if(values[0].equals("READY")) {
 					setStateList(true);
 					setStateEmergency(true);
-					
+
 					mTcpClient.viewConsole();
 
 					tvState.setText(getApplicationContext().getString(R.string.tv_state) + " " + 
@@ -570,20 +562,100 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 					parseEventDir(list);
 					parseEventEmergency(list);
 					parseEventLostControl(list);
+					parseEventSwitch(list);
 				}
 				else if(respLine[0].equals("<REPLY get(1, info)>")) {
 					getInfo(values[0]);
+				}
+				else if(respLine[0].equals("<REPLY queryObjects(11, name1, name2)>")) {
+
+					((LinearLayout) findViewById(R.id.llSwitch)).removeAllViews();
+
+					String list[] = values[0].split("\n");
+
+					Pattern p = Pattern.compile("(.*) name1\\[\"(.*)\"\\] name2\\[\"(.*)\"\\]");
+
+					listSwitch = new ArrayList<ToggleButton>();
+
+					String id = "";
+					String name1 = "";
+					String name2 = "";
+					for(int i=1; i<list.length-1; i++) {
+						Matcher m = p.matcher(list[i]);
+
+						while (m.find() == true) {
+							id = m.group(1).trim();
+							name1 = m.group(2).trim();
+							name2 = m.group(3).trim();
+
+							ToggleButton tg = createButton(id,name1 + " " + name2);
+
+							listSwitch.add(tg);
+							((LinearLayout) findViewById(R.id.llSwitch)).addView(tg);
+						}
+					}
+
+					//get initial state
+					for (ToggleButton t : listSwitch) {
+						mTcpClient.getState(Integer.parseInt(t.getTag().toString()));
+					}
+				}
+				else {
+					String list[] = values[0].split("\n");
+
+					Pattern p = Pattern.compile("(.*) state\\[(.*)\\]");
+
+					for(int i=1; i<list.length-1; i++) {
+						Matcher m = p.matcher(list[i]);
+
+						int id = 0;
+						int state = 0;
+						while (m.find() == true) {
+
+							try {
+								id = Integer.parseInt(m.group(1).trim());
+								state = Integer.parseInt(m.group(2).trim());
+
+								for(ToggleButton t : listSwitch) {
+									if(Integer.parseInt(t.getTag().toString()) == id) {
+										if(state == 1) {
+											t.setChecked(true);
+										}
+										else {
+											t.setChecked(false);
+										}
+									}
+								}
+							}
+							catch(Exception e) {
+
+							}
+
+						}
+					}
 				}
 			}
 		}
 	}
 
+	public ToggleButton createButton(String id, String name) {
+
+		ToggleButton tg = new ToggleButton(getApplicationContext());
+		tg.setText(name);
+		tg.setTextOn(name);
+		tg.setTextOff(name);
+		tg.setTag(Integer.parseInt(id));
+		tg.setOnClickListener(this);
+
+		return tg;
+	}
+
 	public void getInfo(String result) {
-		
+
 		String list[] = result.split("\n");
-		
+
 		Pattern p = Pattern.compile("(.*) ProtocolVersion\\[(.*)\\]");
-		
+
 		for(int i=1; i<list.length-1; i++) {
 			Matcher m = p.matcher(list[i]);
 
@@ -591,9 +663,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				protocolVersion.setText(m.group(2).trim());
 			}
 		}
-	
+
 		p = Pattern.compile("(.*) ApplicationVersion\\[(.*)\\]");
-		
+
 		for(int i=1; i<list.length-1; i++) {
 			Matcher m = p.matcher(list[i]);
 
@@ -601,9 +673,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				applicationVersion.setText(m.group(2).trim());
 			}
 		}
-		
+
 		p = Pattern.compile("(.*) HardwareVersion\\[(.*)\\]");
-		
+
 		for(int i=1; i<list.length-1; i++) {
 			Matcher m = p.matcher(list[i]);
 
@@ -612,8 +684,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			}
 		}
 	}
-	
-	
+
+
 	public void connectToStation(boolean state) {
 		//connect
 		if(state) {
@@ -629,19 +701,24 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 			//connect, begin state machine
 			Settings.state = Settings.State.NONE;
-			
+
 			new connectTask().execute("");
 		}
 		else {	//disconnect
-			mTcpClient.stopClient();
-			tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.tv_disconnect));
-			setStateButtons(false);
-			setStateControl(false);
-			setStateEmergency(false);
-			setStateList(false);
-			infoItem.setEnabled(false);
-			Settings.state = Settings.State.NONE;
+			disconnect();
 		}
+	}
+
+	public void disconnect() {
+		mTcpClient.stopClient();
+		tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.tv_disconnect));
+		setStateButtons(false);
+		setStateControl(false);
+		setStateEmergency(false);
+		setStateList(false);
+		infoItem.setEnabled(false);
+		Settings.state = Settings.State.NONE;
+		llSwitch.removeAllViews();
 	}
 
 	/**
@@ -761,14 +838,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			state.add(s);
 		}
 
-		((ToggleButton) findViewById(R.id.btnF0)).setChecked(state.get(0));
-		((ToggleButton) findViewById(R.id.btnF1)).setChecked(state.get(1));
-		((ToggleButton) findViewById(R.id.btnF2)).setChecked(state.get(2));
-		((ToggleButton) findViewById(R.id.btnF3)).setChecked(state.get(3));
-		((ToggleButton) findViewById(R.id.btnF4)).setChecked(state.get(4));
-		((ToggleButton) findViewById(R.id.btnF5)).setChecked(state.get(5));
-		((ToggleButton) findViewById(R.id.btnF6)).setChecked(state.get(6));
-		((ToggleButton) findViewById(R.id.btnF7)).setChecked(state.get(7));
+		for(int i=0; i<=7; i++) {
+			listButtons.get(i).setChecked(state.get(i));
+		}
 	}
 
 	public void getTrainButtonStateExtra(String result) {
@@ -789,14 +861,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			state.add(s);
 		}
 
-		((ToggleButton) findViewById(R.id.btnF8)).setChecked(state.get(0));
-		((ToggleButton) findViewById(R.id.btnF9)).setChecked(state.get(1));
-		((ToggleButton) findViewById(R.id.btnF10)).setChecked(state.get(2));
-		((ToggleButton) findViewById(R.id.btnF11)).setChecked(state.get(3));
-		((ToggleButton) findViewById(R.id.btnF12)).setChecked(state.get(4));
-		((ToggleButton) findViewById(R.id.btnF13)).setChecked(state.get(5));
-		((ToggleButton) findViewById(R.id.btnF14)).setChecked(state.get(6));
-		((ToggleButton) findViewById(R.id.btnF15)).setChecked(state.get(7));
+		for(int i=0; i<=7; i++) {
+			listButtons.get(i+8).setChecked(state.get(i));
+		}
 
 		//activate button
 		setStateButtons(true);
@@ -828,6 +895,35 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 					int ispeed = Integer.parseInt(speed);
 					sbSpeed.setProgress(ispeed);
 					tvSpeed.setText(getApplicationContext().getString(R.string.tv_speed) + speed);
+				}
+			}
+		}
+	}
+
+	public void parseEventSwitch(String[] list) {
+		Pattern p = Pattern.compile("(.*) state\\[(.*)\\]");
+
+		for(int i=1; i<list.length-1; i++) {
+			Matcher m = p.matcher(list[i]);
+			int id = 0;
+			int state = 0;
+			while (m.find() == true) {
+				try {
+					id = Integer.parseInt(m.group(1).trim());
+					state = Integer.parseInt(m.group(2).trim());
+
+					for(ToggleButton t : listSwitch) {
+						if(Integer.parseInt(t.getTag().toString()) == id) {
+							if(state == 1) {
+								t.setChecked(true);
+							}
+							else {
+								t.setChecked(false);
+							}
+						}
+					}
+				}
+				catch(Exception e) {
 				}
 			}
 		}
@@ -869,53 +965,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 						istate = true;
 					}
 
-					if(ibtn == 0) {
-						((ToggleButton) findViewById(R.id.btnF0)).setChecked(istate);
-					}
-					else if(ibtn == 1) {
-						((ToggleButton) findViewById(R.id.btnF1)).setChecked(istate);
-					}
-					else if(ibtn == 2) {
-						((ToggleButton) findViewById(R.id.btnF2)).setChecked(istate);
-					}
-					else if(ibtn == 3) {
-						((ToggleButton) findViewById(R.id.btnF3)).setChecked(istate);
-					}
-					else if(ibtn == 4) {
-						((ToggleButton) findViewById(R.id.btnF4)).setChecked(istate);
-					}
-					else if(ibtn == 5) {
-						((ToggleButton) findViewById(R.id.btnF5)).setChecked(istate);
-					}
-					else if(ibtn == 6) {
-						((ToggleButton) findViewById(R.id.btnF6)).setChecked(istate);
-					}
-					else if(ibtn == 7) {
-						((ToggleButton) findViewById(R.id.btnF7)).setChecked(istate);
-					}
-					else if(ibtn == 8) {
-						((ToggleButton) findViewById(R.id.btnF8)).setChecked(istate);
-					}
-					else if(ibtn == 9) {
-						((ToggleButton) findViewById(R.id.btnF9)).setChecked(istate);
-					}
-					else if(ibtn == 10) {
-						((ToggleButton) findViewById(R.id.btnF10)).setChecked(istate);
-					}
-					else if(ibtn == 11) {
-						((ToggleButton) findViewById(R.id.btnF11)).setChecked(istate);
-					}
-					else if(ibtn == 12) {
-						((ToggleButton) findViewById(R.id.btnF12)).setChecked(istate);
-					}
-					else if(ibtn == 13) {
-						((ToggleButton) findViewById(R.id.btnF13)).setChecked(istate);
-					}
-					else if(ibtn == 14) {
-						((ToggleButton) findViewById(R.id.btnF14)).setChecked(istate);
-					}
-					else if(ibtn == 15) {
-						((ToggleButton) findViewById(R.id.btnF15)).setChecked(istate);
+					if(ibtn < listButtons.size()) {
+						listButtons.get(ibtn).setChecked(istate);
 					}
 				}
 			}
