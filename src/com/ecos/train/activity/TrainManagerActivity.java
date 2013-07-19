@@ -112,12 +112,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		btnEmergency = (ToggleButton) findViewById(R.id.btnEmergency);
 		tvSpeed = (TextView) findViewById(R.id.tvSpeed);
 
-		//init buttons
-		setStateButtons(false);
-		setStateEmergency(false);
-		setStateList(false);
-		setStateControl(false);
-
 		//add listeners
 		btnConnect.setOnClickListener(this);
 		cbReverse.setOnClickListener(this);
@@ -146,6 +140,13 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			listButtons.get(i).setOnClickListener(this);
 			listButtons.get(i).setTag("btn;"+i);
 		}
+		
+		//init buttons
+		setStateButtons(false);
+		setStateEmergency(false);
+		setStateList(false);
+		setStateControl(false);
+		
 		((ToggleButton) findViewById(R.id.btnEmergency)).setOnClickListener(this);
 
 		((TextView) findViewById(R.id.tvMore)).setOnClickListener(this);
