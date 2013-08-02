@@ -97,6 +97,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	List<ToggleButton> listSwitch = new ArrayList<ToggleButton>();
 	List<ToggleButton> listButtons = new ArrayList<ToggleButton>();
 
+	/**************************************************************************/
+	/** Listeners **/
+	/**************************************************************************/
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -231,7 +235,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		}
 	}
 
-
 	@Override
 	public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) { 
 	}
@@ -245,7 +248,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		mTcpClient.setSpeed(sb.getProgress());
 		tvSpeed.setText(this.getString(R.string.tv_speed) + " " + sb.getProgress());
 	}
-
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -347,11 +349,45 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		}
 	}
 
+	@Override
+	public void onItemSelected(AdapterView<?> parent, View view, int pos,long id) {
 
-	/**
-	 * 
-	 * @param isEnabled
-	 */
+		setStateButtons(false);
+
+		//release old train
+		if(Settings.currentTrain.getId() != -1) {
+			mTcpClient.releaseViewTrain();
+			mTcpClient.releaseControl();
+		}
+
+		//get train and take control
+		Settings.currentTrain = ((Train)parent.getItemAtPosition(pos));
+
+		mTcpClient.takeControl();
+		btnControl.setChecked(true);
+		mTcpClient.takeViewTrain();
+		Settings.state = Settings.State.GET_TRAIN_MAIN_STATE;
+		mTcpClient.getTrainMainState();
+	}
+
+	@Override
+	public void onNothingSelected(AdapterView<?> arg0) {
+	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		try {
+			mTcpClient.stopClient();
+		} catch (Exception e) {
+
+		}
+	}
+	
+	/**************************************************************************/
+	/** Buttons management **/
+	/**************************************************************************/	
+	
 	private void setFnButtons(boolean isEnabled) {
 
 		for(ToggleButton t: listButtons) {
@@ -400,56 +436,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		sTrainId.setEnabled(state);
 	}
 
-	@Override
-	protected void onStop() {
-		super.onStop();
-		try {
-			mTcpClient.stopClient();
-		} catch (Exception e) {
-
-		}
-	}
-
-	/**
-	 * 
-	 * @param error
-	 */
-	public void displayError(String error) {
-		Toast.makeText(this, error , Toast.LENGTH_SHORT).show();
-	}
-
-	@Override
-	public void onItemSelected(AdapterView<?> parent, View view, int pos,long id) {
-
-		setStateButtons(false);
-
-		//release old train
-		if(Settings.currentTrain.getId() != -1) {
-			mTcpClient.releaseViewTrain();
-			mTcpClient.releaseControl();
-		}
-
-		//get train and take control
-		Settings.currentTrain = ((Train)parent.getItemAtPosition(pos));
-
-		mTcpClient.takeControl();
-		btnControl.setChecked(true);
-		mTcpClient.takeViewTrain();
-		Settings.state = Settings.State.GET_TRAIN_MAIN_STATE;
-		mTcpClient.getTrainMainState();
-	}
-
-	@Override
-	public void onNothingSelected(AdapterView<?> arg0) {
-	}
-
-
-
-	/**
-	 * 
-	 * AsyncTask for TCPClient creation
-	 *
-	 */
+	/**************************************************************************/
+	/** AsyncTask for UI change **/
+	/**************************************************************************/
 	public class connectTask extends AsyncTask<String,String,TCPClient> {
 
 		@Override
@@ -661,54 +650,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		}
 	}
 
-	public ToggleButton createButton(String id, String name) {
-
-		ToggleButton tg = new ToggleButton(getApplicationContext());
-		tg.setText(name);
-		tg.setTextOn(name);
-		tg.setTextOff(name);
-		tg.setTag(Integer.parseInt(id));
-		tg.setOnClickListener(this);
-
-		return tg;
-	}
-
-	public void getInfo(String result) {
-
-		String list[] = result.split("\n");
-
-		Pattern p = Pattern.compile("(.*) ProtocolVersion\\[(.*)\\]");
-
-		for(int i=1; i<list.length-1; i++) {
-			Matcher m = p.matcher(list[i]);
-
-			while (m.find() == true) {
-				protocolVersion.setText(m.group(2).trim());
-			}
-		}
-
-		p = Pattern.compile("(.*) ApplicationVersion\\[(.*)\\]");
-
-		for(int i=1; i<list.length-1; i++) {
-			Matcher m = p.matcher(list[i]);
-
-			while (m.find() == true) {
-				applicationVersion.setText(m.group(2).trim());
-			}
-		}
-
-		p = Pattern.compile("(.*) HardwareVersion\\[(.*)\\]");
-
-		for(int i=1; i<list.length-1; i++) {
-			Matcher m = p.matcher(list[i]);
-
-			while (m.find() == true) {
-				hardwareVersion.setText(m.group(2).trim());
-			}
-		}
-	}
-
-
+	/**************************************************************************/
+	/** Connect/Disconnect to console **/
+	/**************************************************************************/
+	
 	public void connectToStation(boolean state) {
 		//connect
 		if(state) {
@@ -744,11 +689,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		llSwitch.removeAllViews();
 	}
 
-	/**
-	 * 
-	 * @param result
-	 * @return
-	 */
+	/**************************************************************************/
+	/** Get state **/
+	/**************************************************************************/	
+	
 	public boolean getEmergencyState(String result) {
 
 		int index1 = result.lastIndexOf('[');
@@ -762,12 +706,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		}
 	}
 
-
-	/**
-	 * 
-	 * @param result
-	 * @return
-	 */
 	public List<Train> getAllTrains(String result) {
 
 		List<Train> trainId = new ArrayList<Train>();
@@ -800,10 +738,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		return trainId;
 	}
 
-	/**
-	 * 
-	 * @param result
-	 */
 	public void getTrainMainState(String result) {
 		String list[] = result.split("\n");
 
@@ -837,11 +771,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		cbReverse.setChecked(!dir);
 	}
 
-
-	/**
-	 * 
-	 * @param result
-	 */
 	public void getTrainButtonState(String result) {
 
 		String list[] = result.split("\n");
@@ -894,7 +823,45 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		setStateControl(true);
 	}
 
+	public void getInfo(String result) {
 
+		String list[] = result.split("\n");
+
+		Pattern p = Pattern.compile("(.*) ProtocolVersion\\[(.*)\\]");
+
+		for(int i=1; i<list.length-1; i++) {
+			Matcher m = p.matcher(list[i]);
+
+			while (m.find() == true) {
+				protocolVersion.setText(m.group(2).trim());
+			}
+		}
+
+		p = Pattern.compile("(.*) ApplicationVersion\\[(.*)\\]");
+
+		for(int i=1; i<list.length-1; i++) {
+			Matcher m = p.matcher(list[i]);
+
+			while (m.find() == true) {
+				applicationVersion.setText(m.group(2).trim());
+			}
+		}
+
+		p = Pattern.compile("(.*) HardwareVersion\\[(.*)\\]");
+
+		for(int i=1; i<list.length-1; i++) {
+			Matcher m = p.matcher(list[i]);
+
+			while (m.find() == true) {
+				hardwareVersion.setText(m.group(2).trim());
+			}
+		}
+	}
+	
+	/**************************************************************************/
+	/** Parse events **/
+	/**************************************************************************/
+	
 	public boolean parseEventSpeed(String[] list) {
 		Pattern p = Pattern.compile("(.*) speed\\[(.*)\\]");
 		String id = "";
@@ -1089,6 +1056,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		return match;
 	}
 
+	/**************************************************************************/
+	/** Utils **/
+	/**************************************************************************/
 	static boolean checkSig(Context context) {
 		boolean match = false;
 		if (context.getPackageManager().checkSignatures(
@@ -1097,7 +1067,22 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		return match;
 	}
 
+	public ToggleButton createButton(String id, String name) {
 
+		ToggleButton tg = new ToggleButton(getApplicationContext());
+		tg.setText(name);
+		tg.setTextOn(name);
+		tg.setTextOff(name);
+		tg.setTag(Integer.parseInt(id));
+		tg.setOnClickListener(this);
+
+		return tg;
+	}
+	
+	public void displayError(String error) {
+		Toast.makeText(this, error , Toast.LENGTH_SHORT).show();
+	}
+	
 	/**************************************************************************/
 	/** Change speed with volume button **/
 	/**************************************************************************/
