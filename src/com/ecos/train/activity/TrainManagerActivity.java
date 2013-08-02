@@ -70,30 +70,30 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	public static final String FULL_PACKAGE = "com.ecos.train.unlock";
 	public static final String CONTACT = "erkan2005+ecos@gmail.com";
 
-	SharedPreferences pref;
+	SharedPreferences pref = null;
 	private TCPClient mTcpClient = null;
 
-	TextView tvState;
-	ToggleButton btnConnect;
-	ToggleButton cbReverse;
-	Spinner sTrainId;
-	ToggleButton btnControl;
-	ToggleButton btnEmergency;
-	SeekBar sbSpeed;
-	TextView tvSpeed;
-
+	TextView tvState = null;
+	ToggleButton btnConnect = null;
+	ToggleButton cbReverse = null;
+	Spinner sTrainId = null;
+	ToggleButton btnControl = null;
+	ToggleButton btnEmergency = null;
+	SeekBar sbSpeed = null;
+	TextView tvSpeed = null;
+	TextView tvSwitching = null;
+	LinearLayout llSwitch = null;
+	
 	SpinAdapter dataAdapter;
 	private MenuItem editItem = null;
 	private MenuItem infoItem = null;
 
-	Dialog infoDialog;
-	TextView protocolVersion;
-	TextView applicationVersion;
-	TextView hardwareVersion;
-	TextView ecosVersion;
+	Dialog infoDialog = null;
+	TextView protocolVersion = null;
+	TextView applicationVersion = null;
+	TextView hardwareVersion = null;
+	TextView ecosVersion = null;
 
-	TextView tvSwitching;
-	LinearLayout llSwitch;
 	List<ToggleButton> listSwitch = new ArrayList<ToggleButton>();
 	List<ToggleButton> listButtons = new ArrayList<ToggleButton>();
 
@@ -388,7 +388,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	/** Buttons management **/
 	/**************************************************************************/	
 	
-	private void setFnButtons(boolean isEnabled) {
+	public void setFnButtons(boolean isEnabled) {
 
 		for(ToggleButton t: listButtons) {
 			t.setEnabled(isEnabled);
@@ -708,7 +708,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 	public List<Train> getAllTrains(String result) {
 
-		List<Train> trainId = new ArrayList<Train>();
+		List<Train> listTrain = new ArrayList<Train>();
 
 		String list[] = result.split("\n");
 		Pattern p = Pattern.compile("(.*) name\\[\"(.*)\"\\] addr\\[(.*)\\]");
@@ -733,9 +733,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 			}
 
-			trainId.add(new Train(idd, name, addr));
+			listTrain.add(new Train(idd, name, addr));
 		}
-		return trainId;
+		return listTrain;
 	}
 
 	public void getTrainMainState(String result) {
@@ -827,6 +827,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 		String list[] = result.split("\n");
 
+		//read Protocol Version
 		Pattern p = Pattern.compile("(.*) ProtocolVersion\\[(.*)\\]");
 
 		for(int i=1; i<list.length-1; i++) {
@@ -837,6 +838,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			}
 		}
 
+		//read Application Version
 		p = Pattern.compile("(.*) ApplicationVersion\\[(.*)\\]");
 
 		for(int i=1; i<list.length-1; i++) {
@@ -847,6 +849,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			}
 		}
 
+		//read Hardware Version
 		p = Pattern.compile("(.*) HardwareVersion\\[(.*)\\]");
 
 		for(int i=1; i<list.length-1; i++) {
@@ -1059,7 +1062,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	/**************************************************************************/
 	/** Utils **/
 	/**************************************************************************/
-	static boolean checkSig(Context context) {
+	public static boolean checkSig(Context context) {
 		boolean match = false;
 		if (context.getPackageManager().checkSignatures(
 				LITE_PACKAGE, FULL_PACKAGE) == PackageManager.SIGNATURE_MATCH)

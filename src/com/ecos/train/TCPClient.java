@@ -7,7 +7,6 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 
-
 public class TCPClient {
 
 	private String serverMessage;
@@ -110,14 +109,42 @@ public class TCPClient {
 	}
 	
 	
-
+	/**************************************************************************/
+	/** Command Console **/
+	/**************************************************************************/
+	
 	public void getEmergencyState() {
 		sendMessage("get(1, status)");
 	}
 	
+	public void emergencyStop(boolean state) {
+		if(state) {
+			sendMessage("set(1, stop)");
+		}
+		else {
+			sendMessage("set(1, go)");
+		}
+	}
+	
+	public void viewConsole() {
+		sendMessage("request(1, view)");
+	}
+	
+	public void getInfo() {
+		sendMessage("get(1, info)");
+	}
+	
+	/**************************************************************************/
+	/** Command Train Manager **/
+	/**************************************************************************/
+	
 	public void getAllTrains() {
 		sendMessage("queryObjects(10, name, addr)");
 	}
+	
+	/**************************************************************************/
+	/** Command Train **/
+	/**************************************************************************/
 	
 	public void getTrainMainState() {
 		sendMessage("get("+Settings.currentTrain.getId()+",name,speed,dir)");
@@ -136,15 +163,6 @@ public class TCPClient {
 	public void setButton(int i, boolean enabled) {
 		int value = (enabled) ? 1 : 0;
 		sendMessage("set("+Settings.currentTrain.getId()+", func["+i+", "+value+"])");
-	}
-	
-	public void emergencyStop(boolean state) {
-		if(state) {
-			sendMessage("set(1, stop)");
-		}
-		else {
-			sendMessage("set(1, go)");
-		}
 	}
 	
 	public void setSpeed(int speed) {
@@ -171,19 +189,14 @@ public class TCPClient {
 		sendMessage("release("+Settings.currentTrain.getId()+", view)");
 	}
 	
-	public void viewConsole() {
-		sendMessage("request(1, view)");
-	}
-	
 	public void setName(String name) {
 		sendMessage("set("+Settings.currentTrain.getId()+", name[\""+name+"\"])");
 	}
 	
-	public void getInfo() {
-		sendMessage("get(1, info)");
-	}
+	/**************************************************************************/
+	/** Command Switching Objects **/
+	/**************************************************************************/
 	
-	//Objects
 	public void getAllObject() {
 		sendMessage("queryObjects(11, name1, name2)");
 	}
