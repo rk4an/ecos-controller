@@ -140,13 +140,13 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			listButtons.get(i).setOnClickListener(this);
 			listButtons.get(i).setTag("btn;"+i);
 		}
-		
+
 		//init buttons
 		setStateButtons(false);
 		setStateEmergency(false);
 		setStateList(false);
 		setStateControl(false);
-		
+
 		((ToggleButton) findViewById(R.id.btnEmergency)).setOnClickListener(this);
 
 		((TextView) findViewById(R.id.tvMore)).setOnClickListener(this);
@@ -178,7 +178,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		//function buttons
 		if(v.getTag() != null) {
 			if(v.getTag().toString().startsWith("btn")) {
-			 	String token[] = v.getTag().toString().split(";");
+				String token[] = v.getTag().toString().split(";");
 				mTcpClient.setButton(Integer.parseInt(
 						token[1]), ((ToggleButton) v).isChecked());
 				return;
@@ -558,12 +558,37 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 					String list[] = values[0].split("\n");
 
-					parseEventSpeed(list);
-					parseEventButtons(list);
-					parseEventDir(list);
-					parseEventEmergency(list);
-					parseEventLostControl(list);
-					parseEventSwitch(list);
+					Pattern p = Pattern.compile("<EVENT (.*)>");
+
+					Matcher m = p.matcher(list[0]);
+					while (m.find() == true) {
+
+						try {
+							int eventId = Integer.parseInt(m.group(1).trim());
+							
+							//console station
+							if(eventId == 1) {
+								parseEventEmergency(list);
+							}
+							else {
+								if(parseEventSpeed(list))
+									return;
+								if(parseEventButtons(list))
+									return;
+								if(parseEventDir(list))
+									return;
+								if(parseEventLostControl(list))
+									return;
+								if(parseEventSwitch(list))
+									return;
+							}
+
+						}
+						catch(Exception e) {
+							return;
+						}
+
+					}
 				}
 				else if(respLine[0].equals("<REPLY get(1, info)>")) {
 					getInfo(values[0]);
@@ -628,14 +653,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 									}
 								}
 							}
-							catch(Exception e) {
-
-							}
-
+							catch(Exception e) { }
 						}
 					}
 				}
-			}
+			}//state IDLE
 		}
 	}
 
@@ -873,10 +895,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	}
 
 
-	public void parseEventSpeed(String[] list) {
+	public boolean parseEventSpeed(String[] list) {
 		Pattern p = Pattern.compile("(.*) speed\\[(.*)\\]");
 		String id = "";
 		int iid = 0;
+		boolean match = false;
 
 		String speed = "";
 
@@ -884,6 +907,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			Matcher m = p.matcher(list[i]);
 
 			while (m.find() == true) {
+				match = true;
 				id = m.group(1).trim();
 				try {
 					iid = Integer.parseInt(id);
@@ -899,16 +923,19 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				}
 			}
 		}
+		return match;
 	}
 
-	public void parseEventSwitch(String[] list) {
+	public boolean parseEventSwitch(String[] list) {
 		Pattern p = Pattern.compile("(.*) state\\[(.*)\\]");
+		boolean match = false;
 
 		for(int i=1; i<list.length-1; i++) {
 			Matcher m = p.matcher(list[i]);
 			int id = 0;
 			int state = 0;
 			while (m.find() == true) {
+				match = true;
 				try {
 					id = Integer.parseInt(m.group(1).trim());
 					state = Integer.parseInt(m.group(2).trim());
@@ -928,9 +955,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				}
 			}
 		}
+		return match;
 	}
 
-	public void parseEventButtons(String[] list) {
+	public boolean parseEventButtons(String[] list) {
 		Pattern p = Pattern.compile("(.*) func\\[(.*),(.*)\\]");
 		String id = "";
 		int iid = 0;
@@ -940,10 +968,13 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		String state = "";
 		boolean istate = false;
 
+		boolean match = false;
+
 		for(int i=1; i<list.length-1; i++) {
 			Matcher m = p.matcher(list[i]);
 
 			while (m.find() == true) {
+				match = true;
 				id = m.group(1).trim();
 				btn = m.group(2).trim();
 				state = m.group(3).trim();
@@ -972,20 +1003,23 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				}
 			}
 		}
+		return match;
 	}
 
-	public void parseEventDir(String[] list) {
+	public boolean parseEventDir(String[] list) {
 		Pattern p = Pattern.compile("(.*) dir\\[(.*)\\]");
 		String id = "";
 		int iid = 0;
 
 		String dir = "";
 		boolean idir = true;
+		boolean match = false;
 
 		for(int i=1; i<list.length-1; i++) {
 			Matcher m = p.matcher(list[i]);
 
 			while (m.find() == true) {
+				match = true;
 				id = m.group(1).trim();
 				try {
 					iid = Integer.parseInt(id);
@@ -1006,15 +1040,18 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				}
 			}
 		}
+		return match;
 	}
 
-	public void parseEventEmergency(String[] list) {
+	public boolean parseEventEmergency(String[] list) {
 		Pattern p = Pattern.compile("(.*) status\\[(.*)\\]");
 		String state = "";
+		boolean match = false;
 
 		for(int i=1; i<list.length-1; i++) {
 			Matcher m = p.matcher(list[i]);
 			while (m.find() == true) {
+				match = true;
 				state = m.group(2).trim();
 
 				if(state.equals("GO")) {
@@ -1029,15 +1066,18 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				}
 			}
 		}
+		return match;
 	}
 
-	public void parseEventLostControl(String[] list) {
+	public boolean parseEventLostControl(String[] list) {
 		Pattern p = Pattern.compile("(.*) msg\\[(.*)\\]");
 		String event = "";
+		boolean match = false;
 
 		for(int i=1; i<list.length-1; i++) {
 			Matcher m = p.matcher(list[i]);
 			while (m.find() == true) {
+				match = true;
 				event = m.group(2).trim();
 
 				if(event.equals("CONTROL_LOST")) {
@@ -1046,6 +1086,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				}
 			}
 		}
+		return match;
 	}
 
 	static boolean checkSig(Context context) {
