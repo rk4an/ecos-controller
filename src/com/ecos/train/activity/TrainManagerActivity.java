@@ -395,16 +395,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		}
 
 		if(!Settings.fullVersion) {
-			((ToggleButton) findViewById(R.id.btnF8)).setEnabled(false);
-			((ToggleButton) findViewById(R.id.btnF9)).setEnabled(false);
-			((ToggleButton) findViewById(R.id.btnF10)).setEnabled(false);
-			((ToggleButton) findViewById(R.id.btnF11)).setEnabled(false);
-			((ToggleButton) findViewById(R.id.btnF12)).setEnabled(false);
-			((ToggleButton) findViewById(R.id.btnF13)).setEnabled(false);
-			((ToggleButton) findViewById(R.id.btnF14)).setEnabled(false);
-			((ToggleButton) findViewById(R.id.btnF15)).setEnabled(false);
+			for(int i=8; i<=15; i++) {
+				listButtons.get(i).setEnabled(false);
+			}
 		}
-
 	}
 
 	public void setStateButtons(boolean state) {
