@@ -523,7 +523,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			else if(Settings.state == Settings.State.GET_TRAIN_MAIN_STATE) {
 				if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",name,speed,dir)>")) {
 					Settings.state = Settings.State.GET_TRAIN_BUTTON_STATE;
-					getTrainMainState(values[0]);
+					getTrainMainState(respLine);
 					mTcpClient.getTrainButtonState();
 				}
 			}
@@ -531,7 +531,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[0],func[1],func[2],func[3]," +
 						"func[4],func[5],func[6],func[7])>")) {
 					Settings.state = Settings.State.GET_TRAIN_BUTTON_STATE_EXTRA;
-					getTrainButtonState(values[0]);
+					getTrainButtonState(respLine);
 					mTcpClient.getTrainButtonStateExtra();
 				}
 			}
@@ -539,114 +539,23 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[8],func[9],func[10],func[11]," +
 						"func[12],func[13],func[14],func[15])>")) {
 					Settings.state = Settings.State.IDLE;
-					getTrainButtonStateExtra(values[0]);
+					getTrainButtonStateExtra(respLine);
 				}
 			}
 			else if(Settings.state == Settings.State.IDLE) {
-				if(values[0].startsWith("<EVENT")) {	//manage event
-
-					String list[] = values[0].split("\n");
-
-					Pattern p = Pattern.compile("<EVENT (.*)>");
-
-					Matcher m = p.matcher(list[0]);
-					while (m.find() == true) {
-
-						try {
-							int eventId = Integer.parseInt(m.group(1).trim());
-							
-							//console station
-							if(eventId == 1) {
-								parseEventEmergency(list);
-							}
-							else {
-								if(parseEventSpeed(list))
-									return;
-								if(parseEventButtons(list))
-									return;
-								if(parseEventDir(list))
-									return;
-								if(parseEventLostControl(list))
-									return;
-								if(parseEventSwitch(list))
-									return;
-							}
-
-						}
-						catch(Exception e) {
-							return;
-						}
-
-					}
+				if(respLine[0].startsWith("<EVENT")) {	//manage event
+					parseEvent(respLine);
 				}
 				else if(respLine[0].equals("<REPLY get(1, info)>")) {
-					getInfo(values[0]);
+					getInfo(respLine);
 				}
 				else if(respLine[0].equals("<REPLY queryObjects(11, name1, name2)>")) {
-
-					((LinearLayout) findViewById(R.id.llSwitch)).removeAllViews();
-
-					String list[] = values[0].split("\n");
-
-					Pattern p = Pattern.compile("(.*) name1\\[\"(.*)\"\\] name2\\[\"(.*)\"\\]");
-
-					listSwitch = new ArrayList<ToggleButton>();
-
-					String id = "";
-					String name1 = "";
-					String name2 = "";
-					for(int i=1; i<list.length-1; i++) {
-						Matcher m = p.matcher(list[i]);
-
-						while (m.find() == true) {
-							id = m.group(1).trim();
-							name1 = m.group(2).trim();
-							name2 = m.group(3).trim();
-
-							ToggleButton tg = createButton(id,name1 + " " + name2);
-
-							listSwitch.add(tg);
-							((LinearLayout) findViewById(R.id.llSwitch)).addView(tg);
-						}
-					}
-
-					//get initial state
-					for (ToggleButton t : listSwitch) {
-						mTcpClient.getState(Integer.parseInt(t.getTag().toString()));
-					}
+					getSwitching(respLine);
 				}
 				else {
-					String list[] = values[0].split("\n");
-
-					Pattern p = Pattern.compile("(.*) state\\[(.*)\\]");
-
-					for(int i=1; i<list.length-1; i++) {
-						Matcher m = p.matcher(list[i]);
-
-						int id = 0;
-						int state = 0;
-						while (m.find() == true) {
-
-							try {
-								id = Integer.parseInt(m.group(1).trim());
-								state = Integer.parseInt(m.group(2).trim());
-
-								for(ToggleButton t : listSwitch) {
-									if(Integer.parseInt(t.getTag().toString()) == id) {
-										if(state == 1) {
-											t.setChecked(true);
-										}
-										else {
-											t.setChecked(false);
-										}
-									}
-								}
-							}
-							catch(Exception e) { }
-						}
-					}
+					getSwitchingState(respLine);
 				}
-			}//state IDLE
+			}
 		}
 	}
 
@@ -738,16 +647,15 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		return listTrain;
 	}
 
-	public void getTrainMainState(String result) {
-		String list[] = result.split("\n");
+	public void getTrainMainState(String[] result) {
 
 		//speed
-		int index1 = list[2].lastIndexOf('[');
-		int index2 = list[2].lastIndexOf(']');
+		int index1 = result[2].lastIndexOf('[');
+		int index2 = result[2].lastIndexOf(']');
 
 		int speed = 0;
 		try {
-			speed = Integer.parseInt(list[2].substring(index1+1, index2));
+			speed = Integer.parseInt(result[2].substring(index1+1, index2));
 		}
 		catch(Exception s) {
 
@@ -757,12 +665,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 
 		//direction
-		index1 = list[3].lastIndexOf('[');
-		index2 = list[3].lastIndexOf(']');
+		index1 = result[3].lastIndexOf('[');
+		index2 = result[3].lastIndexOf(']');
 
 		boolean dir = false;
 		try {
-			dir = Integer.parseInt(list[3].substring(index1+1, index2)) == 0
+			dir = Integer.parseInt(result[3].substring(index1+1, index2)) == 0
 					? true : false;
 		}
 		catch(Exception s) {
@@ -771,18 +679,16 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		cbReverse.setChecked(!dir);
 	}
 
-	public void getTrainButtonState(String result) {
-
-		String list[] = result.split("\n");
+	public void getTrainButtonState(String[] result) {
 
 		List<Boolean> state = new ArrayList<Boolean>();
 
 		for(int i=1;i<9;i++) {
-			int index1 = list[i].lastIndexOf(' ');
-			int index2 = list[i].lastIndexOf(']');
+			int index1 = result[i].lastIndexOf(' ');
+			int index2 = result[i].lastIndexOf(']');
 			boolean s = false;
 			try {
-				s = Integer.parseInt(list[i].substring(index1+1, index2)) == 1
+				s = Integer.parseInt(result[i].substring(index1+1, index2)) == 1
 						? true : false;
 			}
 			catch(Exception e) {
@@ -795,17 +701,16 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		}
 	}
 
-	public void getTrainButtonStateExtra(String result) {
-		String list[] = result.split("\n");
+	public void getTrainButtonStateExtra(String[] result) {
 
 		List<Boolean> state = new ArrayList<Boolean>();
 
 		for(int i=1;i<9;i++) {
-			int index1 = list[i].lastIndexOf(' ');
-			int index2 = list[i].lastIndexOf(']');
+			int index1 = result[i].lastIndexOf(' ');
+			int index2 = result[i].lastIndexOf(']');
 			boolean s = false;
 			try {
-				s = Integer.parseInt(list[i].substring(index1+1, index2)) == 1
+				s = Integer.parseInt(result[i].substring(index1+1, index2)) == 1
 						? true : false;
 			}
 			catch(Exception e) {
@@ -823,15 +728,75 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		setStateControl(true);
 	}
 
-	public void getInfo(String result) {
+	public void getSwitching(String[] result) {
+		((LinearLayout) findViewById(R.id.llSwitch)).removeAllViews();
 
-		String list[] = result.split("\n");
+		Pattern p = Pattern.compile("(.*) name1\\[\"(.*)\"\\] name2\\[\"(.*)\"\\]");
+
+		listSwitch = new ArrayList<ToggleButton>();
+
+		String id = "";
+		String name1 = "";
+		String name2 = "";
+		for(int i=1; i<result.length-1; i++) {
+			Matcher m = p.matcher(result[i]);
+
+			while (m.find() == true) {
+				id = m.group(1).trim();
+				name1 = m.group(2).trim();
+				name2 = m.group(3).trim();
+
+				ToggleButton tg = createButton(id,name1 + " " + name2);
+
+				listSwitch.add(tg);
+				((LinearLayout) findViewById(R.id.llSwitch)).addView(tg);
+			}
+		}
+
+		//get initial state
+		for (ToggleButton t : listSwitch) {
+			mTcpClient.getState(Integer.parseInt(t.getTag().toString()));
+		}
+	}
+	
+	public void getSwitchingState(String[] result) {
+
+		Pattern p = Pattern.compile("(.*) state\\[(.*)\\]");
+
+		for(int i=1; i<result.length-1; i++) {
+			Matcher m = p.matcher(result[i]);
+
+			int id = 0;
+			int state = 0;
+			while (m.find() == true) {
+
+				try {
+					id = Integer.parseInt(m.group(1).trim());
+					state = Integer.parseInt(m.group(2).trim());
+
+					for(ToggleButton t : listSwitch) {
+						if(Integer.parseInt(t.getTag().toString()) == id) {
+							if(state == 1) {
+								t.setChecked(true);
+							}
+							else {
+								t.setChecked(false);
+							}
+						}
+					}
+				}
+				catch(Exception e) { }
+			}
+		}
+	}
+	
+	public void getInfo(String[] result) {
 
 		//read Protocol Version
 		Pattern p = Pattern.compile("(.*) ProtocolVersion\\[(.*)\\]");
 
-		for(int i=1; i<list.length-1; i++) {
-			Matcher m = p.matcher(list[i]);
+		for(int i=1; i<result.length-1; i++) {
+			Matcher m = p.matcher(result[i]);
 
 			while (m.find() == true) {
 				protocolVersion.setText(m.group(2).trim());
@@ -841,8 +806,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		//read Application Version
 		p = Pattern.compile("(.*) ApplicationVersion\\[(.*)\\]");
 
-		for(int i=1; i<list.length-1; i++) {
-			Matcher m = p.matcher(list[i]);
+		for(int i=1; i<result.length-1; i++) {
+			Matcher m = p.matcher(result[i]);
 
 			while (m.find() == true) {
 				applicationVersion.setText(m.group(2).trim());
@@ -852,8 +817,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		//read Hardware Version
 		p = Pattern.compile("(.*) HardwareVersion\\[(.*)\\]");
 
-		for(int i=1; i<list.length-1; i++) {
-			Matcher m = p.matcher(list[i]);
+		for(int i=1; i<result.length-1; i++) {
+			Matcher m = p.matcher(result[i]);
 
 			while (m.find() == true) {
 				hardwareVersion.setText(m.group(2).trim());
@@ -864,6 +829,39 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	/**************************************************************************/
 	/** Parse events **/
 	/**************************************************************************/
+	
+	public void parseEvent(String[] result) {
+		
+		Pattern p = Pattern.compile("<EVENT (.*)>");
+
+		Matcher m = p.matcher(result[0]);
+		while (m.find() == true) {
+
+			try {
+				int eventId = Integer.parseInt(m.group(1).trim());
+				
+				//console station
+				if(eventId == 1) {
+					parseEventEmergency(result);
+				}
+				else {
+					if(parseEventSpeed(result))
+						return;
+					if(parseEventButtons(result))
+						return;
+					if(parseEventDir(result))
+						return;
+					if(parseEventLostControl(result))
+						return;
+					if(parseEventSwitch(result))
+						return;
+				}
+			}
+			catch(Exception e) {
+				return;
+			}
+		}
+	}
 	
 	public boolean parseEventSpeed(String[] list) {
 		Pattern p = Pattern.compile("(.*) speed\\[(.*)\\]");
