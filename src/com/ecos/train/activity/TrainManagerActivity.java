@@ -888,21 +888,17 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			try {
 				int eventId = Integer.parseInt(m.group(1).trim());
 				
-				//console station
 				if(eventId == 1) {
 					parseEventEmergency(result);
 				}
+				else if(eventId == Settings.currentTrain.getId()) {
+					if(parseEventSpeed(result))			return;
+					if(parseEventButtons(result))		return;
+					if(parseEventDir(result))			return;
+					if(parseEventLostControl(result))	return;
+				}
 				else {
-					if(parseEventSpeed(result))
-						return;
-					if(parseEventButtons(result))
-						return;
-					if(parseEventDir(result))
-						return;
-					if(parseEventLostControl(result))
-						return;
-					if(parseEventSwitch(result))
-						return;
+					parseEventSwitch(result);
 				}
 			}
 			catch(Exception e) {
