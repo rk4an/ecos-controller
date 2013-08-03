@@ -155,9 +155,14 @@ public class TCPClient {
 				"func[4],func[5],func[6],func[7])");
 	}
 	
-	public void getTrainButtonStateExtra() {
+	public void getTrainButtonStateF8F15() {
 		sendMessage("get("+Settings.currentTrain.getId()+",func[8],func[9],func[10],func[11]," +
 				"func[12],func[13],func[14],func[15])");
+	}
+	
+	public void getTrainButtonStateF16F23() {
+		sendMessage("get("+Settings.currentTrain.getId()+",func[16],func[17],func[18],func[19]," +
+				"func[20],func[21],func[22],func[23])");
 	}
 	
 	public void setButton(int i, boolean enabled) {

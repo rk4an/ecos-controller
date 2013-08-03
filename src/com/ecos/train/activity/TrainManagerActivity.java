@@ -139,10 +139,23 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		listButtons.add(((ToggleButton) findViewById(R.id.btnF13)));
 		listButtons.add(((ToggleButton) findViewById(R.id.btnF14)));
 		listButtons.add(((ToggleButton) findViewById(R.id.btnF15)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF16)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF17)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF18)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF19)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF20)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF21)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF22)));
+		listButtons.add(((ToggleButton) findViewById(R.id.btnF23)));
 
 		for(int i=0; i<listButtons.size(); i++) {
 			listButtons.get(i).setOnClickListener(this);
 			listButtons.get(i).setTag("btn;"+i);
+			if(i>0) {
+				listButtons.get(i).setText(getString(R.string.btn_f) + i);
+				listButtons.get(i).setTextOn(getString(R.string.btn_f) + i);
+				listButtons.get(i).setTextOff(getString(R.string.btn_f) + i);
+			}
 		}
 
 		//init buttons
@@ -153,7 +166,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 		((ToggleButton) findViewById(R.id.btnEmergency)).setOnClickListener(this);
 
-		((TextView) findViewById(R.id.tvMore)).setOnClickListener(this);
+		((TextView) findViewById(R.id.tvF8_F15)).setOnClickListener(this);
+		((TextView) findViewById(R.id.tvF16_F23)).setOnClickListener(this);
 
 		pref = PreferenceManager.getDefaultSharedPreferences(this);
 		Settings.fullVersion = checkSig(this);
@@ -205,8 +219,17 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				setStateButtons(false);
 			}
 		}
-		else if(v.getId() == R.id.tvMore) {
-			LinearLayout l = (LinearLayout) findViewById(R.id.llButtonsExtras);
+		else if(v.getId() == R.id.tvF8_F15) {
+			LinearLayout l = (LinearLayout) findViewById(R.id.llF8_F15);
+			if(l.getVisibility() == LinearLayout.VISIBLE) {
+				l.setVisibility(LinearLayout.GONE);
+			}
+			else {
+				l.setVisibility(LinearLayout.VISIBLE);
+			}
+		}
+		else if(v.getId() == R.id.tvF16_F23) {
+			LinearLayout l = (LinearLayout) findViewById(R.id.llF16_F23);
 			if(l.getVisibility() == LinearLayout.VISIBLE) {
 				l.setVisibility(LinearLayout.GONE);
 			}
@@ -395,7 +418,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		}
 
 		if(!Settings.fullVersion) {
-			for(int i=8; i<=15; i++) {
+			for(int i=8; i<listButtons.size(); i++) {
 				listButtons.get(i).setEnabled(false);
 			}
 		}
@@ -524,16 +547,24 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			else if(Settings.state == Settings.State.GET_TRAIN_BUTTON_STATE) {
 				if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[0],func[1],func[2],func[3]," +
 						"func[4],func[5],func[6],func[7])>")) {
-					Settings.state = Settings.State.GET_TRAIN_BUTTON_STATE_EXTRA;
+					Settings.state = Settings.State.GET_TRAIN_BUTTON_STATE_F8_F15;
 					getTrainButtonState(respLine);
-					mTcpClient.getTrainButtonStateExtra();
+					mTcpClient.getTrainButtonStateF8F15();
 				}
 			}
-			else if(Settings.state == Settings.State.GET_TRAIN_BUTTON_STATE_EXTRA) {
+			else if(Settings.state == Settings.State.GET_TRAIN_BUTTON_STATE_F8_F15) {
 				if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[8],func[9],func[10],func[11]," +
 						"func[12],func[13],func[14],func[15])>")) {
+					Settings.state = Settings.State.GET_TRAIN_BUTTON_STATE_F16_F23;
+					getTrainButtonStateF8F15(respLine);
+					mTcpClient.getTrainButtonStateF16F23();
+				}
+			}
+			else if(Settings.state == Settings.State.GET_TRAIN_BUTTON_STATE_F16_F23) {
+				if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[16],func[17],func[18],func[19]," +
+						"func[20],func[21],func[22],func[23])>")) {
 					Settings.state = Settings.State.IDLE;
-					getTrainButtonStateExtra(respLine);
+					getTrainButtonStateF16F23(respLine);
 				}
 			}
 			else if(Settings.state == Settings.State.IDLE) {
@@ -695,7 +726,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		}
 	}
 
-	public void getTrainButtonStateExtra(String[] result) {
+	public void getTrainButtonStateF8F15(String[] result) {
 
 		List<Boolean> state = new ArrayList<Boolean>();
 
@@ -716,12 +747,35 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			listButtons.get(i+8).setChecked(state.get(i));
 		}
 
+	}
+
+	public void getTrainButtonStateF16F23(String[] result) {
+
+		List<Boolean> state = new ArrayList<Boolean>();
+
+		for(int i=1;i<9;i++) {
+			int index1 = result[i].lastIndexOf(' ');
+			int index2 = result[i].lastIndexOf(']');
+			boolean s = false;
+			try {
+				s = Integer.parseInt(result[i].substring(index1+1, index2)) == 1
+						? true : false;
+			}
+			catch(Exception e) {
+			}
+			state.add(s);
+		}
+
+		for(int i=0; i<=7; i++) {
+			listButtons.get(i+16).setChecked(state.get(i));
+		}
+
 		//activate button
 		setStateButtons(true);
 		setStateList(true);
 		setStateControl(true);
 	}
-
+	
 	public void getSwitching(String[] result) {
 		((LinearLayout) findViewById(R.id.llSwitch)).removeAllViews();
 
