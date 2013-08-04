@@ -588,7 +588,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 					getSwitching(respLine);
 				}
 				else {
-					getSwitchingState(respLine);
+					parseEventSwitch(respLine);
 				}
 			}
 		}
@@ -792,6 +792,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		Pattern p = Pattern.compile("(.*) name1\\[\"(.*)\"\\] name2\\[\"(.*)\"\\] addrext\\[(.*)\\]");
 
 		listSwitch = new ArrayList<ToggleButton>();
+		listSwitchMulti = new ArrayList<SeekBar>();
 
 		String id = "";
 		String name1 = "";
@@ -808,13 +809,16 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 				String[] addr = addrext.split(",");
 				if(addr.length == 2) {
-					ToggleButton tg = createButton(id,name1 + " " + name2);
+					ToggleButton tg = createButton(id, name1 + " " + name2);
 					listSwitch.add(tg);
 					((LinearLayout) findViewById(R.id.llSwitch)).addView(tg);
 				}
 				else {
 					SeekBar sb = createProgressBar(id, addr.length);
 					listSwitchMulti.add(sb);
+					TextView name = new TextView(getApplicationContext());
+					name.setText(name1 + " " + name2);
+					((LinearLayout) findViewById(R.id.llSwitch)).addView(name);
 					((LinearLayout) findViewById(R.id.llSwitch)).addView(sb);
 				}
 			}
@@ -823,42 +827,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		//get initial state
 		for (ToggleButton t : listSwitch) {
 			mTcpClient.getState(Integer.parseInt(t.getTag().toString()));
-		}
-	}
-
-	public void getSwitchingState(String[] result) {
-
-		Pattern p = Pattern.compile("(.*) state\\[(.*)\\]");
-
-		for(int i=1; i<result.length-1; i++) {
-			Matcher m = p.matcher(result[i]);
-
-			int id = 0;
-			int state = 0;
-			while (m.find() == true) {
-
-				try {
-					id = Integer.parseInt(m.group(1).trim());
-					state = Integer.parseInt(m.group(2).trim());
-
-					for(ToggleButton t : listSwitch) {
-						if(Integer.parseInt(t.getTag().toString()) == id) {
-							if(state == 1) {
-								t.setChecked(true);
-							}
-							else {
-								t.setChecked(false);
-							}
-						}
-					}
-					for(SeekBar t : listSwitchMulti) {
-						if(Integer.parseInt(t.getTag().toString()) == id) {
-							t.setProgress(state);
-						}
-					}
-				}
-				catch(Exception e) { }
-			}
 		}
 	}
 
