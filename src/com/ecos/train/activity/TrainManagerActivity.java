@@ -83,7 +83,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	TextView tvSpeed = null;
 	TextView tvSwitching = null;
 	LinearLayout llSwitch = null;
-	
+
 	SpinAdapter dataAdapter;
 	private MenuItem editItem = null;
 	private MenuItem infoItem = null;
@@ -95,6 +95,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	TextView ecosVersion = null;
 
 	List<ToggleButton> listSwitch = new ArrayList<ToggleButton>();
+	List<SeekBar> listSwitchMulti = new ArrayList<SeekBar>();
 	List<ToggleButton> listButtons = new ArrayList<ToggleButton>();
 
 	/**************************************************************************/
@@ -268,8 +269,17 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 	@Override
 	public void onStopTrackingTouch(SeekBar sb) {
-		mTcpClient.setSpeed(sb.getProgress());
-		tvSpeed.setText(this.getString(R.string.tv_speed) + " " + sb.getProgress());
+		if(sb.getId() == R.id.sbSpeed) {
+			mTcpClient.setSpeed(sb.getProgress());
+			tvSpeed.setText(this.getString(R.string.tv_speed) + " " + sb.getProgress());
+		}
+		else {
+			try {
+				int id = Integer.parseInt(sb.getTag().toString());
+				mTcpClient.changeState(id, sb.getProgress());
+			}
+			catch(Exception e) {}
+		}
 	}
 
 	@Override
@@ -396,7 +406,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	@Override
 	public void onNothingSelected(AdapterView<?> arg0) {
 	}
-	
+
 	@Override
 	protected void onStop() {
 		super.onStop();
@@ -406,11 +416,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 		}
 	}
-	
+
 	/**************************************************************************/
 	/** Buttons management **/
 	/**************************************************************************/	
-	
+
 	public void setFnButtons(boolean isEnabled) {
 
 		for(ToggleButton t: listButtons) {
@@ -574,7 +584,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				else if(respLine[0].equals("<REPLY get(1, info)>")) {
 					getInfo(respLine);
 				}
-				else if(respLine[0].equals("<REPLY queryObjects(11, name1, name2)>")) {
+				else if(respLine[0].equals("<REPLY queryObjects(11, name1, name2, addrext)>")) {
 					getSwitching(respLine);
 				}
 				else {
@@ -587,7 +597,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	/**************************************************************************/
 	/** Connect/Disconnect to console **/
 	/**************************************************************************/
-	
+
 	public void connectToStation(boolean state) {
 		//connect
 		if(state) {
@@ -626,7 +636,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	/**************************************************************************/
 	/** Get state **/
 	/**************************************************************************/	
-	
+
 	public boolean getEmergencyState(String result) {
 
 		int index1 = result.lastIndexOf('[');
@@ -775,17 +785,18 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		setStateList(true);
 		setStateControl(true);
 	}
-	
+
 	public void getSwitching(String[] result) {
 		((LinearLayout) findViewById(R.id.llSwitch)).removeAllViews();
 
-		Pattern p = Pattern.compile("(.*) name1\\[\"(.*)\"\\] name2\\[\"(.*)\"\\]");
+		Pattern p = Pattern.compile("(.*) name1\\[\"(.*)\"\\] name2\\[\"(.*)\"\\] addrext\\[(.*)\\]");
 
 		listSwitch = new ArrayList<ToggleButton>();
 
 		String id = "";
 		String name1 = "";
 		String name2 = "";
+		String addrext = "";
 		for(int i=1; i<result.length-1; i++) {
 			Matcher m = p.matcher(result[i]);
 
@@ -793,11 +804,19 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				id = m.group(1).trim();
 				name1 = m.group(2).trim();
 				name2 = m.group(3).trim();
+				addrext = m.group(4).trim();
 
-				ToggleButton tg = createButton(id,name1 + " " + name2);
-
-				listSwitch.add(tg);
-				((LinearLayout) findViewById(R.id.llSwitch)).addView(tg);
+				String[] addr = addrext.split(",");
+				if(addr.length == 2) {
+					ToggleButton tg = createButton(id,name1 + " " + name2);
+					listSwitch.add(tg);
+					((LinearLayout) findViewById(R.id.llSwitch)).addView(tg);
+				}
+				else {
+					SeekBar sb = createProgressBar(id, addr.length);
+					listSwitchMulti.add(sb);
+					((LinearLayout) findViewById(R.id.llSwitch)).addView(sb);
+				}
 			}
 		}
 
@@ -806,7 +825,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			mTcpClient.getState(Integer.parseInt(t.getTag().toString()));
 		}
 	}
-	
+
 	public void getSwitchingState(String[] result) {
 
 		Pattern p = Pattern.compile("(.*) state\\[(.*)\\]");
@@ -832,12 +851,17 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 							}
 						}
 					}
+					for(SeekBar t : listSwitchMulti) {
+						if(Integer.parseInt(t.getTag().toString()) == id) {
+							t.setProgress(state);
+						}
+					}
 				}
 				catch(Exception e) { }
 			}
 		}
 	}
-	
+
 	public void getInfo(String[] result) {
 
 		//read Protocol Version
@@ -873,13 +897,13 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			}
 		}
 	}
-	
+
 	/**************************************************************************/
 	/** Parse events **/
 	/**************************************************************************/
-	
+
 	public void parseEvent(String[] result) {
-		
+
 		Pattern p = Pattern.compile("<EVENT (.*)>");
 
 		Matcher m = p.matcher(result[0]);
@@ -887,7 +911,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 			try {
 				int eventId = Integer.parseInt(m.group(1).trim());
-				
+
 				if(eventId == 1) {
 					parseEventEmergency(result);
 				}
@@ -906,7 +930,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			}
 		}
 	}
-	
+
 	public boolean parseEventSpeed(String[] list) {
 		Pattern p = Pattern.compile("(.*) speed\\[(.*)\\]");
 		String id = "";
@@ -946,6 +970,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			Matcher m = p.matcher(list[i]);
 			int id = 0;
 			int state = 0;
+
 			while (m.find() == true) {
 				match = true;
 				try {
@@ -960,6 +985,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 							else {
 								t.setChecked(false);
 							}
+						}
+					}
+					for(SeekBar t : listSwitchMulti) {
+						if(Integer.parseInt(t.getTag().toString()) == id) {
+							t.setProgress(state);
 						}
 					}
 				}
@@ -1118,16 +1148,27 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		tg.setText(name);
 		tg.setTextOn(name);
 		tg.setTextOff(name);
-		tg.setTag(Integer.parseInt(id));
+		tg.setTag(id);
 		tg.setOnClickListener(this);
 
 		return tg;
 	}
-	
+
+	public SeekBar createProgressBar(String id, int max) {
+
+		SeekBar sb = new SeekBar(getApplicationContext());
+		sb.setMax(max);
+		sb.setProgress(0);
+		sb.setTag(id);
+		sb.setOnSeekBarChangeListener(this);
+
+		return sb;
+	}
+
 	public void displayError(String error) {
 		Toast.makeText(this, error , Toast.LENGTH_SHORT).show();
 	}
-	
+
 	/**************************************************************************/
 	/** Change speed with volume button **/
 	/**************************************************************************/

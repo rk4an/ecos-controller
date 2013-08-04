@@ -203,7 +203,7 @@ public class TCPClient {
 	/**************************************************************************/
 	
 	public void getAllObject() {
-		sendMessage("queryObjects(11, name1, name2)");
+		sendMessage("queryObjects(11, name1, name2, addrext)");
 	}
 	
 	public void takeViewObject() {
