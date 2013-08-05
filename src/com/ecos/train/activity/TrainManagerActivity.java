@@ -814,7 +814,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 					((LinearLayout) findViewById(R.id.llSwitch)).addView(tg);
 				}
 				else {
-					SeekBar sb = createProgressBar(id, addr.length);
+					SeekBar sb = createProgressBar(id, addr.length - 1);
 					listSwitchMulti.add(sb);
 					TextView name = new TextView(getApplicationContext());
 					name.setText(name1 + " " + name2);
