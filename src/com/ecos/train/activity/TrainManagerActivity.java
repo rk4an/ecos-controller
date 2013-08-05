@@ -37,6 +37,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -96,6 +97,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 	List<ToggleButton> listSwitch = new ArrayList<ToggleButton>();
 	List<SeekBar> listSwitchMulti = new ArrayList<SeekBar>();
+	List<TextView> listSwitchMultiValue = new ArrayList<TextView>();
 	List<ToggleButton> listButtons = new ArrayList<ToggleButton>();
 
 	/**************************************************************************/
@@ -277,6 +279,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			try {
 				int id = Integer.parseInt(sb.getTag().toString());
 				mTcpClient.changeState(id, sb.getProgress());
+				
+				for(TextView t: listSwitchMultiValue) {
+					if(Integer.parseInt(t.getTag().toString()) == id) {
+						t.setText(sb.getProgress());
+					}
+				}
 			}
 			catch(Exception e) {}
 		}
@@ -793,6 +801,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 		listSwitch = new ArrayList<ToggleButton>();
 		listSwitchMulti = new ArrayList<SeekBar>();
+		listSwitchMultiValue = new ArrayList<TextView>();
 
 		String id = "";
 		String name1 = "";
@@ -814,12 +823,21 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 					((LinearLayout) findViewById(R.id.llSwitch)).addView(tg);
 				}
 				else {
-					SeekBar sb = createProgressBar(id, addr.length - 1);
+					SeekBar sb = createSeekBar(id, addr.length - 1);
 					listSwitchMulti.add(sb);
+					
 					TextView name = new TextView(getApplicationContext());
 					name.setText(name1 + " " + name2);
+					
+					TextView value = new TextView(getApplicationContext());
+					value.setText(sb.getProgress());
+					value.setTag(id);
+					value.setGravity(Gravity.CENTER);
+					listSwitchMultiValue.add(value);
+					
 					((LinearLayout) findViewById(R.id.llSwitch)).addView(name);
 					((LinearLayout) findViewById(R.id.llSwitch)).addView(sb);
+					((LinearLayout) findViewById(R.id.llSwitch)).addView(value);
 				}
 			}
 		}
@@ -958,6 +976,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 					for(SeekBar t : listSwitchMulti) {
 						if(Integer.parseInt(t.getTag().toString()) == id) {
 							t.setProgress(state);
+							
+							for(TextView v: listSwitchMultiValue) {
+								if(Integer.parseInt(v.getTag().toString()) == id) {
+									v.setText(t.getProgress());
+								}
+							}
 						}
 					}
 				}
@@ -1122,7 +1146,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		return tg;
 	}
 
-	public SeekBar createProgressBar(String id, int max) {
+	public SeekBar createSeekBar(String id, int max) {
 
 		SeekBar sb = new SeekBar(getApplicationContext());
 		sb.setMax(max);
