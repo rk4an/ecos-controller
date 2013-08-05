@@ -282,7 +282,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				
 				for(TextView t: listSwitchMultiValue) {
 					if(Integer.parseInt(t.getTag().toString()) == id) {
-						t.setText(sb.getProgress());
+						t.setText(sb.getProgress()+"");
 					}
 				}
 			}
@@ -830,7 +830,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 					name.setText(name1 + " " + name2);
 					
 					TextView value = new TextView(getApplicationContext());
-					value.setText(sb.getProgress());
+					value.setText(sb.getProgress()+"");
 					value.setTag(id);
 					value.setGravity(Gravity.CENTER);
 					listSwitchMultiValue.add(value);
@@ -979,7 +979,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 							
 							for(TextView v: listSwitchMultiValue) {
 								if(Integer.parseInt(v.getTag().toString()) == id) {
-									v.setText(t.getProgress());
+									v.setText(t.getProgress()+"");
 								}
 							}
 						}
