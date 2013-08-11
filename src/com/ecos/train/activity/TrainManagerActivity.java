@@ -20,6 +20,7 @@
 package com.ecos.train.activity;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -549,6 +550,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				if(respLine[0].equals("<REPLY queryObjects(10, name, addr)>")) {
 					Settings.state = Settings.State.GET_TRAIN_MAIN_STATE;
 					Settings.allTrains = getAllTrains(values[0]);
+					Collections.sort(Settings.allTrains, Train.TrainNameComparator);
 					dataAdapter = new SpinAdapter(getApplicationContext(),
 							android.R.layout.simple_spinner_item, Settings.allTrains);
 					dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

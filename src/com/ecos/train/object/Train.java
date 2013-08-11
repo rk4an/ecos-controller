@@ -1,6 +1,8 @@
 package com.ecos.train.object;
 
-public class Train {
+import java.util.Comparator;
+
+public class Train implements Comparable<Train> {
 
 	private int id;
 	private String name;
@@ -35,4 +37,24 @@ public class Train {
 	public void setAddress(String address) {
 		this.address = address;
 	}
+
+	public String toString() {
+		return name;
+	}
+
+	@Override
+	public int compareTo(Train t) {
+		return name.compareTo(t.getName());
+	}
+
+	public static Comparator<Train> TrainNameComparator = new Comparator<Train>() {
+
+		public int compare(Train train1, Train train2) {
+
+			String trainName1 = train1.getName().toUpperCase();
+			String trainName2 = train2.getName().toUpperCase();
+
+			return trainName1.compareTo(trainName2);
+		}
+	};
 }
