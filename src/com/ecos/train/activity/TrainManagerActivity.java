@@ -401,18 +401,23 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				disconnect();
 				return;
 			}
-			if(Settings.sortById != pref.getBoolean("pref_sort", false)) {
-				Settings.sortById = pref.getBoolean("pref_sort", false);
-				if(Settings.sortById)
-					Collections.sort(Settings.allTrains, Train.TrainIdComparator);
-				else
-					Collections.sort(Settings.allTrains, Train.TrainNameComparator);
-				dataAdapter.notifyDataSetChanged();
-				//restore the latest selection
-				for(int i=0; i<Settings.allTrains.size(); i++) {
-					if(Settings.allTrains.get(i).getId() == Settings.currentTrain.getId()) {
-						sTrainId.setSelection(i);
-						break;
+
+			if(Settings.state != Settings.State.NONE) {
+				if(Settings.sortById != pref.getBoolean("pref_sort", false)) {
+					Settings.sortById = pref.getBoolean("pref_sort", false);
+					if(Settings.sortById) {
+						Collections.sort(Settings.allTrains, Train.TrainIdComparator);
+					}
+					else {
+						Collections.sort(Settings.allTrains, Train.TrainNameComparator);
+					}
+					dataAdapter.notifyDataSetChanged();
+					//restore the latest selection
+					for(int i=0; i<Settings.allTrains.size(); i++) {
+						if(Settings.allTrains.get(i).getId() == Settings.currentTrain.getId()) {
+							sTrainId.setSelection(i);
+							break;
+						}
 					}
 				}
 			}
