@@ -550,7 +550,13 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				if(respLine[0].equals("<REPLY queryObjects(10, name, addr)>")) {
 					Settings.state = Settings.State.GET_TRAIN_MAIN_STATE;
 					Settings.allTrains = getAllTrains(values[0]);
-					Collections.sort(Settings.allTrains, Train.TrainNameComparator);
+					
+					boolean sortById = pref.getBoolean("pref_sort", false);
+					if(sortById)
+						Collections.sort(Settings.allTrains, Train.TrainIdComparator);
+					else
+						Collections.sort(Settings.allTrains, Train.TrainNameComparator);
+					
 					dataAdapter = new SpinAdapter(getApplicationContext(),
 							android.R.layout.simple_spinner_item, Settings.allTrains);
 					dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

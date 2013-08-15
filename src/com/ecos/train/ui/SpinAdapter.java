@@ -54,7 +54,7 @@ public class SpinAdapter extends ArrayAdapter<Train>{
 		TextView contactName = (TextView) spinnerEntry
 				.findViewById(R.id.spinnerName);
 		
-		contactName.setText(values.get(position).getName());
+		contactName.setText(values.get(position).toString());
 		
 		return spinnerEntry;
 	}

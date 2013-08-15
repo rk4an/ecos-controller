@@ -34,6 +34,8 @@
     <string name="tv_application_version">Version Application:</string>
     <string name="tv_hardware_version">Version Hardware:</string>
     <string name="tv_ecos_version">Version ECoS Controller:</string>
-    <string name="tv_switch">Objets de commutation (expérimental)</string>
+    <string name="tv_switch">Objets de commutation</string>
+    <string name="pref_sort">Trier la liste par ID</string>
+    <string name="pref_sort_id">Trier par ID</string>
     
 </resources>

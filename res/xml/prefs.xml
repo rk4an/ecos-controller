@@ -13,6 +13,11 @@
         </EditTextPreference>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/tv_console" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_sort"
+            android:summary="@string/pref_sort"
+            android:title="@string/pref_sort_id" />
     </PreferenceCategory>
 
 </PreferenceScreen>

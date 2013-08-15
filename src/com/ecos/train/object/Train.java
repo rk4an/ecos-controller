@@ -39,7 +39,7 @@ public class Train implements Comparable<Train> {
 	}
 
 	public String toString() {
-		return name;
+		return name + " (" + id + ")";
 	}
 
 	@Override
@@ -55,6 +55,17 @@ public class Train implements Comparable<Train> {
 			String trainName2 = train2.getName().toUpperCase();
 
 			return trainName1.compareTo(trainName2);
+		}
+	};
+	
+	public static Comparator<Train> TrainIdComparator = new Comparator<Train>() {
+
+		public int compare(Train train1, Train train2) {
+
+			int trainId1 = train1.getId();
+			int trainId2 = train2.getId();
+
+			return trainId1 - trainId2;
 		}
 	};
 }
