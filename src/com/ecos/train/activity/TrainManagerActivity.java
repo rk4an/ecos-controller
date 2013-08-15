@@ -409,13 +409,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 					Collections.sort(Settings.allTrains, Train.TrainNameComparator);
 				dataAdapter.notifyDataSetChanged();
 				//restore the latest selection
-				/*for(int i=0; i<Settings.allTrains.size(); i++) {
+				for(int i=0; i<Settings.allTrains.size(); i++) {
 					if(Settings.allTrains.get(i).getId() == Settings.currentTrain.getId()) {
 						sTrainId.setSelection(i);
 						break;
 					}
-				}*/
-				sTrainId.setSelection(0);
+				}
 			}
 		}
 	}
@@ -672,7 +671,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	}
 
 	public void disconnect() {
-		mTcpClient.stopClient();
+		if(mTcpClient != null) {
+			mTcpClient.stopClient();
+		}
 		tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.tv_disconnect));
 		setStateButtons(false);
 		setStateControl(false);
