@@ -101,6 +101,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	List<TextView> listSwitchMultiValue = new ArrayList<TextView>();
 	List<ToggleButton> listButtons = new ArrayList<ToggleButton>();
 
+	private static final int SETTINGS = 0;
+
 	/**************************************************************************/
 	/** Listeners **/
 	/**************************************************************************/
@@ -192,6 +194,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		((TextView) findViewById(R.id.tvSwitch)).setOnClickListener(this);
 		llSwitch = ((LinearLayout) findViewById(R.id.llSwitch));
 		llSwitch.setVisibility(LinearLayout.GONE);
+
 	}
 
 	@Override
@@ -280,7 +283,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			try {
 				int id = Integer.parseInt(sb.getTag().toString());
 				mTcpClient.changeState(id, sb.getProgress());
-				
+
 				for(TextView t: listSwitchMultiValue) {
 					if(Integer.parseInt(t.getTag().toString()) == id) {
 						t.setText(sb.getProgress()+"");
@@ -322,7 +325,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		switch (item.getItemId()) {
 		case R.id.iSettings:
 			Intent i = new Intent(this, PreferencesActivity.class);
-			startActivity(i);
+			startActivityForResult(i, TrainManagerActivity.SETTINGS);
 			return true;
 		case R.id.iPack:
 			Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -391,6 +394,32 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		}
 	}
 
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if(requestCode == TrainManagerActivity.SETTINGS) {
+			//check if something change
+			if(!Settings.consoleIp.equals(pref.getString("ip", ""))){
+				disconnect();
+				return;
+			}
+			if(Settings.sortById != pref.getBoolean("pref_sort", false)) {
+				Settings.sortById = pref.getBoolean("pref_sort", false);
+				if(Settings.sortById)
+					Collections.sort(Settings.allTrains, Train.TrainIdComparator);
+				else
+					Collections.sort(Settings.allTrains, Train.TrainNameComparator);
+				dataAdapter.notifyDataSetChanged();
+				//restore the latest selection
+				/*for(int i=0; i<Settings.allTrains.size(); i++) {
+					if(Settings.allTrains.get(i).getId() == Settings.currentTrain.getId()) {
+						sTrainId.setSelection(i);
+						break;
+					}
+				}*/
+				sTrainId.setSelection(0);
+			}
+		}
+	}
+
 	@Override
 	public void onItemSelected(AdapterView<?> parent, View view, int pos,long id) {
 
@@ -418,6 +447,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 	@Override
 	protected void onStop() {
+		super.onStop();
+	}
+
+	@Override
+	protected void onDestroy() {
 		super.onStop();
 		try {
 			mTcpClient.stopClient();
@@ -550,13 +584,13 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				if(respLine[0].equals("<REPLY queryObjects(10, name, addr)>")) {
 					Settings.state = Settings.State.GET_TRAIN_MAIN_STATE;
 					Settings.allTrains = getAllTrains(values[0]);
-					
-					boolean sortById = pref.getBoolean("pref_sort", false);
-					if(sortById)
+
+					Settings.sortById = pref.getBoolean("pref_sort", false);
+					if(Settings.sortById)
 						Collections.sort(Settings.allTrains, Train.TrainIdComparator);
 					else
 						Collections.sort(Settings.allTrains, Train.TrainNameComparator);
-					
+
 					dataAdapter = new SpinAdapter(getApplicationContext(),
 							android.R.layout.simple_spinner_item, Settings.allTrains);
 					dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -833,16 +867,16 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				else {
 					SeekBar sb = createSeekBar(id, addr.length - 1);
 					listSwitchMulti.add(sb);
-					
+
 					TextView name = new TextView(getApplicationContext());
 					name.setText(name1 + " " + name2);
-					
+
 					TextView value = new TextView(getApplicationContext());
 					value.setText(sb.getProgress()+"");
 					value.setTag(id);
 					value.setGravity(Gravity.CENTER);
 					listSwitchMultiValue.add(value);
-					
+
 					((LinearLayout) findViewById(R.id.llSwitch)).addView(name);
 					((LinearLayout) findViewById(R.id.llSwitch)).addView(sb);
 					((LinearLayout) findViewById(R.id.llSwitch)).addView(value);
@@ -984,7 +1018,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 					for(SeekBar t : listSwitchMulti) {
 						if(Integer.parseInt(t.getTag().toString()) == id) {
 							t.setProgress(state);
-							
+
 							for(TextView v: listSwitchMultiValue) {
 								if(Integer.parseInt(v.getTag().toString()) == id) {
 									v.setText(t.getProgress()+"");

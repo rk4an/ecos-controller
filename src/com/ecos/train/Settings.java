@@ -23,6 +23,8 @@ public class Settings {
 	public static final int SPEED_MAX = 127;
 	public static final int SPEED_STEP = 10;
 	
+	public static boolean sortById = false;
+	
 	public enum State {
 		NONE, 
 		INIT_GET_EMERGENCY, 
