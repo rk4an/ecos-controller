@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ecos.train"
     android:installLocation="auto"
-    android:versionCode="382"
+    android:versionCode="384"
     android:versionName="3.8.2" >
 
     <uses-sdk
