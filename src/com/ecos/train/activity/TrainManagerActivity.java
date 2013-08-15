@@ -402,9 +402,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				return;
 			}
 
-			if(Settings.state != Settings.State.NONE) {
-				if(Settings.sortById != pref.getBoolean("pref_sort", false)) {
-					Settings.sortById = pref.getBoolean("pref_sort", false);
+			if(Settings.sortById != pref.getBoolean("pref_sort", false)) {
+				Settings.sortById = pref.getBoolean("pref_sort", false);
+				if(Settings.state != Settings.State.NONE) {
+
 					if(Settings.sortById) {
 						Collections.sort(Settings.allTrains, Train.TrainIdComparator);
 					}
