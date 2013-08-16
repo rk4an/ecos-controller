@@ -405,13 +405,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			if(Settings.sortById != pref.getBoolean("pref_sort", false)) {
 				Settings.sortById = pref.getBoolean("pref_sort", false);
 				if(Settings.state != Settings.State.NONE) {
-
-					if(Settings.sortById) {
-						Collections.sort(Settings.allTrains, Train.TrainIdComparator);
-					}
-					else {
-						Collections.sort(Settings.allTrains, Train.TrainNameComparator);
-					}
+					sortList(Settings.sortById);
 					dataAdapter.notifyDataSetChanged();
 					//restore the latest selection
 					for(int i=0; i<Settings.allTrains.size(); i++) {
@@ -591,10 +585,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 					Settings.allTrains = getAllTrains(values[0]);
 
 					Settings.sortById = pref.getBoolean("pref_sort", false);
-					if(Settings.sortById)
-						Collections.sort(Settings.allTrains, Train.TrainIdComparator);
-					else
-						Collections.sort(Settings.allTrains, Train.TrainNameComparator);
+					sortList(Settings.sortById);
 
 					dataAdapter = new SpinAdapter(getApplicationContext(),
 							android.R.layout.simple_spinner_item, Settings.allTrains);
@@ -1175,6 +1166,15 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	/**************************************************************************/
 	/** Utils **/
 	/**************************************************************************/
+	public void sortList(boolean sortById) {
+		if(sortById) {
+			Collections.sort(Settings.allTrains, Train.TrainIdComparator);
+		}
+		else {
+			Collections.sort(Settings.allTrains, Train.TrainNameComparator);
+		}
+	}
+
 	public static boolean checkSig(Context context) {
 		boolean match = false;
 		if (context.getPackageManager().checkSignatures(
