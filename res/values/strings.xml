@@ -43,7 +43,7 @@
     <string name="state_train_buttons">Get Train buttons state</string>
     <string name="state_f8_f15">Get F8-F15 buttons state</string>
     <string name="state_f16_f23">Get F16-F23 buttons state</string>
-    <string name="state_switching_objects">Get Swicthing Objets state</string>
+    <string name="state_switching_objects">Get Switching Objets state</string>
     <string name="state_ready">Ready</string>
     
 </resources>
