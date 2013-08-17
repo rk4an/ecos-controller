@@ -33,6 +33,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -61,6 +65,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.ecos.train.R;
 import com.ecos.train.Settings;
 import com.ecos.train.TCPClient;
+import com.ecos.train.object.Symbols;
 import com.ecos.train.object.Train;
 import com.ecos.train.ui.SpinAdapter;
 
@@ -154,15 +159,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		listButtons.add(((ToggleButton) findViewById(R.id.btnF22)));
 		listButtons.add(((ToggleButton) findViewById(R.id.btnF23)));
 
-		for(int i=0; i<listButtons.size(); i++) {
-			listButtons.get(i).setOnClickListener(this);
-			listButtons.get(i).setTag("btn;"+i);
-			if(i>0) {
-				listButtons.get(i).setText(getString(R.string.btn_f) + i);
-				listButtons.get(i).setTextOn(getString(R.string.btn_f) + i);
-				listButtons.get(i).setTextOff(getString(R.string.btn_f) + i);
-			}
-		}
+		initFunctionButtons();
 
 		//init buttons
 		setStateButtons(false);
@@ -195,6 +192,19 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		llSwitch = ((LinearLayout) findViewById(R.id.llSwitch));
 		llSwitch.setVisibility(LinearLayout.GONE);
 
+	}
+
+	private void initFunctionButtons() {
+		for(int i=0; i<listButtons.size(); i++) {
+			listButtons.get(i).setOnClickListener(this);
+			listButtons.get(i).setTag("btn;"+i);
+			if(i>0) {
+				listButtons.get(i).setText(getString(R.string.btn_f) + i);
+				listButtons.get(i).setTextOn(getString(R.string.btn_f) + i);
+				listButtons.get(i).setTextOff(getString(R.string.btn_f) + i);
+				listButtons.get(i).setCompoundDrawablesWithIntrinsicBounds(null,null,null,null);
+			}
+		}
 	}
 
 	@Override
@@ -597,6 +607,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",name,speed,dir)>")) {
 					Settings.state = Settings.State.GET_TRAIN_BUTTON_STATE;
 					getTrainMainState(respLine);
+					initFunctionButtons();
 					mTcpClient.getTrainButtonState();
 				}
 			}
@@ -621,6 +632,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 						"func[20],func[21],func[22],func[23])>")) {
 					Settings.state = Settings.State.IDLE;
 					getTrainButtonStateF16F23(respLine);
+					mTcpClient.getButtonName();
 				}
 			}
 			else if(Settings.state == Settings.State.IDLE) {
@@ -632,6 +644,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				}
 				else if(respLine[0].equals("<REPLY queryObjects(11, name1, name2, addrext)>")) {
 					getSwitching(respLine);
+				}
+				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+", funcexists[0], " +
+						"funcexists[1], funcexists[2], funcexists[3], funcexists[4], funcexists[5], funcexists[6], funcexists[7])>")){
+					getButtonName(respLine);
 				}
 				else {
 					parseEventSwitch(respLine);
@@ -832,6 +848,43 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		setStateButtons(true);
 		setStateList(true);
 		setStateControl(true);
+	}
+
+	private void getButtonName(String[] result) {
+		Pattern p = Pattern.compile("(.*) funcexists\\[(.*)\\]");
+
+		for(int i=1; i<result.length-1; i++) {
+			Matcher m = p.matcher(result[i]);
+
+			int fctNum = -1;
+			int fctSymbol = -1;
+
+			while (m.find() == true) {
+
+				String[] f = m.group(2).split(",");
+
+				if(f.length >= 2) {
+					fctNum = Integer.parseInt(f[0].trim());
+					fctSymbol = Integer.parseInt(f[1].trim());
+
+					if(fctSymbol == -1) {
+						listButtons.get(fctNum).setEnabled(false);
+					}
+					else if(!Symbols.getInstance().getSymbols().get(fctSymbol,"").equals("")) {
+						Resources res = getResources();
+						int resourceId = res.getIdentifier("f"+fctSymbol, "drawable", getPackageName());
+						Drawable img = res.getDrawable( resourceId );
+						if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.GINGERBREAD_MR1) {
+							img.setColorFilter(Color.parseColor("#FFFFFF"),PorterDuff.Mode.SRC_ATOP);
+						}
+						else {
+							img.setColorFilter(Color.parseColor("#000000"),PorterDuff.Mode.SRC_ATOP);
+						}
+						listButtons.get(fctNum).setCompoundDrawablesWithIntrinsicBounds(img, null , null, null);
+					}
+				}
+			}
+		}
 	}
 
 	public void getSwitching(String[] result) {

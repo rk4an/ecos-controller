@@ -198,6 +198,11 @@ public class TCPClient {
 		sendMessage("set("+Settings.currentTrain.getId()+", name[\""+name+"\"])");
 	}
 	
+	public void getButtonName() {
+		sendMessage("get("+Settings.currentTrain.getId()+", funcexists[0], " +
+				"funcexists[1], funcexists[2], funcexists[3], funcexists[4], funcexists[5], funcexists[6], funcexists[7])");
+	}
+	
 	/**************************************************************************/
 	/** Command Switching Objects **/
 	/**************************************************************************/
