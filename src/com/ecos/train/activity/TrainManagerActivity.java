@@ -228,6 +228,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			else {
 				l.setVisibility(LinearLayout.VISIBLE);
 				if(Settings.state == Settings.State.IDLE) {
+					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_f8_f15));
 					mTcpClient.getTrainButtonStateF8F15();
 				}
 			}
@@ -240,6 +241,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			else {
 				l.setVisibility(LinearLayout.VISIBLE);
 				if(Settings.state == Settings.State.IDLE) {
+					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_f16_f23));
 					mTcpClient.getTrainButtonStateF16F23();
 				}
 			}
@@ -256,6 +258,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			else {
 				llSwitch.setVisibility(LinearLayout.VISIBLE);
 				if(Settings.fullVersion && Settings.state == Settings.State.IDLE) {
+					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_switching_objects));
 					mTcpClient.getAllObject();
 				}
 			}
@@ -437,6 +440,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		btnControl.setChecked(true);
 		mTcpClient.takeViewTrain();
 		Settings.state = Settings.State.GET_TRAIN_MAIN_STATE;
+		tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_train_state));
 		mTcpClient.getTrainMainState();
 	}
 
@@ -568,10 +572,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 					btnConnect.setChecked(true);
 
 					Settings.state = Settings.State.INIT_GET_EMERGENCY;
+					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_emergency_state));
 					mTcpClient.getEmergencyState();
 				}
 				else {
-					tvState.setText(getApplicationContext().getString(R.string.tv_state) + " " + values[0]);
+					tvState.setText(getApplicationContext().getString(R.string.tv_state) + " " + getString(R.string.tv_disconnect));
 					btnConnect.setChecked(false);
 				}
 			}
@@ -579,7 +584,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				if(respLine[0].equals("<REPLY get(1, status)>")) {
 					Settings.state = Settings.State.INIT_GET_TRAINS;
 					boolean isEmergency = getEmergencyState(values[0]);
-					btnEmergency.setChecked(isEmergency);	
+					btnEmergency.setChecked(isEmergency);
+					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_train_list));
 					mTcpClient.getAllTrains();
 				}
 			}
@@ -602,6 +608,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 					Settings.state = Settings.State.GET_TRAIN_BUTTON_STATE;
 					getTrainMainState(respLine);
 					initFunctionButtons();
+					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_train_buttons));
 					mTcpClient.getTrainButtonState();
 				}
 			}
@@ -609,7 +616,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[0],func[1],func[2],func[3]," +
 						"func[4],func[5],func[6],func[7])>")) {
 					Settings.state = Settings.State.IDLE;
-					getTrainButtonState(respLine, 0);
+					getTrainButtonState(respLine,0);
 				}
 			}
 			else if(Settings.state == Settings.State.IDLE) {
@@ -644,6 +651,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				}
 				else {
 					parseEventSwitch(respLine);
+				}
+
+				if(Settings.state == Settings.State.IDLE) {
+					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_ready));
 				}
 			}
 		}
