@@ -874,12 +874,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 						Resources res = getResources();
 						int resourceId = res.getIdentifier("f"+fctSymbol, "drawable", getPackageName());
 						Drawable img = res.getDrawable( resourceId );
-						if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.GINGERBREAD_MR1) {
-							img.setColorFilter(Color.parseColor("#FFFFFF"),PorterDuff.Mode.SRC_ATOP);
-						}
-						else {
-							img.setColorFilter(Color.parseColor("#000000"),PorterDuff.Mode.SRC_ATOP);
-						}
 						listButtons.get(fctNum).setCompoundDrawablesWithIntrinsicBounds(img, null , null, null);
 					}
 				}
