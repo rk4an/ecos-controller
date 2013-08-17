@@ -189,20 +189,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		((TextView) findViewById(R.id.tvSwitch)).setOnClickListener(this);
 		llSwitch = ((LinearLayout) findViewById(R.id.llSwitch));
 		llSwitch.setVisibility(LinearLayout.GONE);
-
-	}
-
-	private void initFunctionButtons() {
-		for(int i=0; i<listButtons.size(); i++) {
-			listButtons.get(i).setOnClickListener(this);
-			listButtons.get(i).setTag("btn;"+i);
-			if(i>0) {
-				listButtons.get(i).setText(getString(R.string.btn_f) + i);
-				listButtons.get(i).setTextOn(getString(R.string.btn_f) + i);
-				listButtons.get(i).setTextOff(getString(R.string.btn_f) + i);
-				listButtons.get(i).setCompoundDrawablesWithIntrinsicBounds(null,null,null,null);
-			}
-		}
 	}
 
 	@Override
@@ -241,6 +227,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			}
 			else {
 				l.setVisibility(LinearLayout.VISIBLE);
+				if(Settings.state == Settings.State.IDLE) {
+					mTcpClient.getTrainButtonStateF8F15();
+				}
 			}
 		}
 		else if(v.getId() == R.id.tvF16_F23) {
@@ -250,6 +239,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			}
 			else {
 				l.setVisibility(LinearLayout.VISIBLE);
+				if(Settings.state == Settings.State.IDLE) {
+					mTcpClient.getTrainButtonStateF16F23();
+				}
 			}
 		}
 		else if(v.getId() == R.id.cbReverse) {
@@ -498,6 +490,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		}
 
 		setFnButtons(state);
+		LinearLayout lF8_F15 = (LinearLayout) findViewById(R.id.llF8_F15);
+		lF8_F15.setVisibility(LinearLayout.GONE);
+		LinearLayout lF16_23 = (LinearLayout) findViewById(R.id.llF16_F23);
+		lF16_23.setVisibility(LinearLayout.GONE);
 	}
 
 	public void setStateControl(boolean state) {
@@ -612,25 +608,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			else if(Settings.state == Settings.State.GET_TRAIN_BUTTON_STATE) {
 				if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[0],func[1],func[2],func[3]," +
 						"func[4],func[5],func[6],func[7])>")) {
-					Settings.state = Settings.State.GET_TRAIN_BUTTON_STATE_F8_F15;
-					getTrainButtonState(respLine);
-					mTcpClient.getTrainButtonStateF8F15();
-				}
-			}
-			else if(Settings.state == Settings.State.GET_TRAIN_BUTTON_STATE_F8_F15) {
-				if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[8],func[9],func[10],func[11]," +
-						"func[12],func[13],func[14],func[15])>")) {
-					Settings.state = Settings.State.GET_TRAIN_BUTTON_STATE_F16_F23;
-					getTrainButtonStateF8F15(respLine);
-					mTcpClient.getTrainButtonStateF16F23();
-				}
-			}
-			else if(Settings.state == Settings.State.GET_TRAIN_BUTTON_STATE_F16_F23) {
-				if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[16],func[17],func[18],func[19]," +
-						"func[20],func[21],func[22],func[23])>")) {
 					Settings.state = Settings.State.IDLE;
-					getTrainButtonStateF16F23(respLine);
-					mTcpClient.getButtonName();
+					getTrainButtonState(respLine, 0);
 				}
 			}
 			else if(Settings.state == Settings.State.IDLE) {
@@ -646,6 +625,22 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+", funcexists[0], " +
 						"funcexists[1], funcexists[2], funcexists[3], funcexists[4], funcexists[5], funcexists[6], funcexists[7])>")){
 					getButtonName(respLine);
+				}
+				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+", funcexists[8], " +
+						"funcexists[9], funcexists[10], funcexists[11], funcexists[12], funcexists[13], funcexists[14], funcexists[15])>")){
+					getButtonName(respLine);
+				}
+				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+", funcexists[16], " +
+						"funcexists[17], funcexists[18], funcexists[19], funcexists[20], funcexists[21], funcexists[22], funcexists[23])>")){
+					getButtonName(respLine);
+				}
+				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[8],func[9],func[10],func[11]," +
+						"func[12],func[13],func[14],func[15])>")) {
+					getTrainButtonState(respLine,8);
+				}
+				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[16],func[17],func[18],func[19]," +
+						"func[20],func[21],func[22],func[23])>")) {
+					getTrainButtonState(respLine,16);
 				}
 				else {
 					parseEventSwitch(respLine);
@@ -776,7 +771,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		cbReverse.setChecked(!dir);
 	}
 
-	public void getTrainButtonState(String[] result) {
+	public void getTrainButtonState(String[] result, int offset) {
 
 		List<Boolean> state = new ArrayList<Boolean>();
 
@@ -794,58 +789,22 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		}
 
 		for(int i=0; i<=7; i++) {
-			listButtons.get(i).setChecked(state.get(i));
-		}
-	}
-
-	public void getTrainButtonStateF8F15(String[] result) {
-
-		List<Boolean> state = new ArrayList<Boolean>();
-
-		for(int i=1;i<9;i++) {
-			int index1 = result[i].lastIndexOf(' ');
-			int index2 = result[i].lastIndexOf(']');
-			boolean s = false;
-			try {
-				s = Integer.parseInt(result[i].substring(index1+1, index2)) == 1
-						? true : false;
-			}
-			catch(Exception e) {
-			}
-			state.add(s);
+			listButtons.get(i+offset).setChecked(state.get(i));
 		}
 
-		for(int i=0; i<=7; i++) {
-			listButtons.get(i+8).setChecked(state.get(i));
+		if(offset == 0) {
+			//ready, activate button
+			setStateButtons(true);
+			setStateList(true);
+			setStateControl(true);
+			mTcpClient.getButtonName();
 		}
-
-	}
-
-	public void getTrainButtonStateF16F23(String[] result) {
-
-		List<Boolean> state = new ArrayList<Boolean>();
-
-		for(int i=1;i<9;i++) {
-			int index1 = result[i].lastIndexOf(' ');
-			int index2 = result[i].lastIndexOf(']');
-			boolean s = false;
-			try {
-				s = Integer.parseInt(result[i].substring(index1+1, index2)) == 1
-						? true : false;
-			}
-			catch(Exception e) {
-			}
-			state.add(s);
+		else if(offset == 8) {
+			mTcpClient.getButtonNameF8F15();
 		}
-
-		for(int i=0; i<=7; i++) {
-			listButtons.get(i+16).setChecked(state.get(i));
+		else if(offset == 16) {
+			mTcpClient.getButtonNameF16F23();
 		}
-
-		//activate button
-		setStateButtons(true);
-		setStateList(true);
-		setStateControl(true);
 	}
 
 	private void getButtonName(String[] result) {
@@ -1238,6 +1197,19 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		tg.setOnClickListener(this);
 
 		return tg;
+	}
+
+	private void initFunctionButtons() {
+		for(int i=0; i<listButtons.size(); i++) {
+			listButtons.get(i).setOnClickListener(this);
+			listButtons.get(i).setTag("btn;"+i);
+			if(i>0) {
+				listButtons.get(i).setText(getString(R.string.btn_f) + i);
+				listButtons.get(i).setTextOn(getString(R.string.btn_f) + i);
+				listButtons.get(i).setTextOff(getString(R.string.btn_f) + i);
+				listButtons.get(i).setCompoundDrawablesWithIntrinsicBounds(null,null,null,null);
+			}
+		}
 	}
 
 	public SeekBar createSeekBar(String id, int max) {

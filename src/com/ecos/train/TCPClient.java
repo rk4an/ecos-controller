@@ -203,6 +203,16 @@ public class TCPClient {
 				"funcexists[1], funcexists[2], funcexists[3], funcexists[4], funcexists[5], funcexists[6], funcexists[7])");
 	}
 	
+	public void getButtonNameF8F15() {
+		sendMessage("get("+Settings.currentTrain.getId()+", funcexists[8], " +
+				"funcexists[9], funcexists[10], funcexists[11], funcexists[12], funcexists[13], funcexists[14], funcexists[15])");
+	}
+	
+	public void getButtonNameF16F23() {
+		sendMessage("get("+Settings.currentTrain.getId()+", funcexists[16], " +
+				"funcexists[17], funcexists[18], funcexists[19], funcexists[20], funcexists[21], funcexists[22], funcexists[23])");
+	}
+	
 	/**************************************************************************/
 	/** Command Switching Objects **/
 	/**************************************************************************/
