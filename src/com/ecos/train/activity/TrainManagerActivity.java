@@ -825,6 +825,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 						int resourceId = res.getIdentifier("f"+fctSymbol, "drawable", getPackageName());
 						Drawable img = res.getDrawable( resourceId );
 						listButtons.get(fctNum).setCompoundDrawablesWithIntrinsicBounds(img, null , null, null);
+						
+						if(f.length == 3) {
+							//TODO: moment
+						}
 					}
 				}
 			}
