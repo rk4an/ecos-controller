@@ -132,30 +132,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		sTrainId.setOnItemSelectedListener(this);
 		btnControl.setOnClickListener(this);
 
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF0)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF1)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF2)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF3)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF4)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF5)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF6)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF7)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF8)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF9)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF10)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF11)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF12)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF13)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF14)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF15)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF16)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF17)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF18)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF19)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF20)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF21)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF22)));
-		listButtons.add(((ToggleButton) findViewById(R.id.btnF23)));
+		//get the function buttons
+		Resources res = getResources();
+		for(int i=0; i<24; i++) {
+			int resourceId = res.getIdentifier("btnF"+i, "id", getPackageName());
+			listButtons.add(((ToggleButton) findViewById(resourceId)));
+		}
 
 		initFunctionButtons();
 
@@ -653,17 +635,17 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				//train buttons name response 0-7
 				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+", funcexists[0], " +
 						"funcexists[1], funcexists[2], funcexists[3], funcexists[4], funcexists[5], funcexists[6], funcexists[7])>")){
-					getButtonName(respLine);
+					getTrainButtonSymbol(respLine);
 				}
 				//train buttons name response 8-15
 				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+", funcexists[8], " +
 						"funcexists[9], funcexists[10], funcexists[11], funcexists[12], funcexists[13], funcexists[14], funcexists[15])>")){
-					getButtonName(respLine);
+					getTrainButtonSymbol(respLine);
 				}
 				//train buttons name response 16-23
 				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+", funcexists[16], " +
 						"funcexists[17], funcexists[18], funcexists[19], funcexists[20], funcexists[21], funcexists[22], funcexists[23])>")){
-					getButtonName(respLine);
+					getTrainButtonSymbol(respLine);
 				}
 				//train buttons response 8-15
 				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[8],func[9],func[10],func[11]," +
@@ -778,35 +760,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	}
 
 	public void getTrainMainState(String[] result) {
-
-		//speed
-		int index1 = result[2].lastIndexOf('[');
-		int index2 = result[2].lastIndexOf(']');
-
-		int speed = 0;
-		try {
-			speed = Integer.parseInt(result[2].substring(index1+1, index2));
-		}
-		catch(Exception s) {
-
-		}
-		sbSpeed.setProgress(speed);
-		tvSpeed.setText(this.getString(R.string.tv_speed) + speed);
-
-
-		//direction
-		index1 = result[3].lastIndexOf('[');
-		index2 = result[3].lastIndexOf(']');
-
-		boolean dir = false;
-		try {
-			dir = Integer.parseInt(result[3].substring(index1+1, index2)) == 0
-					? true : false;
-		}
-		catch(Exception s) {
-		}
-
-		cbReverse.setChecked(!dir);
+		parseEventSpeed(result);
+		parseEventDir(result);
 	}
 
 	public void getTrainButtonState(String[] result, int offset) {
@@ -845,7 +800,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		}
 	}
 
-	private void getButtonName(String[] result) {
+	private void getTrainButtonSymbol(String[] result) {
 		Pattern p = Pattern.compile("(.*) funcexists\\[(.*)\\]");
 
 		for(int i=1; i<result.length-1; i++) {
@@ -1173,13 +1128,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 				if(state.equals("GO")) {
 					btnEmergency.setChecked(false);
-					//setStateButtons(true);
-					//setStateControl(true);
 				}
 				else {
 					btnEmergency.setChecked(true);
-					//setStateButtons(false);
-					//setStateControl(false);
 				}
 			}
 		}
@@ -1242,12 +1193,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		for(int i=0; i<listButtons.size(); i++) {
 			listButtons.get(i).setOnClickListener(this);
 			listButtons.get(i).setTag("btn;"+i);
-			//if(i>0) {
-				listButtons.get(i).setText(getString(R.string.btn_f) + i);
-				listButtons.get(i).setTextOn(getString(R.string.btn_f) + i);
-				listButtons.get(i).setTextOff(getString(R.string.btn_f) + i);
-				listButtons.get(i).setCompoundDrawablesWithIntrinsicBounds(null,null,null,null);
-			//}
+			listButtons.get(i).setText(getString(R.string.btn_f) + i);
+			listButtons.get(i).setTextOn(getString(R.string.btn_f) + i);
+			listButtons.get(i).setTextOff(getString(R.string.btn_f) + i);
+			listButtons.get(i).setCompoundDrawablesWithIntrinsicBounds(null,null,null,null);
 		}
 	}
 
