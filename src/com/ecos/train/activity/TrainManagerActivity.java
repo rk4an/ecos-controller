@@ -194,7 +194,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	@Override
 	public void onClick(View v) {
 
-		//function buttons
+		//click on a function buttons
 		if(v.getTag() != null) {
 			if(v.getTag().toString().startsWith("btn")) {
 				String token[] = v.getTag().toString().split(";");
@@ -204,12 +204,15 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			}
 		}
 
+		//click on emergency button
 		if(v.getId() == R.id.btnEmergency) {
 			mTcpClient.emergencyStop(((ToggleButton) v).isChecked());
 		}
+		//click on connect button
 		else if(v.getId() == R.id.btnConnect) {
 			connectToStation(((ToggleButton) v).isChecked());
 		} 
+		//click on control button
 		else if(v.getId() == R.id.tbControl) {
 			if(((ToggleButton) v).isChecked()) {
 				mTcpClient.takeControl();
@@ -220,6 +223,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				setStateButtons(false);
 			}
 		}
+		//click on F8-F15 banner
 		else if(v.getId() == R.id.tvF8_F15) {
 			LinearLayout l = (LinearLayout) findViewById(R.id.llF8_F15);
 			if(l.getVisibility() == LinearLayout.VISIBLE) {
@@ -233,6 +237,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				}
 			}
 		}
+		//click on F16-F23 banner
 		else if(v.getId() == R.id.tvF16_F23) {
 			LinearLayout l = (LinearLayout) findViewById(R.id.llF16_F23);
 			if(l.getVisibility() == LinearLayout.VISIBLE) {
@@ -246,9 +251,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				}
 			}
 		}
+		//click on reverse button
 		else if(v.getId() == R.id.cbReverse) {
 			mTcpClient.setDir(((ToggleButton) v).isChecked()?1:0);
 		}
+		//click on switching objects banner
 		else if(v.getId() == R.id.tvSwitch) {
 
 			if(llSwitch.getVisibility() == LinearLayout.VISIBLE) {
@@ -263,6 +270,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				}
 			}
 		}
+		//click on switching objects button
 		else {
 			mTcpClient.changeState(Integer.parseInt(v.getTag().toString()), ((ToggleButton) v).isChecked()?1 :0);
 		}
@@ -278,10 +286,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 	@Override
 	public void onStopTrackingTouch(SeekBar sb) {
+		//speed seekbar
 		if(sb.getId() == R.id.sbSpeed) {
 			mTcpClient.setSpeed(sb.getProgress());
 			tvSpeed.setText(this.getString(R.string.tv_speed) + " " + sb.getProgress());
 		}
+		//switching object seekbar
 		else {
 			try {
 				int id = Integer.parseInt(sb.getTag().toString());
@@ -336,6 +346,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			startActivity(intent);
 			return true;
 		case R.id.iEdit:
+			//show alert dialog to edit train name
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
 			LayoutInflater inflater = getLayoutInflater();
@@ -372,6 +383,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 			return true;
 		case R.id.iInfo:
+			//show alert dialog to display console info
 			infoDialog.show();
 
 			try {
@@ -399,12 +411,13 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if(requestCode == TrainManagerActivity.SETTINGS) {
-			//check if something change
+			//check if something change on ip address
 			if(!Settings.consoleIp.equals(pref.getString("ip", ""))){
 				disconnect();
 				return;
 			}
 
+			//check if something change on sorting preference
 			if(Settings.sortById != pref.getBoolean("pref_sort", false)) {
 				Settings.sortById = pref.getBoolean("pref_sort", false);
 				if(Settings.state != Settings.State.NONE) {
@@ -561,6 +574,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 			//state machine
 			if(Settings.state == Settings.State.NONE) {
+				//check if connection ok
 				if(values[0].equals("READY")) {
 					setStateList(true);
 					setStateEmergency(true);
@@ -580,6 +594,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 					btnConnect.setChecked(false);
 				}
 			}
+			//emergency state response
 			else if(Settings.state == Settings.State.INIT_GET_EMERGENCY) {
 				if(respLine[0].equals("<REPLY get(1, status)>")) {
 					Settings.state = Settings.State.INIT_GET_TRAINS;
@@ -589,6 +604,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 					mTcpClient.getAllTrains();
 				}
 			}
+			//train list response
 			else if(Settings.state == Settings.State.INIT_GET_TRAINS) {
 				if(respLine[0].equals("<REPLY queryObjects(10, name, addr)>")) {
 					Settings.state = Settings.State.GET_TRAIN_MAIN_STATE;
@@ -603,6 +619,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 					sTrainId.setAdapter(dataAdapter);
 				}
 			}
+			//train state response
 			else if(Settings.state == Settings.State.GET_TRAIN_MAIN_STATE) {
 				if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",name,speed,dir)>")) {
 					Settings.state = Settings.State.GET_TRAIN_BUTTON_STATE;
@@ -612,6 +629,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 					mTcpClient.getTrainButtonState();
 				}
 			}
+			//train buttons state response
 			else if(Settings.state == Settings.State.GET_TRAIN_BUTTON_STATE) {
 				if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[0],func[1],func[2],func[3]," +
 						"func[4],func[5],func[6],func[7])>")) {
@@ -620,35 +638,44 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				}
 			}
 			else if(Settings.state == Settings.State.IDLE) {
-				if(respLine[0].startsWith("<EVENT")) {	//manage event
+				//manage event
+				if(respLine[0].startsWith("<EVENT")) {	
 					parseEvent(respLine);
 				}
+				//console info response
 				else if(respLine[0].equals("<REPLY get(1, info)>")) {
 					getInfo(respLine);
 				}
+				//switching objects list response
 				else if(respLine[0].equals("<REPLY queryObjects(11, name1, name2, addrext)>")) {
 					getSwitching(respLine);
 				}
+				//train buttons name response 0-7
 				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+", funcexists[0], " +
 						"funcexists[1], funcexists[2], funcexists[3], funcexists[4], funcexists[5], funcexists[6], funcexists[7])>")){
 					getButtonName(respLine);
 				}
+				//train buttons name response 8-15
 				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+", funcexists[8], " +
 						"funcexists[9], funcexists[10], funcexists[11], funcexists[12], funcexists[13], funcexists[14], funcexists[15])>")){
 					getButtonName(respLine);
 				}
+				//train buttons name response 16-23
 				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+", funcexists[16], " +
 						"funcexists[17], funcexists[18], funcexists[19], funcexists[20], funcexists[21], funcexists[22], funcexists[23])>")){
 					getButtonName(respLine);
 				}
+				//train buttons response 8-15
 				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[8],func[9],func[10],func[11]," +
 						"func[12],func[13],func[14],func[15])>")) {
 					getTrainButtonState(respLine,8);
 				}
+				//train buttons response 16-23
 				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[16],func[17],func[18],func[19]," +
 						"func[20],func[21],func[22],func[23])>")) {
 					getTrainButtonState(respLine,16);
 				}
+				//a switching object response
 				else {
 					parseEventSwitch(respLine);
 				}
@@ -682,7 +709,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 			new connectTask().execute("");
 		}
-		else {	//disconnect
+		else {
 			disconnect();
 		}
 	}
@@ -872,12 +899,13 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				addrext = m.group(4).trim();
 
 				String[] addr = addrext.split(",");
+				//for 2 states create ToggleButton
 				if(addr.length == 2) {
 					ToggleButton tg = createButton(id, name1 + " " + name2);
 					listSwitch.add(tg);
 					((LinearLayout) findViewById(R.id.llSwitch)).addView(tg);
 				}
-				else {
+				else { //for multi states create SeekBar
 					SeekBar sb = createSeekBar(id, addr.length - 1);
 					listSwitchMulti.add(sb);
 
@@ -1214,12 +1242,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		for(int i=0; i<listButtons.size(); i++) {
 			listButtons.get(i).setOnClickListener(this);
 			listButtons.get(i).setTag("btn;"+i);
-			if(i>0) {
+			//if(i>0) {
 				listButtons.get(i).setText(getString(R.string.btn_f) + i);
 				listButtons.get(i).setTextOn(getString(R.string.btn_f) + i);
 				listButtons.get(i).setTextOff(getString(R.string.btn_f) + i);
 				listButtons.get(i).setCompoundDrawablesWithIntrinsicBounds(null,null,null,null);
-			}
+			//}
 		}
 	}
 

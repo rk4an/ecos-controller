@@ -13,6 +13,7 @@ public class Symbols {
 		symbols.put(3, "Head light");
 		symbols.put(4, "Light 1");
 		symbols.put(5, "Light 2");
+		symbols.put(6, "Function"); //Fix Function
 		symbols.put(7, "Sound");
 		symbols.put(8, "Music");
 		symbols.put(9, "Announce");
