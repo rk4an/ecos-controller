@@ -45,16 +45,16 @@ public class Symbols {
 		symbols.put(1608, "Diesel Engine Notch Down");
 		symbols.put(2055, "Thunderer whistle");
 		symbols.put(3847, "Buffer sound");
-		/*symbols.put(9001, "Curve sound");
-		symbols.put(9002, "Relief valve");
-		symbols.put(9003, "Steam blow off");
-		symbols.put(9004, "Air pump");
-		symbols.put(9005, "Water pump");
-		symbols.put(9006, "Sand");
-		symbols.put(9007, "Drain valve");
-		symbols.put(9008, "Set barke");
-		symbols.put(9009, "Set barke");
-		symbols.put(9010, "Board lighting");*/
+		symbols.put(11015, "Curve sound");
+		symbols.put(11271, "Relief valve");
+		symbols.put(11527, "Steam blow off");
+		symbols.put(553, "Air pump");
+		symbols.put(1321, "Water pump");
+		symbols.put(11783, "Sand");
+		symbols.put(1799, "Drain valve");
+		symbols.put(12039, "Set barke");
+		symbols.put(1029, "Set barke");
+		symbols.put(772, "Board lighting");
 	}
 
 	public static synchronized Symbols getInstance(){			
