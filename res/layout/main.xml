@@ -129,6 +129,22 @@
 	            android:textOn="@string/cb_reverse" />
 	    </LinearLayout>
 
+	    <TextView
+	        android:id="@+id/tvSpeed"
+	        android:layout_width="fill_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="1"
+	        android:gravity="center"
+	        android:text="@string/tv_speed" />
+
+	    <SeekBar
+	        android:id="@+id/sbSpeed"
+	        android:layout_width="fill_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="1"
+	        android:max="127"
+	        android:padding="20dip" />
+
 	    <LinearLayout
 	        android:id="@+id/llButtons1"
 	        android:layout_width="match_parent"
@@ -150,7 +166,7 @@
 	            android:layout_width="0dp"
 	            android:layout_height="wrap_content"
 	            android:layout_weight="1"
-	            android:state_enabled="false"/>
+	            android:state_enabled="false" />
 
 	        <ToggleButton
 	            android:id="@+id/btnF2"
@@ -164,7 +180,7 @@
 	            android:layout_width="0dp"
 	            android:layout_height="wrap_content"
 	            android:layout_weight="1"
-	            android:state_enabled="false"/>
+	            android:state_enabled="false" />
 	    </LinearLayout>
 
 	    <LinearLayout
@@ -178,21 +194,21 @@
 	            android:layout_width="0dp"
 	            android:layout_height="wrap_content"
 	            android:layout_weight="1"
-	            android:state_enabled="false"/>
+	            android:state_enabled="false" />
 
 	        <ToggleButton
 	            android:id="@+id/btnF5"
 	            android:layout_width="0dp"
 	            android:layout_height="wrap_content"
 	            android:layout_weight="1"
-	            android:state_enabled="false"/>
+	            android:state_enabled="false" />
 
 	        <ToggleButton
 	            android:id="@+id/btnF6"
 	            android:layout_width="0dp"
 	            android:layout_height="wrap_content"
 	            android:layout_weight="1"
-	            android:state_enabled="false"/>
+	            android:state_enabled="false" />
 
 	        <ToggleButton
 	            android:id="@+id/btnF7"
@@ -245,7 +261,7 @@
 	                android:layout_width="0dp"
 	                android:layout_height="wrap_content"
 	                android:layout_weight="1"
-	                android:state_enabled="false"/>
+	                android:state_enabled="false" />
 
 	            <ToggleButton
 	                android:id="@+id/btnF11"
@@ -291,111 +307,94 @@
 	        </LinearLayout>
 	    </LinearLayout>
 
-        <TextView
-            android:id="@+id/tvF16_F23"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_margin="5dp"
-            android:layout_weight="1"
-            android:background="#444242"
-            android:padding="5dp"
-            android:text="@string/tv_f16_f23" />
-
-        <LinearLayout
-            android:id="@+id/llF16_F23"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:visibility="gone" >
-
-            <LinearLayout
-                android:id="@+id/llButtons5"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" >
-
-                <ToggleButton
-                    android:id="@+id/btnF16"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:state_enabled="false" />
-
-                <ToggleButton
-                    android:id="@+id/btnF17"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:state_enabled="false"/>
-
-                <ToggleButton
-                    android:id="@+id/btnF18"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:state_enabled="false"/>
-
-                <ToggleButton
-                    android:id="@+id/btnF19"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:state_enabled="false" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/llButtons6"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" >
-
-                <ToggleButton
-                    android:id="@+id/btnF20"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:state_enabled="false"/>
-
-                <ToggleButton
-                    android:id="@+id/btnF21"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:state_enabled="false"/>
-
-                <ToggleButton
-                    android:id="@+id/btnF22"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:state_enabled="false" />
-
-                <ToggleButton
-                    android:id="@+id/btnF23"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:state_enabled="false"/>
-            </LinearLayout>
-        </LinearLayout>	    
-	    
 	    <TextView
-	        android:id="@+id/tvSpeed"
-	        android:layout_width="fill_parent"
+	        android:id="@+id/tvF16_F23"
+	        android:layout_width="wrap_content"
 	        android:layout_height="0dp"
+	        android:layout_margin="5dp"
 	        android:layout_weight="1"
-	        android:gravity="center"
-	        android:text="@string/tv_speed" >
-	    </TextView>
+	        android:background="#444242"
+	        android:padding="5dp"
+	        android:text="@string/tv_f16_f23" />
 
-	    <SeekBar
-	        android:id="@+id/sbSpeed"
-	        android:layout_width="fill_parent"
+	    <LinearLayout
+	        android:id="@+id/llF16_F23"
+	        android:layout_width="match_parent"
 	        android:layout_height="0dp"
 	        android:layout_weight="1"
-	        android:max="127"
-	        android:padding="20dip" />
+	        android:orientation="vertical"
+	        android:visibility="gone" >
+
+	        <LinearLayout
+	            android:id="@+id/llButtons5"
+	            android:layout_width="match_parent"
+	            android:layout_height="0dp"
+	            android:layout_weight="1" >
+
+	            <ToggleButton
+	                android:id="@+id/btnF16"
+	                android:layout_width="0dp"
+	                android:layout_height="wrap_content"
+	                android:layout_weight="1"
+	                android:state_enabled="false" />
+
+	            <ToggleButton
+	                android:id="@+id/btnF17"
+	                android:layout_width="0dp"
+	                android:layout_height="wrap_content"
+	                android:layout_weight="1"
+	                android:state_enabled="false" />
+
+	            <ToggleButton
+	                android:id="@+id/btnF18"
+	                android:layout_width="0dp"
+	                android:layout_height="wrap_content"
+	                android:layout_weight="1"
+	                android:state_enabled="false" />
+
+	            <ToggleButton
+	                android:id="@+id/btnF19"
+	                android:layout_width="0dp"
+	                android:layout_height="wrap_content"
+	                android:layout_weight="1"
+	                android:state_enabled="false" />
+	        </LinearLayout>
+
+	        <LinearLayout
+	            android:id="@+id/llButtons6"
+	            android:layout_width="match_parent"
+	            android:layout_height="0dp"
+	            android:layout_weight="1" >
+
+	            <ToggleButton
+	                android:id="@+id/btnF20"
+	                android:layout_width="0dp"
+	                android:layout_height="wrap_content"
+	                android:layout_weight="1"
+	                android:state_enabled="false" />
+
+	            <ToggleButton
+	                android:id="@+id/btnF21"
+	                android:layout_width="0dp"
+	                android:layout_height="wrap_content"
+	                android:layout_weight="1"
+	                android:state_enabled="false" />
+
+	            <ToggleButton
+	                android:id="@+id/btnF22"
+	                android:layout_width="0dp"
+	                android:layout_height="wrap_content"
+	                android:layout_weight="1"
+	                android:state_enabled="false" />
+
+	            <ToggleButton
+	                android:id="@+id/btnF23"
+	                android:layout_width="0dp"
+	                android:layout_height="wrap_content"
+	                android:layout_weight="1"
+	                android:state_enabled="false" />
+	        </LinearLayout>
+	    </LinearLayout>
 
 	    <TextView
 	        android:id="@+id/tvSwitch"
@@ -413,9 +412,7 @@
 	        android:layout_height="0dp"
 	        android:layout_weight="1"
 	        android:orientation="vertical" >
-
 	    </LinearLayout>
-
 	</LinearLayout>
 
 </ScrollView>
