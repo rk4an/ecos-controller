@@ -888,6 +888,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		for (ToggleButton t : listSwitch) {
 			mTcpClient.getState(Integer.parseInt(t.getTag().toString()));
 		}
+		for (SeekBar s : listSwitchMulti) {
+			mTcpClient.getState(Integer.parseInt(s.getTag().toString()));
+		}
 	}
 
 	public void getInfo(String[] result) {
