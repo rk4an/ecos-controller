@@ -98,6 +98,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	TextView applicationVersion = null;
 	TextView hardwareVersion = null;
 	TextView ecosVersion = null;
+	
+	String protocolVersionNumber = "";
+	String applicationVersionNumber = "";
+	String hardwareVersionNumber = "";
 
 	List<ToggleButton> listSwitch = new ArrayList<ToggleButton>();
 	List<SeekBar> listSwitchMulti = new ArrayList<SeekBar>();
@@ -373,8 +377,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				ecosVersion.setText(manager.versionName);
 			} catch (Exception e) { }
 
-			mTcpClient.getInfo();
-
 			return true;
 		case R.id.iContact:
 			Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
@@ -567,9 +569,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 							getApplicationContext().getString(R.string.tv_connect));
 					btnConnect.setChecked(true);
 
-					Settings.state = Settings.State.INIT_GET_EMERGENCY;
-					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_emergency_state));
-					mTcpClient.getEmergencyState();
+					Settings.state = Settings.State.INIT_GET_CONSOLE;
+					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_console_info));
+					mTcpClient.getConsoleState();
 				}
 				else {
 					tvState.setText(getApplicationContext().getString(R.string.tv_state) + " " + getString(R.string.tv_disconnect));
@@ -577,11 +579,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				}
 			}
 			//emergency state response
-			else if(Settings.state == Settings.State.INIT_GET_EMERGENCY) {
-				if(respLine[0].equals("<REPLY get(1, status)>")) {
+			else if(Settings.state == Settings.State.INIT_GET_CONSOLE) {
+				if(respLine[0].equals("<REPLY get(1, status, info)>")) {
 					Settings.state = Settings.State.INIT_GET_TRAINS;
-					boolean isEmergency = getEmergencyState(values[0]);
-					btnEmergency.setChecked(isEmergency);
+					parseEventEmergency(respLine);
+					getConsoleVersion(respLine);
 					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_train_list));
 					mTcpClient.getAllTrains();
 				}
@@ -626,7 +628,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				}
 				//console info response
 				else if(respLine[0].equals("<REPLY get(1, info)>")) {
-					getInfo(respLine);
+					getConsoleVersion(respLine);
 				}
 				//switching objects list response
 				else if(respLine[0].equals("<REPLY queryObjects(11, name1, name2, addrext)>")) {
@@ -713,19 +715,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	/**************************************************************************/
 	/** Get state **/
 	/**************************************************************************/	
-
-	public boolean getEmergencyState(String result) {
-
-		int index1 = result.lastIndexOf('[');
-		int index2 = result.lastIndexOf(']');
-
-		try {
-			return result.substring(index1+1, index2).toUpperCase().equals("STOP");
-		}
-		catch(Exception s) {
-			return false;
-		}
-	}
 
 	public List<Train> getAllTrains(String result) {
 
@@ -893,7 +882,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		}
 	}
 
-	public void getInfo(String[] result) {
+	public void getConsoleVersion(String[] result) {
 
 		//read Protocol Version
 		Pattern p = Pattern.compile("(.*) ProtocolVersion\\[(.*)\\]");
@@ -902,7 +891,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			Matcher m = p.matcher(result[i]);
 
 			while (m.find() == true) {
-				protocolVersion.setText(m.group(2).trim());
+				protocolVersionNumber = m.group(2).trim();
+				protocolVersion.setText(protocolVersionNumber);
 			}
 		}
 
@@ -913,7 +903,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			Matcher m = p.matcher(result[i]);
 
 			while (m.find() == true) {
-				applicationVersion.setText(m.group(2).trim());
+				applicationVersionNumber = m.group(2).trim();
+				applicationVersion.setText(applicationVersionNumber);
 			}
 		}
 
@@ -924,7 +915,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			Matcher m = p.matcher(result[i]);
 
 			while (m.find() == true) {
-				hardwareVersion.setText(m.group(2).trim());
+				hardwareVersionNumber = m.group(2).trim();
+				hardwareVersion.setText(hardwareVersionNumber);
 			}
 		}
 	}

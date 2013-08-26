@@ -37,7 +37,7 @@
     <string name="tv_switch">Switching objects</string>
     <string name="pref_sort">Sorting the list by ID</string>
     <string name="pref_sort_id">Sorting by ID</string>
-    <string name="state_emergency_state">Get Emergency state</string>
+    <string name="state_console_info">Get Console info</string>
     <string name="state_train_list">Get Trains list</string>
     <string name="state_train_state">Get Train state</string>
     <string name="state_train_buttons">Get Train buttons state</string>

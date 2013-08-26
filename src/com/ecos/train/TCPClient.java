@@ -113,8 +113,8 @@ public class TCPClient {
 	/** Command Console **/
 	/**************************************************************************/
 	
-	public void getEmergencyState() {
-		sendMessage("get(1, status)");
+	public void getConsoleState() {
+		sendMessage("get(1, status, info)");
 	}
 	
 	public void emergencyStop(boolean state) {
@@ -128,10 +128,6 @@ public class TCPClient {
 	
 	public void viewConsole() {
 		sendMessage("request(1, view)");
-	}
-	
-	public void getInfo() {
-		sendMessage("get(1, info)");
 	}
 	
 	/**************************************************************************/

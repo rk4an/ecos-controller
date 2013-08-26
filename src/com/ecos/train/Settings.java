@@ -27,7 +27,7 @@ public class Settings {
 	
 	public enum State {
 		NONE, 
-		INIT_GET_EMERGENCY, 
+		INIT_GET_CONSOLE, 
 		INIT_GET_TRAINS, 
 		GET_TRAIN_MAIN_STATE,
 		GET_TRAIN_BUTTON_STATE, 
