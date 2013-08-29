@@ -24,6 +24,7 @@ public class Settings {
 	public static final int SPEED_STEP = 10;
 	
 	public static boolean sortById = false;
+	public static String protocolVersion = "0.2";
 	
 	public enum State {
 		NONE, 

@@ -98,10 +98,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	TextView applicationVersion = null;
 	TextView hardwareVersion = null;
 	TextView ecosVersion = null;
-	
-	String protocolVersionNumber = "";
-	String applicationVersionNumber = "";
-	String hardwareVersionNumber = "";
 
 	List<ToggleButton> listSwitch = new ArrayList<ToggleButton>();
 	List<SeekBar> listSwitchMulti = new ArrayList<SeekBar>();
@@ -618,7 +614,15 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[0],func[1],func[2],func[3]," +
 						"func[4],func[5],func[6],func[7])>")) {
 					Settings.state = Settings.State.IDLE;
-					getTrainButtonState(respLine,0);
+
+					parseEventButtons(respLine);
+					setStateButtons(true);
+					setStateList(true);
+					setStateControl(true);
+
+					if(!Settings.protocolVersion.equals("0.1")) {
+						mTcpClient.getButtonName();
+					}
 				}
 			}
 			else if(Settings.state == Settings.State.IDLE) {
@@ -652,12 +656,22 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				//train buttons response 8-15
 				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[8],func[9],func[10],func[11]," +
 						"func[12],func[13],func[14],func[15])>")) {
-					getTrainButtonState(respLine,8);
+
+					parseEventButtons(respLine);
+
+					if(!Settings.protocolVersion.equals("0.1")) {
+						mTcpClient.getButtonNameF8F15();
+					}
 				}
 				//train buttons response 16-23
 				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[16],func[17],func[18],func[19]," +
 						"func[20],func[21],func[22],func[23])>")) {
-					getTrainButtonState(respLine,16);
+					
+					parseEventButtons(respLine);
+
+					if(!Settings.protocolVersion.equals("0.1")) {
+						mTcpClient.getButtonNameF16F23();
+					}
 				}
 				//a switching object response
 				else {
@@ -753,43 +767,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		parseEventDir(result);
 	}
 
-	public void getTrainButtonState(String[] result, int offset) {
-
-		List<Boolean> state = new ArrayList<Boolean>();
-
-		for(int i=1;i<9;i++) {
-			int index1 = result[i].lastIndexOf(' ');
-			int index2 = result[i].lastIndexOf(']');
-			boolean s = false;
-			try {
-				s = Integer.parseInt(result[i].substring(index1+1, index2)) == 1
-						? true : false;
-			}
-			catch(Exception e) {
-			}
-			state.add(s);
-		}
-
-		for(int i=0; i<=7; i++) {
-			listButtons.get(i+offset).setChecked(state.get(i));
-		}
-
-		if(offset == 0) {
-			//ready, activate button
-			setStateButtons(true);
-			setStateList(true);
-			setStateControl(true);
-			mTcpClient.getButtonName();
-		}
-		else if(offset == 8) {
-			mTcpClient.getButtonNameF8F15();
-		}
-		else if(offset == 16) {
-			mTcpClient.getButtonNameF16F23();
-		}
-	}
-
 	private void getTrainButtonSymbol(String[] result) {
+
 		Pattern p = Pattern.compile("(.*) funcexists\\[(.*)\\]");
 
 		for(int i=1; i<result.length-1; i++) {
@@ -814,7 +793,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 						int resourceId = res.getIdentifier("f"+fctSymbol, "drawable", getPackageName());
 						Drawable img = res.getDrawable( resourceId );
 						listButtons.get(fctNum).setCompoundDrawablesWithIntrinsicBounds(img, null , null, null);
-						
+
 						if(f.length == 3) {
 							//TODO: moment
 						}
@@ -891,8 +870,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			Matcher m = p.matcher(result[i]);
 
 			while (m.find() == true) {
-				protocolVersionNumber = m.group(2).trim();
-				protocolVersion.setText(protocolVersionNumber);
+				Settings.protocolVersion = m.group(2).trim();
+				protocolVersion.setText(Settings.protocolVersion);
 			}
 		}
 
@@ -903,7 +882,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			Matcher m = p.matcher(result[i]);
 
 			while (m.find() == true) {
-				applicationVersionNumber = m.group(2).trim();
+				String applicationVersionNumber = m.group(2).trim();
 				applicationVersion.setText(applicationVersionNumber);
 			}
 		}
@@ -915,7 +894,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			Matcher m = p.matcher(result[i]);
 
 			while (m.find() == true) {
-				hardwareVersionNumber = m.group(2).trim();
+				String hardwareVersionNumber = m.group(2).trim();
 				hardwareVersion.setText(hardwareVersionNumber);
 			}
 		}
