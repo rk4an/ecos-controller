@@ -143,7 +143,7 @@ public class TCPClient {
 	/**************************************************************************/
 	
 	public void getTrainMainState() {
-		sendMessage("get("+Settings.currentTrain.getId()+",name,speed,dir)");
+		sendMessage("get("+Settings.currentTrain.getId()+",name,speed,dir,speedindicator)");
 	}
 	
 	public void getTrainButtonState() {

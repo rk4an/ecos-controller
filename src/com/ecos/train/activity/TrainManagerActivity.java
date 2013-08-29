@@ -105,6 +105,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	List<ToggleButton> listButtons = new ArrayList<ToggleButton>();
 
 	private static final int SETTINGS = 0;
+	private int speedIndicator = 0;
 
 	/**************************************************************************/
 	/** Listeners **/
@@ -271,7 +272,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		//speed seekbar
 		if(sb.getId() == R.id.sbSpeed) {
 			mTcpClient.setSpeed(sb.getProgress());
-			tvSpeed.setText(this.getString(R.string.tv_speed) + " " + sb.getProgress());
+			displaySpeed(sb.getProgress());
 		}
 		//switching object seekbar
 		else {
@@ -601,7 +602,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			}
 			//train state response
 			else if(Settings.state == Settings.State.GET_TRAIN_MAIN_STATE) {
-				if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",name,speed,dir)>")) {
+				if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",name,speed,dir,speedindicator)>")) {
 					Settings.state = Settings.State.GET_TRAIN_BUTTON_STATE;
 					getTrainMainState(respLine);
 					initFunctionButtons();
@@ -666,7 +667,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				//train buttons response 16-23
 				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[16],func[17],func[18],func[19]," +
 						"func[20],func[21],func[22],func[23])>")) {
-					
+
 					parseEventButtons(respLine);
 
 					if(!Settings.protocolVersion.equals("0.1")) {
@@ -934,12 +935,13 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	}
 
 	public boolean parseEventSpeed(String[] list) {
-		Pattern p = Pattern.compile("(.*) speed\\[(.*)\\]");
+
 		String id = "";
 		int iid = 0;
 		boolean match = false;
 
-		String speed = "";
+
+		Pattern p = Pattern.compile("(.*) speedindicator\\[(.*)\\]");
 
 		for(int i=1; i<list.length-1; i++) {
 			Matcher m = p.matcher(list[i]);
@@ -949,19 +951,50 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				id = m.group(1).trim();
 				try {
 					iid = Integer.parseInt(id);
+					speedIndicator = Integer.parseInt(m.group(2).trim());
 				}
 				catch(Exception e) {	
 				}
-				speed = m.group(2).trim();
+			}
+		}
+
+
+		p = Pattern.compile("(.*) speed\\[(.*)\\]");
+		int speed = 0;
+
+		for(int i=1; i<list.length-1; i++) {
+			Matcher m = p.matcher(list[i]);
+
+			while (m.find() == true) {
+				match = true;
+				id = m.group(1).trim();
+				try {
+					iid = Integer.parseInt(id);
+					speed = Integer.parseInt(m.group(2).trim());
+				}
+				catch(Exception e) {	
+				}
 
 				if(iid == Settings.currentTrain.getId()) {
-					int ispeed = Integer.parseInt(speed);
-					sbSpeed.setProgress(ispeed);
-					tvSpeed.setText(getApplicationContext().getString(R.string.tv_speed) + speed);
+					sbSpeed.setProgress(speed);
+					displaySpeed(speed);
 				}
 			}
 		}
+
 		return match;
+	}
+
+	private void displaySpeed(int speed) {
+		if(speedIndicator == 0) {
+			tvSpeed.setText(getApplicationContext().getString(
+					R.string.tv_speed) + " " + speed + "/" + Settings.SPEED_MAX);
+		}
+		else {
+			tvSpeed.setText(getApplicationContext().getString(
+					R.string.tv_speed) + " " + speed + "/" + Settings.SPEED_MAX + 
+					" (" + ((int)speedIndicator*speed/Settings.SPEED_MAX) + "/" + speedIndicator + "km/h)");
+		}
 	}
 
 	public boolean parseEventSwitch(String[] list) {
@@ -1244,7 +1277,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 			}
 			mTcpClient.setSpeed(sbSpeed.getProgress());
-			tvSpeed.setText(this.getString(R.string.tv_speed) + " " + sbSpeed.getProgress());
+			displaySpeed(sbSpeed.getProgress());
 		}
 	}
 }
