@@ -105,7 +105,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	List<ToggleButton> listButtons = new ArrayList<ToggleButton>();
 
 	private static final int SETTINGS = 0;
-	private int speedIndicator = 0;
 
 	/**************************************************************************/
 	/** Listeners **/
@@ -306,7 +305,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		if(Settings.fullVersion) {
 			menu.getItem(1).setEnabled(false);
 		}
-		if(Settings.currentTrain.getId() == -1) {
+		if(Settings.currentTrainIndex == -1) {
 			menu.getItem(2).setEnabled(false);
 			menu.getItem(3).setEnabled(false);
 		}
@@ -337,9 +336,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			final EditText edName = ((EditText)dialogView.findViewById(R.id.edName));
 			final TextView edId = ((TextView)dialogView.findViewById(R.id.tv_id));
 			final TextView edAddress = ((TextView)dialogView.findViewById(R.id.tv_address));
-			edName.setText(Settings.currentTrain.getName());
-			edId.setText(Settings.currentTrain.getId()+"");
-			edAddress.setText(Settings.currentTrain.getAddress());
+			edName.setText(Settings.getCurrentTrain().getName());
+			edId.setText(Settings.getCurrentTrain().getId()+"");
+			edAddress.setText(Settings.getCurrentTrain().getAddress());
 
 			builder.setView( dialogView);
 			builder.setTitle(getString(R.string.btn_edit))
@@ -351,7 +350,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 					mTcpClient.setName(name);
 
 					for (Train t : Settings.allTrains) {
-						if(t.getId() == Settings.currentTrain.getId()) {
+						if(t.getId() == Settings.getCurrentTrain().getId()) {
 							t.setName(name);
 						}
 					}
@@ -406,7 +405,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 					dataAdapter.notifyDataSetChanged();
 					//restore the latest selection
 					for(int i=0; i<Settings.allTrains.size(); i++) {
-						if(Settings.allTrains.get(i).getId() == Settings.currentTrain.getId()) {
+						if(Settings.allTrains.get(i).getId() == Settings.getCurrentTrain().getId()) {
 							sTrainId.setSelection(i);
 							break;
 						}
@@ -422,13 +421,13 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		setStateButtons(false);
 
 		//release old train
-		if(Settings.currentTrain.getId() != -1) {
+		if(Settings.currentTrainIndex != -1) {
 			mTcpClient.releaseViewTrain();
 			mTcpClient.releaseControl();
 		}
 
 		//get train and take control
-		Settings.currentTrain = ((Train)parent.getItemAtPosition(pos));
+		Settings.currentTrainIndex = pos;
 
 		mTcpClient.takeControl();
 		btnControl.setChecked(true);
@@ -602,7 +601,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			}
 			//train state response
 			else if(Settings.state == Settings.State.GET_TRAIN_MAIN_STATE) {
-				if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",name,speed,dir,speedindicator)>")) {
+				if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",name,speed,dir,speedindicator)>")) {
 					Settings.state = Settings.State.GET_TRAIN_BUTTON_STATE;
 					getTrainMainState(respLine);
 					initFunctionButtons();
@@ -612,7 +611,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			}
 			//train buttons state response
 			else if(Settings.state == Settings.State.GET_TRAIN_BUTTON_STATE) {
-				if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[0],func[1],func[2],func[3]," +
+				if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",func[0],func[1],func[2],func[3]," +
 						"func[4],func[5],func[6],func[7])>")) {
 					Settings.state = Settings.State.IDLE;
 
@@ -640,22 +639,22 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 					getSwitching(respLine);
 				}
 				//train buttons name response 0-7
-				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+", funcexists[0], " +
+				else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[0], " +
 						"funcexists[1], funcexists[2], funcexists[3], funcexists[4], funcexists[5], funcexists[6], funcexists[7])>")){
 					getTrainButtonSymbol(respLine);
 				}
 				//train buttons name response 8-15
-				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+", funcexists[8], " +
+				else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[8], " +
 						"funcexists[9], funcexists[10], funcexists[11], funcexists[12], funcexists[13], funcexists[14], funcexists[15])>")){
 					getTrainButtonSymbol(respLine);
 				}
 				//train buttons name response 16-23
-				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+", funcexists[16], " +
+				else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[16], " +
 						"funcexists[17], funcexists[18], funcexists[19], funcexists[20], funcexists[21], funcexists[22], funcexists[23])>")){
 					getTrainButtonSymbol(respLine);
 				}
 				//train buttons response 8-15
-				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[8],func[9],func[10],func[11]," +
+				else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",func[8],func[9],func[10],func[11]," +
 						"func[12],func[13],func[14],func[15])>")) {
 
 					parseEventButtons(respLine);
@@ -665,7 +664,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 					}
 				}
 				//train buttons response 16-23
-				else if(respLine[0].equals("<REPLY get("+Settings.currentTrain.getId()+",func[16],func[17],func[18],func[19]," +
+				else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",func[16],func[17],func[18],func[19]," +
 						"func[20],func[21],func[22],func[23])>")) {
 
 					parseEventButtons(respLine);
@@ -918,7 +917,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				if(eventId == 1) {
 					parseEventEmergency(result);
 				}
-				else if(eventId == Settings.currentTrain.getId()) {
+				else if(eventId == Settings.getCurrentTrain().getId()) {
 					if(parseEventSpeed(result))			return;
 					if(parseEventButtons(result))		return;
 					if(parseEventDir(result))			return;
@@ -951,7 +950,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				id = m.group(1).trim();
 				try {
 					iid = Integer.parseInt(id);
-					speedIndicator = Integer.parseInt(m.group(2).trim());
+					Settings.getCurrentTrain().setSpeedIndicator(Integer.parseInt(m.group(2).trim()));
 				}
 				catch(Exception e) {	
 				}
@@ -975,7 +974,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				catch(Exception e) {	
 				}
 
-				if(iid == Settings.currentTrain.getId()) {
+				if(iid == Settings.getCurrentTrain().getId()) {
 					sbSpeed.setProgress(speed);
 					displaySpeed(speed);
 				}
@@ -986,6 +985,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	}
 
 	private void displaySpeed(int speed) {
+		int speedIndicator = Settings.getCurrentTrain().getSpeedIndicator();
 		if(speedIndicator == 0) {
 			tvSpeed.setText(getApplicationContext().getString(
 					R.string.tv_speed) + " " + speed + "/" + Settings.SPEED_MAX);
@@ -1067,7 +1067,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				catch(Exception e) {		
 				}
 
-				if(iid == Settings.currentTrain.getId()) {
+				if(iid == Settings.getCurrentTrain().getId()) {
 					ibtn = -1;
 					try {
 						ibtn = Integer.parseInt(btn);
@@ -1111,7 +1111,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 				}
 				dir = m.group(2).trim();
 
-				if(iid == Settings.currentTrain.getId()) {
+				if(iid == Settings.getCurrentTrain().getId()) {
 
 					try {
 						idir = Integer.parseInt(dir) == 0 ? true : false;

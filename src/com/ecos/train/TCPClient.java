@@ -143,69 +143,69 @@ public class TCPClient {
 	/**************************************************************************/
 	
 	public void getTrainMainState() {
-		sendMessage("get("+Settings.currentTrain.getId()+",name,speed,dir,speedindicator)");
+		sendMessage("get("+Settings.getCurrentTrain().getId()+",name,speed,dir,speedindicator)");
 	}
 	
 	public void getTrainButtonState() {
-		sendMessage("get("+Settings.currentTrain.getId()+",func[0],func[1],func[2],func[3]," +
+		sendMessage("get("+Settings.getCurrentTrain().getId()+",func[0],func[1],func[2],func[3]," +
 				"func[4],func[5],func[6],func[7])");
 	}
 	
 	public void getTrainButtonStateF8F15() {
-		sendMessage("get("+Settings.currentTrain.getId()+",func[8],func[9],func[10],func[11]," +
+		sendMessage("get("+Settings.getCurrentTrain().getId()+",func[8],func[9],func[10],func[11]," +
 				"func[12],func[13],func[14],func[15])");
 	}
 	
 	public void getTrainButtonStateF16F23() {
-		sendMessage("get("+Settings.currentTrain.getId()+",func[16],func[17],func[18],func[19]," +
+		sendMessage("get("+Settings.getCurrentTrain().getId()+",func[16],func[17],func[18],func[19]," +
 				"func[20],func[21],func[22],func[23])");
 	}
 	
 	public void setButton(int i, boolean enabled) {
 		int value = (enabled) ? 1 : 0;
-		sendMessage("set("+Settings.currentTrain.getId()+", func["+i+", "+value+"])");
+		sendMessage("set("+Settings.getCurrentTrain().getId()+", func["+i+", "+value+"])");
 	}
 	
 	public void setSpeed(int speed) {
-		sendMessage("set("+Settings.currentTrain.getId()+", speed["+speed+"])");
+		sendMessage("set("+Settings.getCurrentTrain().getId()+", speed["+speed+"])");
 	}
 	
 	public void setDir(int dir) {
-		sendMessage("set("+Settings.currentTrain.getId()+", dir["+dir+"])");
+		sendMessage("set("+Settings.getCurrentTrain().getId()+", dir["+dir+"])");
 	}
 	
 	public void takeControl() {
-		sendMessage("request("+Settings.currentTrain.getId()+", control, force)");
+		sendMessage("request("+Settings.getCurrentTrain().getId()+", control, force)");
 	}
 	
 	public void releaseControl() {
-		sendMessage("release("+Settings.currentTrain.getId()+", control)");
+		sendMessage("release("+Settings.getCurrentTrain().getId()+", control)");
 	}
 
 	public void takeViewTrain() {
-		sendMessage("request("+Settings.currentTrain.getId()+", view)");
+		sendMessage("request("+Settings.getCurrentTrain().getId()+", view)");
 	}
 	
 	public void releaseViewTrain() {
-		sendMessage("release("+Settings.currentTrain.getId()+", view)");
+		sendMessage("release("+Settings.getCurrentTrain().getId()+", view)");
 	}
 	
 	public void setName(String name) {
-		sendMessage("set("+Settings.currentTrain.getId()+", name[\""+name+"\"])");
+		sendMessage("set("+Settings.getCurrentTrain().getId()+", name[\""+name+"\"])");
 	}
 	
 	public void getButtonName() {
-		sendMessage("get("+Settings.currentTrain.getId()+", funcexists[0], " +
+		sendMessage("get("+Settings.getCurrentTrain().getId()+", funcexists[0], " +
 				"funcexists[1], funcexists[2], funcexists[3], funcexists[4], funcexists[5], funcexists[6], funcexists[7])");
 	}
 	
 	public void getButtonNameF8F15() {
-		sendMessage("get("+Settings.currentTrain.getId()+", funcexists[8], " +
+		sendMessage("get("+Settings.getCurrentTrain().getId()+", funcexists[8], " +
 				"funcexists[9], funcexists[10], funcexists[11], funcexists[12], funcexists[13], funcexists[14], funcexists[15])");
 	}
 	
 	public void getButtonNameF16F23() {
-		sendMessage("get("+Settings.currentTrain.getId()+", funcexists[16], " +
+		sendMessage("get("+Settings.getCurrentTrain().getId()+", funcexists[16], " +
 				"funcexists[17], funcexists[18], funcexists[19], funcexists[20], funcexists[21], funcexists[22], funcexists[23])");
 	}
 	

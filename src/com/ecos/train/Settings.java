@@ -13,7 +13,7 @@ public class Settings {
 	public static int consolePort = CONSOLE_PORT;
 	
 	public static List<Train> allTrains = new ArrayList<Train>();
-	public static Train currentTrain = new Train(-1, "", "");
+	public static int currentTrainIndex = -1;
 	
 	public static State state = State.NONE;
 
@@ -33,6 +33,10 @@ public class Settings {
 		GET_TRAIN_MAIN_STATE,
 		GET_TRAIN_BUTTON_STATE, 
 		IDLE;
+	}
+	
+	public static Train getCurrentTrain() {
+		return allTrains.get(currentTrainIndex);
 	}
 	
 }
