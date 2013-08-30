@@ -134,7 +134,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 		//get the function buttons
 		Resources res = getResources();
-		for(int i=0; i<24; i++) {
+		for(int i=0; i<Settings.FUNCTION_BUTTONS; i++) {
 			int resourceId = res.getIdentifier("btnF"+i, "id", getPackageName());
 			listButtons.add(((ToggleButton) findViewById(resourceId)));
 		}

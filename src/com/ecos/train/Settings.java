@@ -22,6 +22,7 @@ public class Settings {
 	public static final int SPEED_MIN = 0;
 	public static final int SPEED_MAX = 127;
 	public static final int SPEED_STEP = 10;
+	public static final int FUNCTION_BUTTONS = 24;
 	
 	public static boolean sortById = false;
 	public static String protocolVersion = "0.2";
