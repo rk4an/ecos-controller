@@ -105,6 +105,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	List<ToggleButton> listButtons = new ArrayList<ToggleButton>();
 
 	private static final int SETTINGS = 0;
+	private int speedStep = Settings.SPEED_STEP;
 
 	/**************************************************************************/
 	/** Listeners **/
@@ -155,6 +156,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		pref = PreferenceManager.getDefaultSharedPreferences(this);
 		Settings.fullVersion = checkSig(this);
 
+		//get speed step in save preference
+		speedStep = Integer.parseInt(pref.getString("pref_speed", Settings.SPEED_STEP+""));
+		
 		//info dialog
 		infoDialog = new Dialog(this);
 		LayoutInflater inflater = getLayoutInflater();
@@ -391,6 +395,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if(requestCode == TrainManagerActivity.SETTINGS) {
+				
+			//get speed step
+			speedStep = Integer.parseInt(pref.getString("pref_speed", Settings.SPEED_STEP+""));
+			
 			//check if something change on ip address
 			if(!Settings.consoleIp.equals(pref.getString("ip", ""))){
 				disconnect();
@@ -1259,17 +1267,16 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 		if(sbSpeed.isEnabled()) {
 			int current_value = sbSpeed.getProgress();
 			int new_value = current_value;
-			int step = Settings.SPEED_STEP;
 
 			if(increase) {
-				new_value = current_value + step;
+				new_value = current_value + speedStep;
 				if(new_value > Settings.SPEED_MAX) {
 					new_value = Settings.SPEED_MAX;
 				}
 				sbSpeed.setProgress(new_value);
 			}
 			else {
-				new_value = current_value - step;
+				new_value = current_value - speedStep;
 				if(new_value < Settings.SPEED_MIN) {
 					new_value = Settings.SPEED_MIN;
 				}

@@ -16,8 +16,16 @@
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="pref_sort"
-            android:summary="@string/pref_sort"
-            android:title="@string/pref_sort_id" />
+            android:summary="@string/pref_sort_sum"
+            android:title="@string/pref_sort_title" />
+
+        <ListPreference
+            android:defaultValue="10"
+            android:entries="@array/speed_step_entries"
+            android:entryValues="@array/speed_step_values"
+            android:key="pref_speed"
+            android:summary="@string/pref_speed_step_sum"
+            android:title="@string/pref_speed_step_title" />
     </PreferenceCategory>
 
 </PreferenceScreen>

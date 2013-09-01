@@ -35,8 +35,8 @@
     <string name="tv_hardware_version">Hardware Version:</string>
     <string name="tv_ecos_version">ECoS Controller Version:</string>
     <string name="tv_switch">Switching objects</string>
-    <string name="pref_sort">Sorting the list by ID</string>
-    <string name="pref_sort_id">Sorting by ID</string>
+    <string name="pref_sort_sum">Sorting the list by ID</string>
+    <string name="pref_sort_title">Sorting by ID</string>
     <string name="state_console_info">Get Console info</string>
     <string name="state_train_list">Get Trains list</string>
     <string name="state_train_state">Get Train state</string>
@@ -45,5 +45,7 @@
     <string name="state_f16_f23">Get F16-F23 buttons state</string>
     <string name="state_switching_objects">Get Switching Objets state</string>
     <string name="state_ready">Ready</string>
+    <string name="pref_speed_step_title">Speed step</string>
+    <string name="pref_speed_step_sum">Speed step for volume button</string>
     
 </resources>
