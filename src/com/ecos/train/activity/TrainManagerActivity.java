@@ -1306,14 +1306,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			if(v.getTag(R.string.btn_type).toString().equals("moment")) {
 				String token[] = v.getTag(R.string.btn_name).toString().split(";");
 				if (me.getAction() == MotionEvent.ACTION_DOWN) {
-					mTcpClient.setButton(Integer.parseInt(
-							token[1]), true);
+					mTcpClient.setButton(Integer.parseInt(token[1]), true);
 					((ToggleButton) v).setChecked(true);
 					return true;
 				}
 				else if (me.getAction() == MotionEvent.ACTION_UP) {
-					mTcpClient.setButton(Integer.parseInt(
-							token[1]), false);
+					mTcpClient.setButton(Integer.parseInt(token[1]), false);
 					((ToggleButton) v).setChecked(false);
 					return true;
 				}

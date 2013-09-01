@@ -55,6 +55,8 @@ public class Symbols {
 		symbols.put(12039, "Set barke");
 		symbols.put(1029, "Set barke");
 		symbols.put(772, "Board lighting");
+		symbols.put(5639, "Diesel Engine Notch Up");
+		symbols.put(5640, "Diesel Engine Notch Down");
 	}
 
 	public static synchronized Symbols getInstance(){			
