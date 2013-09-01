@@ -184,7 +184,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 		//click on a function buttons
 		if(v.getTag(R.string.btn_name) != null) {
-			
+
 			if(v.getTag(R.string.btn_name).toString().startsWith("btn")) {
 				String token[] = v.getTag(R.string.btn_name).toString().split(";");
 				mTcpClient.setButton(Integer.parseInt(
@@ -1301,21 +1301,22 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 	@Override
 	public boolean onTouch(View v, MotionEvent me) {
-		if(v.getTag(R.string.btn_type).toString().equals("moment")) {
-			String token[] = v.getTag(R.string.btn_name).toString().split(";");
-			if (me.getAction() == MotionEvent.ACTION_DOWN) {
-				mTcpClient.setButton(Integer.parseInt(
-						token[1]), true);
-				((ToggleButton) v).setChecked(true);
-				Log.d("Released", "Button press");
-				return true;
-			}
-			else if (me.getAction() == MotionEvent.ACTION_UP) {
-				mTcpClient.setButton(Integer.parseInt(
-						token[1]), false);
-				((ToggleButton) v).setChecked(false);
-				Log.d("Released", "Button released");
-				return true;
+
+		if(v.getTag(R.string.btn_type) != null) {
+			if(v.getTag(R.string.btn_type).toString().equals("moment")) {
+				String token[] = v.getTag(R.string.btn_name).toString().split(";");
+				if (me.getAction() == MotionEvent.ACTION_DOWN) {
+					mTcpClient.setButton(Integer.parseInt(
+							token[1]), true);
+					((ToggleButton) v).setChecked(true);
+					return true;
+				}
+				else if (me.getAction() == MotionEvent.ACTION_UP) {
+					mTcpClient.setButton(Integer.parseInt(
+							token[1]), false);
+					((ToggleButton) v).setChecked(false);
+					return true;
+				}
 			}
 		}
 		return false;
