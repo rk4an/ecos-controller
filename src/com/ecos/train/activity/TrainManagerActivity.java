@@ -43,8 +43,10 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.EditText;
@@ -69,7 +71,7 @@ import com.ecos.train.ui.SpinAdapter;
 
 public class TrainManagerActivity 
 extends SherlockActivity 
-implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
+implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnTouchListener {
 
 	public static final String LITE_PACKAGE = "com.ecos.train";  
 	public static final String FULL_PACKAGE = "com.ecos.train.unlock";
@@ -158,7 +160,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 		//get speed step in save preference
 		speedStep = Integer.parseInt(pref.getString("pref_speed", Settings.SPEED_STEP+""));
-		
+
 		//info dialog
 		infoDialog = new Dialog(this);
 		LayoutInflater inflater = getLayoutInflater();
@@ -182,16 +184,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 		//click on a function buttons
 		if(v.getTag(R.string.btn_name) != null) {
+			
 			if(v.getTag(R.string.btn_name).toString().startsWith("btn")) {
 				String token[] = v.getTag(R.string.btn_name).toString().split(";");
 				mTcpClient.setButton(Integer.parseInt(
 						token[1]), ((ToggleButton) v).isChecked());
-				
-				//uncheck moment function immediatly
-				if(v.getTag(R.string.btn_type).toString().equals("moment")) {
-					((ToggleButton) v).setChecked(false);
-				}
-				
 				return;
 			}
 		}
@@ -401,10 +398,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if(requestCode == TrainManagerActivity.SETTINGS) {
-				
+
 			//get speed step
 			speedStep = Integer.parseInt(pref.getString("pref_speed", Settings.SPEED_STEP+""));
-			
+
 			//check if something change on ip address
 			if(!Settings.consoleIp.equals(pref.getString("ip", ""))){
 				disconnect();
@@ -1224,6 +1221,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	private void initFunctionButtons() {
 		for(int i=0; i<listButtons.size(); i++) {
 			listButtons.get(i).setOnClickListener(this);
+			listButtons.get(i).setOnTouchListener(this);
 			listButtons.get(i).setTag(R.string.btn_name,"btn;"+i);
 			listButtons.get(i).setText(getString(R.string.btn_f) + i);
 			listButtons.get(i).setTextOn(getString(R.string.btn_f) + i);
@@ -1299,5 +1297,27 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 			mTcpClient.setSpeed(sbSpeed.getProgress());
 			displaySpeed(sbSpeed.getProgress());
 		}
+	}
+
+	@Override
+	public boolean onTouch(View v, MotionEvent me) {
+		if(v.getTag(R.string.btn_type).toString().equals("moment")) {
+			String token[] = v.getTag(R.string.btn_name).toString().split(";");
+			if (me.getAction() == MotionEvent.ACTION_DOWN) {
+				mTcpClient.setButton(Integer.parseInt(
+						token[1]), true);
+				((ToggleButton) v).setChecked(true);
+				Log.d("Released", "Button press");
+				return true;
+			}
+			else if (me.getAction() == MotionEvent.ACTION_UP) {
+				mTcpClient.setButton(Integer.parseInt(
+						token[1]), false);
+				((ToggleButton) v).setChecked(false);
+				Log.d("Released", "Button released");
+				return true;
+			}
+		}
+		return false;
 	}
 }
