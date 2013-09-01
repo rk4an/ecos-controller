@@ -47,5 +47,6 @@
     <string name="state_ready">Ready</string>
     <string name="pref_speed_step_title">Speed step</string>
     <string name="pref_speed_step_sum">Speed step for volume button</string>
-    
+    <string name="btn_name">Name</string>
+    <string name="btn_type">Type</string>
 </resources>

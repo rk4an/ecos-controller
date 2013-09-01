@@ -181,11 +181,17 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	public void onClick(View v) {
 
 		//click on a function buttons
-		if(v.getTag() != null) {
-			if(v.getTag().toString().startsWith("btn")) {
-				String token[] = v.getTag().toString().split(";");
+		if(v.getTag(R.string.btn_name) != null) {
+			if(v.getTag(R.string.btn_name).toString().startsWith("btn")) {
+				String token[] = v.getTag(R.string.btn_name).toString().split(";");
 				mTcpClient.setButton(Integer.parseInt(
 						token[1]), ((ToggleButton) v).isChecked());
+				
+				//uncheck moment function immediatly
+				if(v.getTag(R.string.btn_type).toString().equals("moment")) {
+					((ToggleButton) v).setChecked(false);
+				}
+				
 				return;
 			}
 		}
@@ -802,8 +808,15 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 						Drawable img = res.getDrawable( resourceId );
 						listButtons.get(fctNum).setCompoundDrawablesWithIntrinsicBounds(img, null , null, null);
 
+						//check if moment function
 						if(f.length == 3) {
-							//TODO: moment
+							listButtons.get(fctNum).setTag(R.string.btn_type,"moment");
+							listButtons.get(fctNum).setText(getString(R.string.btn_f) + i + "*");
+							listButtons.get(fctNum).setTextOn(getString(R.string.btn_f) + i + "*");
+							listButtons.get(fctNum).setTextOff(getString(R.string.btn_f) + i + "*");
+						}
+						else {
+							listButtons.get(fctNum).setTag(R.string.btn_type,"permanent");
 						}
 					}
 				}
@@ -1211,7 +1224,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 	private void initFunctionButtons() {
 		for(int i=0; i<listButtons.size(); i++) {
 			listButtons.get(i).setOnClickListener(this);
-			listButtons.get(i).setTag("btn;"+i);
+			listButtons.get(i).setTag(R.string.btn_name,"btn;"+i);
 			listButtons.get(i).setText(getString(R.string.btn_f) + i);
 			listButtons.get(i).setTextOn(getString(R.string.btn_f) + i);
 			listButtons.get(i).setTextOff(getString(R.string.btn_f) + i);
