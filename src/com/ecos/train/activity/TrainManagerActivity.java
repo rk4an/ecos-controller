@@ -811,9 +811,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener {
 						//check if moment function
 						if(f.length == 3) {
 							listButtons.get(fctNum).setTag(R.string.btn_type,"moment");
-							listButtons.get(fctNum).setText(getString(R.string.btn_f) + i + "*");
-							listButtons.get(fctNum).setTextOn(getString(R.string.btn_f) + i + "*");
-							listButtons.get(fctNum).setTextOff(getString(R.string.btn_f) + i + "*");
+							listButtons.get(fctNum).setText(getString(R.string.btn_f) + fctNum + "*");
+							listButtons.get(fctNum).setTextOn(getString(R.string.btn_f) + fctNum + "*");
+							listButtons.get(fctNum).setTextOff(getString(R.string.btn_f) + fctNum + "*");
 						}
 						else {
 							listButtons.get(fctNum).setTag(R.string.btn_type,"permanent");
