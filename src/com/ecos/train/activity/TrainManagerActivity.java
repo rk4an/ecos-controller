@@ -412,7 +412,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			if(Settings.sortById != pref.getBoolean("pref_sort", false)) {
 				Settings.sortById = pref.getBoolean("pref_sort", false);
 				if(Settings.state != Settings.State.NONE) {
-					sortList(Settings.sortById);
+					sortTrainsList(Settings.sortById);
 					dataAdapter.notifyDataSetChanged();
 					//restore the latest selection
 					for(int i=0; i<Settings.allTrains.size(); i++) {
@@ -430,6 +430,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 	public void onItemSelected(AdapterView<?> parent, View view, int pos,long id) {
 
 		setStateButtons(false);
+		hideExtraFunctionButtons();
 
 		//release old train
 		if(Settings.currentTrainIndex != -1) {
@@ -498,10 +499,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		}
 
 		setFnButtons(state);
-		LinearLayout lF8_F15 = (LinearLayout) findViewById(R.id.llF8_F15);
-		lF8_F15.setVisibility(LinearLayout.GONE);
-		LinearLayout lF16_23 = (LinearLayout) findViewById(R.id.llF16_F23);
-		lF16_23.setVisibility(LinearLayout.GONE);
+	}
+	
+	public void hideExtraFunctionButtons() {
+		((LinearLayout) findViewById(R.id.llF8_F15)).setVisibility(LinearLayout.GONE);
+		((LinearLayout) findViewById(R.id.llF16_F23)).setVisibility(LinearLayout.GONE);
 	}
 
 	public void setStateControl(boolean state) {
@@ -589,8 +591,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			else if(Settings.state == Settings.State.INIT_GET_CONSOLE) {
 				if(respLine[0].equals("<REPLY get(1, status, info)>")) {
 					Settings.state = Settings.State.INIT_GET_TRAINS;
-					parseEventEmergency(respLine);
-					getConsoleVersion(respLine);
+					parseEmergency(respLine);
+					parseConsoleVersion(respLine);
 					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_train_list));
 					mTcpClient.getAllTrains();
 				}
@@ -599,10 +601,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			else if(Settings.state == Settings.State.INIT_GET_TRAINS) {
 				if(respLine[0].equals("<REPLY queryObjects(10, name, addr)>")) {
 					Settings.state = Settings.State.GET_TRAIN_MAIN_STATE;
-					Settings.allTrains = getAllTrains(values[0]);
+					Settings.allTrains = parseTrainsList(values[0]);
 
 					Settings.sortById = pref.getBoolean("pref_sort", false);
-					sortList(Settings.sortById);
+					sortTrainsList(Settings.sortById);
 
 					dataAdapter = new SpinAdapter(getApplicationContext(),
 							android.R.layout.simple_spinner_item, Settings.allTrains);
@@ -614,7 +616,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			else if(Settings.state == Settings.State.GET_TRAIN_MAIN_STATE) {
 				if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",name,speed,dir,speedindicator)>")) {
 					Settings.state = Settings.State.GET_TRAIN_BUTTON_STATE;
-					getTrainMainState(respLine);
+					parseTrainState(respLine);
 					initFunctionButtons();
 					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_train_buttons));
 					mTcpClient.getTrainButtonState();
@@ -626,8 +628,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 						"func[4],func[5],func[6],func[7])>")) {
 					Settings.state = Settings.State.IDLE;
 
-					parseEventButtons(respLine);
+					parseButtons(respLine);
 					setStateButtons(true);
+					hideExtraFunctionButtons();
 					setStateList(true);
 					setStateControl(true);
 
@@ -643,32 +646,32 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				}
 				//console info response
 				else if(respLine[0].equals("<REPLY get(1, info)>")) {
-					getConsoleVersion(respLine);
+					parseConsoleVersion(respLine);
 				}
 				//switching objects list response
 				else if(respLine[0].equals("<REPLY queryObjects(11, name1, name2, addrext)>")) {
-					getSwitching(respLine);
+					parseSwitchList(respLine);
 				}
 				//train buttons name response 0-7
 				else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[0], " +
 						"funcexists[1], funcexists[2], funcexists[3], funcexists[4], funcexists[5], funcexists[6], funcexists[7])>")){
-					getTrainButtonSymbol(respLine);
+					parseButtonSymbol(respLine);
 				}
 				//train buttons name response 8-15
 				else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[8], " +
 						"funcexists[9], funcexists[10], funcexists[11], funcexists[12], funcexists[13], funcexists[14], funcexists[15])>")){
-					getTrainButtonSymbol(respLine);
+					parseButtonSymbol(respLine);
 				}
 				//train buttons name response 16-23
 				else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[16], " +
 						"funcexists[17], funcexists[18], funcexists[19], funcexists[20], funcexists[21], funcexists[22], funcexists[23])>")){
-					getTrainButtonSymbol(respLine);
+					parseButtonSymbol(respLine);
 				}
 				//train buttons response 8-15
 				else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",func[8],func[9],func[10],func[11]," +
 						"func[12],func[13],func[14],func[15])>")) {
 
-					parseEventButtons(respLine);
+					parseButtons(respLine);
 
 					if(!Settings.protocolVersion.equals("0.1")) {
 						mTcpClient.getButtonNameF8F15();
@@ -678,7 +681,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",func[16],func[17],func[18],func[19]," +
 						"func[20],func[21],func[22],func[23])>")) {
 
-					parseEventButtons(respLine);
+					parseButtons(respLine);
 
 					if(!Settings.protocolVersion.equals("0.1")) {
 						mTcpClient.getButtonNameF16F23();
@@ -686,7 +689,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				}
 				//a switching object response
 				else {
-					parseEventSwitch(respLine);
+					parseSwitch(respLine);
 				}
 
 				if(Settings.state == Settings.State.IDLE) {
@@ -729,6 +732,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		}
 		tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.tv_disconnect));
 		setStateButtons(false);
+		hideExtraFunctionButtons();
 		setStateControl(false);
 		setStateEmergency(false);
 		setStateList(false);
@@ -738,10 +742,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 	}
 
 	/**************************************************************************/
-	/** Get state **/
+	/** Parse output **/
 	/**************************************************************************/	
 
-	public List<Train> getAllTrains(String result) {
+	public List<Train> parseTrainsList(String result) {
 
 		List<Train> listTrain = new ArrayList<Train>();
 
@@ -773,12 +777,148 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		return listTrain;
 	}
 
-	public void getTrainMainState(String[] result) {
-		parseEventSpeed(result);
-		parseEventDir(result);
+	public void parseTrainState(String[] result) {
+		parseSpeed(result);
+		parseDir(result);
 	}
 
-	private void getTrainButtonSymbol(String[] result) {
+	public boolean parseSpeed(String[] list) {
+
+		String id = "";
+		int iid = 0;
+		boolean match = false;
+
+
+		Pattern p = Pattern.compile("(.*) speedindicator\\[(.*)\\]");
+
+		for(int i=1; i<list.length-1; i++) {
+			Matcher m = p.matcher(list[i]);
+
+			while (m.find() == true) {
+				match = true;
+				id = m.group(1).trim();
+				try {
+					iid = Integer.parseInt(id);
+					Settings.getCurrentTrain().setSpeedIndicator(Integer.parseInt(m.group(2).trim()));
+				}
+				catch(Exception e) {	
+				}
+			}
+		}
+
+
+		p = Pattern.compile("(.*) speed\\[(.*)\\]");
+		int speed = 0;
+
+		for(int i=1; i<list.length-1; i++) {
+			Matcher m = p.matcher(list[i]);
+
+			while (m.find() == true) {
+				match = true;
+				id = m.group(1).trim();
+				try {
+					iid = Integer.parseInt(id);
+					speed = Integer.parseInt(m.group(2).trim());
+				}
+				catch(Exception e) {	
+				}
+
+				if(iid == Settings.getCurrentTrain().getId()) {
+					sbSpeed.setProgress(speed);
+					displaySpeed(speed);
+				}
+			}
+		}
+
+		return match;
+	}	
+	
+	public boolean parseDir(String[] list) {
+		Pattern p = Pattern.compile("(.*) dir\\[(.*)\\]");
+		String id = "";
+		int iid = 0;
+	
+		String dir = "";
+		boolean idir = true;
+		boolean match = false;
+	
+		for(int i=1; i<list.length-1; i++) {
+			Matcher m = p.matcher(list[i]);
+	
+			while (m.find() == true) {
+				match = true;
+				id = m.group(1).trim();
+				try {
+					iid = Integer.parseInt(id);
+				}
+				catch(Exception e) {	
+				}
+				dir = m.group(2).trim();
+	
+				if(iid == Settings.getCurrentTrain().getId()) {
+	
+					try {
+						idir = Integer.parseInt(dir) == 0 ? true : false;
+					}
+					catch(Exception s) {
+					}
+	
+					cbReverse.setChecked(!idir);
+				}
+			}
+		}
+		return match;
+	}
+
+	public boolean parseButtons(String[] list) {
+		Pattern p = Pattern.compile("(.*) func\\[(.*),(.*)\\]");
+		String id = "";
+		int iid = 0;
+	
+		String btn = "";
+		int ibtn = -1;
+		String state = "";
+		boolean istate = false;
+	
+		boolean match = false;
+	
+		for(int i=1; i<list.length-1; i++) {
+			Matcher m = p.matcher(list[i]);
+	
+			while (m.find() == true) {
+				match = true;
+				id = m.group(1).trim();
+				btn = m.group(2).trim();
+				state = m.group(3).trim();
+				try {
+					iid = Integer.parseInt(id);
+				}
+				catch(Exception e) {		
+				}
+	
+				if(iid == Settings.getCurrentTrain().getId()) {
+					ibtn = -1;
+					try {
+						ibtn = Integer.parseInt(btn);
+					}
+					catch(Exception e) {	
+					}
+	
+					istate = false;
+					if(state.equals("1")) {
+						istate = true;
+					}
+	
+					if(ibtn < listButtons.size()) {
+						listButtons.get(ibtn).setChecked(istate);
+					}
+				}
+			}
+		}
+		return match;
+	}
+
+	public void parseButtonSymbol(String[] result) {
 
 		Pattern p = Pattern.compile("(.*) funcexists\\[(.*)\\]");
 
@@ -821,7 +961,121 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		}
 	}
 
-	public void getSwitching(String[] result) {
+	public void parseConsoleVersion(String[] result) {
+
+		//read Protocol Version
+		Pattern p = Pattern.compile("(.*) ProtocolVersion\\[(.*)\\]");
+
+		for(int i=1; i<result.length-1; i++) {
+			Matcher m = p.matcher(result[i]);
+
+			while (m.find() == true) {
+				Settings.protocolVersion = m.group(2).trim();
+				protocolVersion.setText(Settings.protocolVersion);
+			}
+		}
+
+		//read Application Version
+		p = Pattern.compile("(.*) ApplicationVersion\\[(.*)\\]");
+
+		for(int i=1; i<result.length-1; i++) {
+			Matcher m = p.matcher(result[i]);
+
+			while (m.find() == true) {
+				String applicationVersionNumber = m.group(2).trim();
+				applicationVersion.setText(applicationVersionNumber);
+			}
+		}
+
+		//read Hardware Version
+		p = Pattern.compile("(.*) HardwareVersion\\[(.*)\\]");
+
+		for(int i=1; i<result.length-1; i++) {
+			Matcher m = p.matcher(result[i]);
+
+			while (m.find() == true) {
+				String hardwareVersionNumber = m.group(2).trim();
+				hardwareVersion.setText(hardwareVersionNumber);
+			}
+		}
+	}
+
+	public void parseEvent(String[] result) {
+
+		Pattern p = Pattern.compile("<EVENT (.*)>");
+
+		Matcher m = p.matcher(result[0]);
+		while (m.find() == true) {
+
+			try {
+				int eventId = Integer.parseInt(m.group(1).trim());
+
+				if(eventId == 1) {
+					parseEmergency(result);
+				}
+				else if(eventId == Settings.getCurrentTrain().getId()) {
+					parseSpeed(result);
+					parseButtons(result);
+					parseDir(result);
+					parseLostControl(result);
+				}
+				else {
+					parseSwitch(result);
+				}
+			}
+			catch(Exception e) {
+				return;
+			}
+		}
+	}
+
+	
+
+	public boolean parseSwitch(String[] list) {
+		Pattern p = Pattern.compile("(.*) state\\[(.*)\\]");
+		boolean match = false;
+
+		for(int i=1; i<list.length-1; i++) {
+			Matcher m = p.matcher(list[i]);
+			int id = 0;
+			int state = 0;
+
+			while (m.find() == true) {
+				match = true;
+				try {
+					id = Integer.parseInt(m.group(1).trim());
+					state = Integer.parseInt(m.group(2).trim());
+
+					for(ToggleButton t : listSwitch) {
+						if(Integer.parseInt(t.getTag().toString()) == id) {
+							if(state == 1) {
+								t.setChecked(true);
+							}
+							else {
+								t.setChecked(false);
+							}
+						}
+					}
+					for(SeekBar t : listSwitchMulti) {
+						if(Integer.parseInt(t.getTag().toString()) == id) {
+							t.setProgress(state);
+
+							for(TextView v: listSwitchMultiValue) {
+								if(Integer.parseInt(v.getTag().toString()) == id) {
+									v.setText(t.getProgress()+"");
+								}
+							}
+						}
+					}
+				}
+				catch(Exception e) {
+				}
+			}
+		}
+		return match;
+	}
+
+	public void parseSwitchList(String[] result) {
 		((LinearLayout) findViewById(R.id.llSwitch)).removeAllViews();
 
 		Pattern p = Pattern.compile("(.*) name1\\[\"(.*)\"\\] name2\\[\"(.*)\"\\] addrext\\[(.*)\\]");
@@ -879,272 +1133,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		}
 	}
 
-	public void getConsoleVersion(String[] result) {
-
-		//read Protocol Version
-		Pattern p = Pattern.compile("(.*) ProtocolVersion\\[(.*)\\]");
-
-		for(int i=1; i<result.length-1; i++) {
-			Matcher m = p.matcher(result[i]);
-
-			while (m.find() == true) {
-				Settings.protocolVersion = m.group(2).trim();
-				protocolVersion.setText(Settings.protocolVersion);
-			}
-		}
-
-		//read Application Version
-		p = Pattern.compile("(.*) ApplicationVersion\\[(.*)\\]");
-
-		for(int i=1; i<result.length-1; i++) {
-			Matcher m = p.matcher(result[i]);
-
-			while (m.find() == true) {
-				String applicationVersionNumber = m.group(2).trim();
-				applicationVersion.setText(applicationVersionNumber);
-			}
-		}
-
-		//read Hardware Version
-		p = Pattern.compile("(.*) HardwareVersion\\[(.*)\\]");
-
-		for(int i=1; i<result.length-1; i++) {
-			Matcher m = p.matcher(result[i]);
-
-			while (m.find() == true) {
-				String hardwareVersionNumber = m.group(2).trim();
-				hardwareVersion.setText(hardwareVersionNumber);
-			}
-		}
-	}
-
-	/**************************************************************************/
-	/** Parse events **/
-	/**************************************************************************/
-
-	public void parseEvent(String[] result) {
-
-		Pattern p = Pattern.compile("<EVENT (.*)>");
-
-		Matcher m = p.matcher(result[0]);
-		while (m.find() == true) {
-
-			try {
-				int eventId = Integer.parseInt(m.group(1).trim());
-
-				if(eventId == 1) {
-					parseEventEmergency(result);
-				}
-				else if(eventId == Settings.getCurrentTrain().getId()) {
-					parseEventSpeed(result);
-					parseEventButtons(result);
-					parseEventDir(result);
-					parseEventLostControl(result);
-				}
-				else {
-					parseEventSwitch(result);
-				}
-			}
-			catch(Exception e) {
-				return;
-			}
-		}
-	}
-
-	public boolean parseEventSpeed(String[] list) {
-
-		String id = "";
-		int iid = 0;
-		boolean match = false;
-
-
-		Pattern p = Pattern.compile("(.*) speedindicator\\[(.*)\\]");
-
-		for(int i=1; i<list.length-1; i++) {
-			Matcher m = p.matcher(list[i]);
-
-			while (m.find() == true) {
-				match = true;
-				id = m.group(1).trim();
-				try {
-					iid = Integer.parseInt(id);
-					Settings.getCurrentTrain().setSpeedIndicator(Integer.parseInt(m.group(2).trim()));
-				}
-				catch(Exception e) {	
-				}
-			}
-		}
-
-
-		p = Pattern.compile("(.*) speed\\[(.*)\\]");
-		int speed = 0;
-
-		for(int i=1; i<list.length-1; i++) {
-			Matcher m = p.matcher(list[i]);
-
-			while (m.find() == true) {
-				match = true;
-				id = m.group(1).trim();
-				try {
-					iid = Integer.parseInt(id);
-					speed = Integer.parseInt(m.group(2).trim());
-				}
-				catch(Exception e) {	
-				}
-
-				if(iid == Settings.getCurrentTrain().getId()) {
-					sbSpeed.setProgress(speed);
-					displaySpeed(speed);
-				}
-			}
-		}
-
-		return match;
-	}
-
-	private void displaySpeed(int speed) {
-		int speedIndicator = Settings.getCurrentTrain().getSpeedIndicator();
-		if(speedIndicator == 0) {
-			tvSpeed.setText(getApplicationContext().getString(
-					R.string.tv_speed) + " " + speed + "/" + Settings.SPEED_MAX);
-		}
-		else {
-			tvSpeed.setText(getApplicationContext().getString(
-					R.string.tv_speed) + " " + speed + "/" + Settings.SPEED_MAX + 
-					" (" + ((int)speedIndicator*speed/Settings.SPEED_MAX) + "/" + speedIndicator + "km/h)");
-		}
-	}
-
-	public boolean parseEventSwitch(String[] list) {
-		Pattern p = Pattern.compile("(.*) state\\[(.*)\\]");
-		boolean match = false;
-
-		for(int i=1; i<list.length-1; i++) {
-			Matcher m = p.matcher(list[i]);
-			int id = 0;
-			int state = 0;
-
-			while (m.find() == true) {
-				match = true;
-				try {
-					id = Integer.parseInt(m.group(1).trim());
-					state = Integer.parseInt(m.group(2).trim());
-
-					for(ToggleButton t : listSwitch) {
-						if(Integer.parseInt(t.getTag().toString()) == id) {
-							if(state == 1) {
-								t.setChecked(true);
-							}
-							else {
-								t.setChecked(false);
-							}
-						}
-					}
-					for(SeekBar t : listSwitchMulti) {
-						if(Integer.parseInt(t.getTag().toString()) == id) {
-							t.setProgress(state);
-
-							for(TextView v: listSwitchMultiValue) {
-								if(Integer.parseInt(v.getTag().toString()) == id) {
-									v.setText(t.getProgress()+"");
-								}
-							}
-						}
-					}
-				}
-				catch(Exception e) {
-				}
-			}
-		}
-		return match;
-	}
-
-	public boolean parseEventButtons(String[] list) {
-		Pattern p = Pattern.compile("(.*) func\\[(.*),(.*)\\]");
-		String id = "";
-		int iid = 0;
-
-		String btn = "";
-		int ibtn = -1;
-		String state = "";
-		boolean istate = false;
-
-		boolean match = false;
-
-		for(int i=1; i<list.length-1; i++) {
-			Matcher m = p.matcher(list[i]);
-
-			while (m.find() == true) {
-				match = true;
-				id = m.group(1).trim();
-				btn = m.group(2).trim();
-				state = m.group(3).trim();
-				try {
-					iid = Integer.parseInt(id);
-				}
-				catch(Exception e) {		
-				}
-
-				if(iid == Settings.getCurrentTrain().getId()) {
-					ibtn = -1;
-					try {
-						ibtn = Integer.parseInt(btn);
-					}
-					catch(Exception e) {	
-					}
-
-					istate = false;
-					if(state.equals("1")) {
-						istate = true;
-					}
-
-					if(ibtn < listButtons.size()) {
-						listButtons.get(ibtn).setChecked(istate);
-					}
-				}
-			}
-		}
-		return match;
-	}
-
-	public boolean parseEventDir(String[] list) {
-		Pattern p = Pattern.compile("(.*) dir\\[(.*)\\]");
-		String id = "";
-		int iid = 0;
-
-		String dir = "";
-		boolean idir = true;
-		boolean match = false;
-
-		for(int i=1; i<list.length-1; i++) {
-			Matcher m = p.matcher(list[i]);
-
-			while (m.find() == true) {
-				match = true;
-				id = m.group(1).trim();
-				try {
-					iid = Integer.parseInt(id);
-				}
-				catch(Exception e) {	
-				}
-				dir = m.group(2).trim();
-
-				if(iid == Settings.getCurrentTrain().getId()) {
-
-					try {
-						idir = Integer.parseInt(dir) == 0 ? true : false;
-					}
-					catch(Exception s) {
-					}
-
-					cbReverse.setChecked(!idir);
-				}
-			}
-		}
-		return match;
-	}
-
-	public boolean parseEventEmergency(String[] list) {
+	public boolean parseEmergency(String[] list) {
 		Pattern p = Pattern.compile("(.*) status\\[(.*)\\]");
 		String state = "";
 		boolean match = false;
@@ -1166,7 +1155,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		return match;
 	}
 
-	public boolean parseEventLostControl(String[] list) {
+	public boolean parseLostControl(String[] list) {
 		Pattern p = Pattern.compile("(.*) msg\\[(.*)\\]");
 		String event = "";
 		boolean match = false;
@@ -1189,7 +1178,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 	/**************************************************************************/
 	/** Utils **/
 	/**************************************************************************/
-	public void sortList(boolean sortById) {
+	public void sortTrainsList(boolean sortById) {
 		if(sortById) {
 			Collections.sort(Settings.allTrains, Train.TrainIdComparator);
 		}
@@ -1218,7 +1207,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		return tg;
 	}
 
-	private void initFunctionButtons() {
+	public void initFunctionButtons() {
 		for(int i=0; i<listButtons.size(); i++) {
 			listButtons.get(i).setOnClickListener(this);
 			listButtons.get(i).setOnTouchListener(this);
@@ -1241,6 +1230,19 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		return sb;
 	}
 
+	public void displaySpeed(int speed) {
+		int speedIndicator = Settings.getCurrentTrain().getSpeedIndicator();
+		if(speedIndicator == 0) {
+			tvSpeed.setText(getApplicationContext().getString(
+					R.string.tv_speed) + " " + speed + "/" + Settings.SPEED_MAX);
+		}
+		else {
+			tvSpeed.setText(getApplicationContext().getString(
+					R.string.tv_speed) + " " + speed + "/" + Settings.SPEED_MAX + 
+					" (" + ((int)speedIndicator*speed/Settings.SPEED_MAX) + "/" + speedIndicator + "km/h)");
+		}
+	}
+	
 	public void displayError(String error) {
 		Toast.makeText(this, error , Toast.LENGTH_SHORT).show();
 	}

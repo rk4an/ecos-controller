@@ -30,12 +30,12 @@
     <string name="tv_network">Réseau</string>
     <string name="tv_console">Paramètres</string>
     <string name="btn_info">Console Info</string>
-    <string name="tv_protocol_version">Version Protocole:</string>
-    <string name="tv_application_version">Version Application:</string>
-    <string name="tv_hardware_version">Version Hardware:</string>
-    <string name="tv_ecos_version">Version ECoS Controller:</string>
+    <string name="tv_protocol_version">Version Protocole: </string>
+    <string name="tv_application_version">Version Application: </string>
+    <string name="tv_hardware_version">Version Matériel: </string>
+    <string name="tv_ecos_version">Version ECoS Controller: </string>
     <string name="tv_switch">Objets de commutation</string>
-    <string name="pref_sort_sum">Trier la liste par ID</string>
+    <string name="pref_sort_sum">Trier la liste par ID ou par nom</string>
     <string name="pref_sort_title">Trier par ID</string>
     <string name="pref_speed_step_title">Pas de vitesse</string>
     <string name="pref_speed_step_sum">Pas de vitesse pour le bouton volume</string>
