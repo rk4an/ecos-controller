@@ -936,10 +936,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 					parseEventEmergency(result);
 				}
 				else if(eventId == Settings.getCurrentTrain().getId()) {
-					if(parseEventSpeed(result))			return;
-					if(parseEventButtons(result))		return;
-					if(parseEventDir(result))			return;
-					if(parseEventLostControl(result))	return;
+					parseEventSpeed(result);
+					parseEventButtons(result);
+					parseEventDir(result);
+					parseEventLostControl(result);
 				}
 				else {
 					parseEventSwitch(result);
