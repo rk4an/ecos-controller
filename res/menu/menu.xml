@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
 
     <item
         android:id="@+id/iSettings"
         android:alphabeticShortcut="s"
         android:icon="@drawable/ic_action_settings"
-        android:showAsAction="ifRoom"
+        app:showAsAction="ifRoom"
         android:title="@string/btn_settings"/>
     <item
         android:id="@+id/iPack"

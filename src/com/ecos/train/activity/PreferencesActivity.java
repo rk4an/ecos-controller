@@ -24,6 +24,7 @@ import android.preference.PreferenceActivity;
 
 import com.ecos.train.R;
 
+
 public class PreferencesActivity extends PreferenceActivity {
 
     @Override

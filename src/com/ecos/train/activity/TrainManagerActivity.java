@@ -19,7 +19,7 @@
 
 package com.ecos.train.activity;
 
-import java.util.ArrayList;
+ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -39,10 +39,14 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -58,10 +62,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.ecos.train.R;
 import com.ecos.train.Settings;
 import com.ecos.train.TCPClient;
@@ -70,7 +70,7 @@ import com.ecos.train.object.Train;
 import com.ecos.train.ui.SpinAdapter;
 
 public class TrainManagerActivity 
-extends SherlockActivity 
+extends ActionBarActivity 
 implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnTouchListener {
 
 	public static final String LITE_PACKAGE = "com.ecos.train";  
@@ -298,7 +298,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getSupportMenuInflater();
+		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.menu, menu);
 
 		editItem = menu.getItem(2);
@@ -382,15 +382,13 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 			return true;
 		case R.id.iContact:
+			Log.d("RRR","RRR");
 			Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
 					"mailto", TrainManagerActivity.CONTACT, null));
 			emailIntent.putExtra(Intent.EXTRA_SUBJECT, "ECoS Controller Feedback");
 			startActivity(Intent.createChooser(emailIntent, "Send email..."));
 
 			return true;
-			/*case R.id.iReport:
-			ACRA.getErrorReporter().handleException(null);
-			return true;*/
 		default:
 			return super.onOptionsItemSelected(item);
 		}

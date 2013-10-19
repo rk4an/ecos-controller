@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ecos.train"
     android:installLocation="auto"
-    android:versionCode="406"
-    android:versionName="3.9.10" >
+    android:versionCode="410"
+    android:versionName="3.10.0" >
 
     <uses-sdk
         android:minSdkVersion="7"
@@ -16,7 +16,7 @@
         android:name=".TrainManagerApp"
         android:icon="@drawable/icon"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Sherlock" >
+        android:theme="@style/Theme.AppCompat">
         <activity
             android:name="com.ecos.train.activity.TrainManagerActivity"
             android:label="@string/app_name"
