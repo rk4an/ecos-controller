@@ -382,7 +382,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 			return true;
 		case R.id.iContact:
-			Log.d("RRR","RRR");
 			Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
 					"mailto", TrainManagerActivity.CONTACT, null));
 			emailIntent.putExtra(Intent.EXTRA_SUBJECT, "ECoS Controller Feedback");
