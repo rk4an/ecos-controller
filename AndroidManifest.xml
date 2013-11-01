@@ -2,12 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ecos.train"
     android:installLocation="auto"
-    android:versionCode="410"
+    android:versionCode="420"
     android:versionName="3.10.0" >
 
     <uses-sdk
         android:minSdkVersion="7"
-        android:targetSdkVersion="18" />
+        android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.INTERNET" />
 
