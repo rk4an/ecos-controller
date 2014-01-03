@@ -30,10 +30,10 @@
     <string name="tv_network">Network</string>
     <string name="tv_console">Settings</string>
     <string name="btn_info">Console Info</string>
-    <string name="tv_protocol_version">Protocol Version: </string>
-    <string name="tv_application_version">Application Version: </string>
-    <string name="tv_hardware_version">Hardware Version: </string>
-    <string name="tv_ecos_version">ECoS Controller Version: </string>
+    <string name="tv_protocol_version">Protocol:&#160;</string>
+    <string name="tv_application_version">Application:&#160;</string>
+    <string name="tv_hardware_version">Hardware:&#160;</string>
+    <string name="tv_ecos_version">ECoS Controller:&#160;</string>
     <string name="tv_switch">Switching objects</string>
     <string name="state_console_info">Get Console info</string>
     <string name="state_train_list">Get Trains list</string>
@@ -49,6 +49,6 @@
     <string name="pref_speed_step_sum">Speed step for volume button</string>
     <string name="btn_name">Name</string>
     <string name="btn_type">Type</string>
-    <string name="pref_locodesc_title">Show Train Symbol</string>
-    <string name="pref_locodesc_sum">Show Train Symbol, can be slow</string>
+    <string name="pref_locodesc_title">Show trains symbol</string>
+    <string name="pref_locodesc_sum">Show trains symbol (can be slow)</string>
 </resources>

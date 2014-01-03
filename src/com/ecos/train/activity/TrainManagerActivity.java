@@ -421,7 +421,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 					}
 				}
 			}
-			
+
 			//check if locodesc enable
 			boolean locodesc = pref.getBoolean("pref_locodesc", false);
 			if(locodesc) {
@@ -673,7 +673,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 					boolean locodesc = pref.getBoolean("pref_locodesc", false);
 					if(locodesc) {
-					getTrainsSymbol();
+						getTrainsSymbol();
 					}
 
 				}

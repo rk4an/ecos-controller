@@ -2,11 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ecos.train"
     android:installLocation="auto"
-    android:versionCode="440"
+    android:versionCode="441"
     android:versionName="3.12" >
 
     <uses-sdk
-        android:minSdkVersion="7"
+        android:minSdkVersion="8"
         android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.INTERNET" />
