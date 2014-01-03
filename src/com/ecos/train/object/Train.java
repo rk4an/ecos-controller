@@ -8,6 +8,7 @@ public class Train implements Comparable<Train> {
 	private String name;
 	private String address;
 	private int speedIndicator = 0;
+	private int symbol = 3;
 
 	public Train(int id, String name, String address){
 		this.id = id;
@@ -45,6 +46,14 @@ public class Train implements Comparable<Train> {
 
 	public void setSpeedIndicator(int speedIndicator) {
 		this.speedIndicator = speedIndicator;
+	}
+
+	public int getSymbol() {
+		return symbol;
+	}
+
+	public void setSymbol(int symbol) {
+		this.symbol = symbol;
 	}
 
 	public String toString() {

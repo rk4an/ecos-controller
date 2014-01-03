@@ -146,6 +146,10 @@ public class TCPClient {
 		sendMessage("get("+Settings.getCurrentTrain().getId()+",name,speed,dir,speedindicator)");
 	}
 	
+	public void getTrainSymbol(int id) {
+		sendMessage("get("+id+",locodesc)");
+	}
+	
 	public void getTrainButtonState() {
 		sendMessage("get("+Settings.getCurrentTrain().getId()+",func[0],func[1],func[2],func[3]," +
 				"func[4],func[5],func[6],func[7])");
@@ -227,7 +231,7 @@ public class TCPClient {
 	
 	public void getState(int id) {
 		sendMessage("request("+id+",view)");
-		sendMessage("get("+id+", state)");
+		sendMessage("get("+id+", state, symbol)");
 	}
 	
 	public void changeState(int id, int val) {

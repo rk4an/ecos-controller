@@ -3,10 +3,12 @@ package com.ecos.train.ui;
 import java.util.List;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ecos.train.R;
@@ -51,11 +53,17 @@ public class SpinAdapter extends ArrayAdapter<Train>{
 				(LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View spinnerEntry = inflater.inflate(R.layout.spinner_entry_with_icon, null);
 
-		TextView contactName = (TextView) spinnerEntry
-				.findViewById(R.id.spinnerName);
-		
-		contactName.setText(values.get(position).toString());
-		
+		TextView name = (TextView) spinnerEntry.findViewById(R.id.spinnerName);
+
+		name.setText(values.get(position).toString());
+
+		ImageView icon = (ImageView) spinnerEntry.findViewById(R.id.spinnerLogo);
+
+		int symbol = values.get(position).getSymbol();
+		Resources res = getContext().getResources();
+		int resourceId = res.getIdentifier("loco"+symbol, "drawable", getContext().getPackageName());
+		icon.setImageResource(resourceId);
+
 		return spinnerEntry;
 	}
 }

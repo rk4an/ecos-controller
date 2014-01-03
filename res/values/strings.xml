@@ -49,4 +49,6 @@
     <string name="pref_speed_step_sum">Speed step for volume button</string>
     <string name="btn_name">Name</string>
     <string name="btn_type">Type</string>
+    <string name="pref_locodesc_title">Show Train Symbol</string>
+    <string name="pref_locodesc_sum">Show Train Symbol, can be slow</string>
 </resources>

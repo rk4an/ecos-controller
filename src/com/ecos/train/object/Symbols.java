@@ -5,7 +5,7 @@ import android.util.SparseArray;
 public class Symbols {
 
 	private static Symbols INSTANCE = null;
-	private  SparseArray<String> symbols;
+	private SparseArray<String> symbols;
 
 	private Symbols(){
 		symbols = new  SparseArray<String>();

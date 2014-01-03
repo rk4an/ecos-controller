@@ -19,7 +19,7 @@
 
 package com.ecos.train.activity;
 
- import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -65,6 +65,7 @@ import android.widget.ToggleButton;
 import com.ecos.train.R;
 import com.ecos.train.Settings;
 import com.ecos.train.TCPClient;
+import com.ecos.train.object.Switch;
 import com.ecos.train.object.Symbols;
 import com.ecos.train.object.Train;
 import com.ecos.train.ui.SpinAdapter;
@@ -420,6 +421,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 					}
 				}
 			}
+			
+			//check if locodesc enable
+			boolean locodesc = pref.getBoolean("pref_locodesc", false);
+			if(locodesc) {
+				getTrainsSymbol();
+			}
 		}
 	}
 
@@ -497,7 +504,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 		setFnButtons(state);
 	}
-	
+
 	public void hideExtraFunctionButtons() {
 		((LinearLayout) findViewById(R.id.llF8_F15)).setVisibility(LinearLayout.GONE);
 		((LinearLayout) findViewById(R.id.llF16_F23)).setVisibility(LinearLayout.GONE);
@@ -663,6 +670,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[16], " +
 						"funcexists[17], funcexists[18], funcexists[19], funcexists[20], funcexists[21], funcexists[22], funcexists[23])>")){
 					parseButtonSymbol(respLine);
+
+					boolean locodesc = pref.getBoolean("pref_locodesc", false);
+					if(locodesc) {
+					getTrainsSymbol();
+					}
+
 				}
 				//train buttons response 8-15
 				else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",func[8],func[9],func[10],func[11]," +
@@ -686,7 +699,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				}
 				//a switching object response
 				else {
-					parseSwitch(respLine);
+					parseTrainsSymbol(respLine);
+					parseSwitchState(respLine);
 				}
 
 				if(Settings.state == Settings.State.IDLE) {
@@ -829,19 +843,19 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 		return match;
 	}	
-	
+
 	public boolean parseDir(String[] list) {
 		Pattern p = Pattern.compile("(.*) dir\\[(.*)\\]");
 		String id = "";
 		int iid = 0;
-	
+
 		String dir = "";
 		boolean idir = true;
 		boolean match = false;
-	
+
 		for(int i=1; i<list.length-1; i++) {
 			Matcher m = p.matcher(list[i]);
-	
+
 			while (m.find() == true) {
 				match = true;
 				id = m.group(1).trim();
@@ -851,15 +865,15 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				catch(Exception e) {	
 				}
 				dir = m.group(2).trim();
-	
+
 				if(iid == Settings.getCurrentTrain().getId()) {
-	
+
 					try {
 						idir = Integer.parseInt(dir) == 0 ? true : false;
 					}
 					catch(Exception s) {
 					}
-	
+
 					cbReverse.setChecked(!idir);
 				}
 			}
@@ -871,17 +885,17 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		Pattern p = Pattern.compile("(.*) func\\[(.*),(.*)\\]");
 		String id = "";
 		int iid = 0;
-	
+
 		String btn = "";
 		int ibtn = -1;
 		String state = "";
 		boolean istate = false;
-	
+
 		boolean match = false;
-	
+
 		for(int i=1; i<list.length-1; i++) {
 			Matcher m = p.matcher(list[i]);
-	
+
 			while (m.find() == true) {
 				match = true;
 				id = m.group(1).trim();
@@ -892,7 +906,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				}
 				catch(Exception e) {		
 				}
-	
+
 				if(iid == Settings.getCurrentTrain().getId()) {
 					ibtn = -1;
 					try {
@@ -900,12 +914,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 					}
 					catch(Exception e) {	
 					}
-	
+
 					istate = false;
 					if(state.equals("1")) {
 						istate = true;
 					}
-	
+
 					if(ibtn < listButtons.size()) {
 						listButtons.get(ibtn).setChecked(istate);
 					}
@@ -1017,7 +1031,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 					parseLostControl(result);
 				}
 				else {
-					parseSwitch(result);
+					parseSwitchEvent(result);
 				}
 			}
 			catch(Exception e) {
@@ -1026,9 +1040,100 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		}
 	}
 
-	
 
-	public boolean parseSwitch(String[] list) {
+	public boolean parseTrainsSymbol(String[] list) {
+		//1000 symbol[LOCO_TYPE_DIESEL, IMAGE_TYPE_INT, 8]
+		Pattern p = Pattern.compile("(.*) symbol\\[(.*), (.*), (.*)]");
+		boolean match = false;
+
+		for(int i=1; i<list.length-1; i++) {
+			Matcher m = p.matcher(list[i]);
+			int id = 0;
+			String type = "";
+			int index = 0;
+
+			while (m.find() == true) {
+				match = true;
+				try {
+					id = Integer.parseInt(m.group(1).trim());
+					type = m.group(3).trim();
+
+					if(type.equals("IMAGE_TYPE_INT")) {
+
+						index = Integer.parseInt(m.group(4).trim());
+
+						for (Train t : Settings.allTrains) {
+							if(t.getId() == id) {
+								t.setSymbol(index);
+								dataAdapter.notifyDataSetChanged();
+							}
+						}
+					}
+				}
+				catch(Exception e) {
+				}
+			}
+		}
+		return match;
+	}
+
+	public boolean parseSwitchState(String[] list) {
+		Pattern p = Pattern.compile("(.*) state\\[(.*)\\], symbol\\[(.*)\\]");
+		boolean match = false;
+
+		for(int i=1; i<list.length-1; i++) {
+			Matcher m = p.matcher(list[i]);
+			int id = 0;
+			int state = 0;
+			int symbol = 0;
+
+			while (m.find() == true) {
+				match = true;
+				try {
+					id = Integer.parseInt(m.group(1).trim());
+					state = Integer.parseInt(m.group(2).trim());
+					symbol = Integer.parseInt(m.group(3).trim());
+
+					for(ToggleButton t : listSwitch) {
+						if(Integer.parseInt(t.getTag().toString()) == id) {
+
+							if(!Switch.getInstance().getSymbols().get(symbol,"").equals("")) {
+								/*Resources res = getResources();
+								int resourceId = res.getIdentifier("s"+symbol, "drawable", getPackageName());
+								Drawable img = res.getDrawable( resourceId );
+								t.setCompoundDrawablesWithIntrinsicBounds(img, null , null, null);
+								 */
+							}
+
+							if(state == 1) {
+								t.setChecked(true);
+							}
+							else {
+								t.setChecked(false);
+							}
+						}
+					}
+					for(SeekBar t : listSwitchMulti) {
+						if(Integer.parseInt(t.getTag().toString()) == id) {
+							t.setProgress(state);
+
+							for(TextView v: listSwitchMultiValue) {
+								if(Integer.parseInt(v.getTag().toString()) == id) {
+									v.setText(t.getProgress()+"");
+								}
+							}
+						}
+					}
+				}
+				catch(Exception e) {
+				}
+			}
+		}
+		return match;
+	}
+
+
+	public boolean parseSwitchEvent(String[] list) {
 		Pattern p = Pattern.compile("(.*) state\\[(.*)\\]");
 		boolean match = false;
 
@@ -1239,7 +1344,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 					" (" + ((int)speedIndicator*speed/Settings.SPEED_MAX) + "/" + speedIndicator + "km/h)");
 		}
 	}
-	
+
 	public void displayError(String error) {
 		Toast.makeText(this, error , Toast.LENGTH_SHORT).show();
 	}
@@ -1317,5 +1422,13 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			}
 		}
 		return false;
+	}
+
+	private void getTrainsSymbol() {
+		List<Train> list = Settings.allTrains;
+
+		for (Train train : list) {
+			mTcpClient.getTrainSymbol(train.getId());
+		}
 	}
 }
