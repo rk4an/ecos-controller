@@ -26,12 +26,18 @@
             android:key="pref_speed"
             android:summary="@string/pref_speed_step_sum"
             android:title="@string/pref_speed_step_title" />
-        
-         <CheckBoxPreference
+
+        <CheckBoxPreference
             android:defaultValue="false"
             android:key="pref_locodesc"
             android:summary="@string/pref_locodesc_sum"
             android:title="@string/pref_locodesc_title" />
+        
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_lockrotation"
+            android:summary="@string/pref_lockrotation_sum"
+            android:title="@string/pref_lockrotation_title" />
         
     </PreferenceCategory>
 

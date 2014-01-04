@@ -31,6 +31,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -178,6 +179,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		((TextView) findViewById(R.id.tvSwitch)).setOnClickListener(this);
 		llSwitch = ((LinearLayout) findViewById(R.id.llSwitch));
 		llSwitch.setVisibility(LinearLayout.GONE);
+
+		boolean lockRotation = pref.getBoolean("pref_lockrotation", false);
+		if(lockRotation) {
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		}
 	}
 
 	@Override
@@ -426,6 +432,14 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			boolean locodesc = pref.getBoolean("pref_locodesc", false);
 			if(locodesc) {
 				getTrainsSymbol();
+			}
+			
+			boolean lockRotation = pref.getBoolean("pref_lockrotation", false);
+			if(lockRotation) {
+				setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+			}
+			else {
+				setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 			}
 		}
 	}

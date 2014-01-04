@@ -51,4 +51,7 @@
     <string name="btn_type">Type</string>
     <string name="pref_locodesc_title">Show trains symbol</string>
     <string name="pref_locodesc_sum">Show trains symbol (can be slow)</string>
+    <string name="pref_lockrotation_title">Disable screen rotation</string>
+    <string name="pref_lockrotation_sum">Disable screen rotation</string>
+
 </resources>

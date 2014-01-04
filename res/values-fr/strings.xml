@@ -41,5 +41,7 @@
     <string name="pref_speed_step_sum">Pas de vitesse pour le bouton volume</string>
     <string name="pref_locodesc_title">Afficher les symboles</string>
     <string name="pref_locodesc_sum">Afficher les symboles des trains</string>
+    <string name="pref_lockrotation_title">Désactiver la rotation écran</string>
+    <string name="pref_lockrotation_sum">Désactiver la rotation écran</string>
 
 </resources>
