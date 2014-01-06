@@ -110,6 +110,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 	private static final int SETTINGS = 0;
 	private int speedStep = Settings.SPEED_STEP;
+	private boolean symbolLoaded = false;
 
 	/**************************************************************************/
 	/** Listeners **/
@@ -206,6 +207,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		}
 		//click on connect button
 		else if(v.getId() == R.id.btnConnect) {
+			symbolLoaded = false;
 			connectToStation(((ToggleButton) v).isChecked());
 		} 
 		//click on control button
@@ -433,7 +435,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			if(locodesc) {
 				getTrainsSymbol();
 			}
-			
+
+			//check if lock screen rotation enable
 			boolean lockRotation = pref.getBoolean("pref_lockrotation", false);
 			if(lockRotation) {
 				setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -674,6 +677,15 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[0], " +
 						"funcexists[1], funcexists[2], funcexists[3], funcexists[4], funcexists[5], funcexists[6], funcexists[7])>")){
 					parseButtonSymbol(respLine);
+
+					boolean locodesc = pref.getBoolean("pref_locodesc", false);
+					if(locodesc) {
+						if(!symbolLoaded) {
+							symbolLoaded = true;
+							getTrainsSymbol();
+						}
+					}
+
 				}
 				//train buttons name response 8-15
 				else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[8], " +
@@ -684,12 +696,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[16], " +
 						"funcexists[17], funcexists[18], funcexists[19], funcexists[20], funcexists[21], funcexists[22], funcexists[23])>")){
 					parseButtonSymbol(respLine);
-
-					boolean locodesc = pref.getBoolean("pref_locodesc", false);
-					if(locodesc) {
-						getTrainsSymbol();
-					}
-
 				}
 				//train buttons response 8-15
 				else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",func[8],func[9],func[10],func[11]," +
