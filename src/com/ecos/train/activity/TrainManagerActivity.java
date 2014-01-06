@@ -1077,7 +1077,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				match = true;
 				try {
 					id = Integer.parseInt(m.group(1).trim());
-					category = type = m.group(2).trim();
+					category = m.group(2).trim();
 					type = m.group(3).trim();
 					index = Integer.parseInt(m.group(4).trim());
 
