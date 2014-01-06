@@ -1070,18 +1070,31 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			Matcher m = p.matcher(list[i]);
 			int id = 0;
 			String type = "";
+			String category = "";
 			int index = 0;
 
 			while (m.find() == true) {
 				match = true;
 				try {
 					id = Integer.parseInt(m.group(1).trim());
+					category = type = m.group(2).trim();
 					type = m.group(3).trim();
+					index = Integer.parseInt(m.group(4).trim());
 
 					if(type.equals("IMAGE_TYPE_INT")) {
-
-						index = Integer.parseInt(m.group(4).trim());
-
+						for (Train t : Settings.allTrains) {
+							if(t.getId() == id) {
+								t.setSymbol(index);
+								dataAdapter.notifyDataSetChanged();
+							}
+						}
+					}
+					else if(type.equals("IMAGE_TYPE_USER")) {
+						if(category.equals("LOCO_TYPE_DIESEL"))		index = 1;
+						if(category.equals("LOCO_TYPE_STEAM"))		index = 0;
+						if(category.equals("LOCO_TYPE_MISC"))		index = 3;
+						if(category.equals("LOCO_TYPE_E"))			index = 3; //2
+						
 						for (Train t : Settings.allTrains) {
 							if(t.getId() == id) {
 								t.setSymbol(index);
