@@ -1093,7 +1093,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 						if(category.equals("LOCO_TYPE_DIESEL"))		index = 1;
 						if(category.equals("LOCO_TYPE_STEAM"))		index = 0;
 						if(category.equals("LOCO_TYPE_MISC"))		index = 3;
-						if(category.equals("LOCO_TYPE_E"))			index = 3; //2
+						if(category.equals("LOCO_TYPE_E"))			index = 2;
 						
 						for (Train t : Settings.allTrains) {
 							if(t.getId() == id) {
