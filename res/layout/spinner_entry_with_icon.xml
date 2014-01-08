@@ -12,7 +12,7 @@
         <ImageView
             android:id="@+id/spinnerLogo"
             android:layout_height="32sp"
-            android:src="@drawable/loco3" />
+            android:src="@drawable/loco0" />
 
         <TextView
             android:id="@+id/spinnerName"

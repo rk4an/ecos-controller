@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ecos.train"
     android:installLocation="auto"
-    android:versionCode="460"
-    android:versionName="3.11.1" >
+    android:versionCode="461"
+    android:versionName="3.11.2" >
 
     <uses-sdk
         android:minSdkVersion="8"
