@@ -9,7 +9,8 @@ public class Switch {
 
 	private Switch(){
 		symbols = new  SparseArray<String>();
-		symbols.put(0, "Empty");
+		symbols.put(0, "Turnout left");
+		symbols.put(1, "Turnout right");
 	}
 
 	public static synchronized Switch getInstance(){			
