@@ -723,6 +723,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				else {
 					parseTrainsSymbol(respLine);
 					parseSwitchState(respLine);
+					parseSwitchSymbol(respLine);
 				}
 
 				if(Settings.state == Settings.State.IDLE) {
@@ -1120,7 +1121,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			Matcher m = p.matcher(list[i]);
 			int id = 0;
 			int state = 0;
-
+            
 			while (m.find() == true) {
 				match = true;
 				try {
@@ -1129,7 +1130,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 					for(ToggleButton t : listSwitch) {
 						if(Integer.parseInt(t.getTag().toString()) == id) {
-
 							if(state == 1) {
 								t.setChecked(true);
 							}
@@ -1157,7 +1157,51 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		return match;
 	}
 
+	public boolean parseSwitchSymbol(String[] list) {
+		Pattern p = Pattern.compile("(.*) symbol\\[(.*)\\]");
+		boolean match = false;
 
+		for(int i=1; i<list.length-1; i++) {
+			Matcher m = p.matcher(list[i]);
+			int id = 0;
+			int symbol = 0;
+			
+			while (m.find() == true) {
+				match = true;
+				try {
+					id = Integer.parseInt(m.group(1).trim());
+					symbol = Integer.parseInt(m.group(2).trim());
+
+					for(ToggleButton t : listSwitch) {
+						if(Integer.parseInt(t.getTag().toString()) == id) {
+							
+							if(!Switch.getInstance().getSymbols().get(symbol,"").equals("")) {
+								Resources res = getResources();
+								int resourceId = res.getIdentifier("s"+symbol, "drawable", getPackageName());
+								Drawable img = res.getDrawable(resourceId);
+								t.setCompoundDrawablesWithIntrinsicBounds(img, null , null, null);
+							}
+						}
+					}
+					/*for(SeekBar t : listSwitchMulti) {
+						if(Integer.parseInt(t.getTag().toString()) == id) {
+							t.setProgress(state);
+
+							for(TextView v: listSwitchMultiValue) {
+								if(Integer.parseInt(v.getTag().toString()) == id) {
+									v.setText(t.getProgress()+"");
+								}
+							}
+						}
+					}*/
+				}
+				catch(Exception e) {
+				}
+			}
+		}
+		return match;
+	}
+	
 	public boolean parseSwitchEvent(String[] list) {
 		Pattern p = Pattern.compile("(.*) state\\[(.*)\\]");
 		boolean match = false;
