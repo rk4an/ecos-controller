@@ -1113,32 +1113,22 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 	}
 
 	public boolean parseSwitchState(String[] list) {
-		Pattern p = Pattern.compile("(.*) state\\[(.*)\\], symbol\\[(.*)\\]");
+		Pattern p = Pattern.compile("(.*) state\\[(.*)\\]");
 		boolean match = false;
 
 		for(int i=1; i<list.length-1; i++) {
 			Matcher m = p.matcher(list[i]);
 			int id = 0;
 			int state = 0;
-			int symbol = 0;
 
 			while (m.find() == true) {
 				match = true;
 				try {
 					id = Integer.parseInt(m.group(1).trim());
 					state = Integer.parseInt(m.group(2).trim());
-					symbol = Integer.parseInt(m.group(3).trim());
 
 					for(ToggleButton t : listSwitch) {
 						if(Integer.parseInt(t.getTag().toString()) == id) {
-
-							if(!Switch.getInstance().getSymbols().get(symbol,"").equals("")) {
-								/*Resources res = getResources();
-								int resourceId = res.getIdentifier("s"+symbol, "drawable", getPackageName());
-								Drawable img = res.getDrawable( resourceId );
-								t.setCompoundDrawablesWithIntrinsicBounds(img, null , null, null);
-								 */
-							}
 
 							if(state == 1) {
 								t.setChecked(true);
