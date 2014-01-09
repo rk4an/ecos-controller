@@ -16,6 +16,10 @@ public class Switch {
 		symbols.put(6, "Semaphore hp02");
 		symbols.put(7, "Semaphore hp012");
 		symbols.put(12, "Light signal");
+		symbols.put(36, "General function");
+		symbols.put(38, "Dummy 2-states");
+		symbols.put(39, "Dummy 3-states");
+		symbols.put(40, "Dummy 4-states");
 	}
 
 	public static synchronized Switch getInstance(){			
