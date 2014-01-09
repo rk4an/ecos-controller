@@ -433,7 +433,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			//check if locodesc enable
 			boolean locodesc = pref.getBoolean("pref_locodesc", false);
 			if(locodesc) {
-				getTrainsSymbol();
+				if(mTcpClient != null) {
+				    getTrainsSymbol();
+				}
 			}
 
 			//check if lock screen rotation enable
