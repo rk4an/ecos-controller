@@ -722,7 +722,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				//a switching object response
 				else {
 					parseTrainsSymbol(respLine);
-					parseSwitchState(respLine);
+					parseSwitch(respLine);
 					parseSwitchSymbol(respLine);
 				}
 
@@ -1054,7 +1054,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 					parseLostControl(result);
 				}
 				else {
-					parseSwitchEvent(result);
+					parseSwitch(result);
 				}
 			}
 			catch(Exception e) {
@@ -1113,7 +1113,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		return match;
 	}
 
-	public boolean parseSwitchState(String[] list) {
+	public boolean parseSwitch(String[] list) {
 		Pattern p = Pattern.compile("(.*) state\\[(.*)\\]");
 		boolean match = false;
 
@@ -1194,50 +1194,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 							}
 						}
 					}*/
-				}
-				catch(Exception e) {
-				}
-			}
-		}
-		return match;
-	}
-	
-	public boolean parseSwitchEvent(String[] list) {
-		Pattern p = Pattern.compile("(.*) state\\[(.*)\\]");
-		boolean match = false;
-
-		for(int i=1; i<list.length-1; i++) {
-			Matcher m = p.matcher(list[i]);
-			int id = 0;
-			int state = 0;
-
-			while (m.find() == true) {
-				match = true;
-				try {
-					id = Integer.parseInt(m.group(1).trim());
-					state = Integer.parseInt(m.group(2).trim());
-
-					for(ToggleButton t : listSwitch) {
-						if(Integer.parseInt(t.getTag().toString()) == id) {
-							if(state == 1) {
-								t.setChecked(true);
-							}
-							else {
-								t.setChecked(false);
-							}
-						}
-					}
-					for(SeekBar t : listSwitchMulti) {
-						if(Integer.parseInt(t.getTag().toString()) == id) {
-							t.setProgress(state);
-
-							for(TextView v: listSwitchMultiValue) {
-								if(Integer.parseInt(v.getTag().toString()) == id) {
-									v.setText(t.getProgress()+"");
-								}
-							}
-						}
-					}
 				}
 				catch(Exception e) {
 				}
