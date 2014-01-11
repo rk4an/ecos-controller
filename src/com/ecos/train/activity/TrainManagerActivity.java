@@ -435,7 +435,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			boolean locodesc = pref.getBoolean("pref_locodesc", false);
 			if(locodesc) {
 				if(mTcpClient != null) {
-				    getTrainsSymbol();
+					getTrainsSymbol();
 				}
 			}
 
@@ -1098,7 +1098,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 						if(category.equals("LOCO_TYPE_STEAM"))		index = 0;
 						if(category.equals("LOCO_TYPE_MISC"))		index = 3;
 						if(category.equals("LOCO_TYPE_E"))			index = 2;
-						
+
 						for (Train t : Settings.allTrains) {
 							if(t.getId() == id) {
 								t.setSymbol(index);
@@ -1122,7 +1122,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			Matcher m = p.matcher(list[i]);
 			int id = 0;
 			int state = 0;
-            
+
 			while (m.find() == true) {
 				match = true;
 				try {
@@ -1166,7 +1166,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			Matcher m = p.matcher(list[i]);
 			int id = 0;
 			int symbol = 0;
-			
+
 			while (m.find() == true) {
 				match = true;
 				try {
@@ -1175,7 +1175,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 					for(ToggleButton t : listSwitch) {
 						if(Integer.parseInt(t.getTag().toString()) == id) {
-							
+
 							if(!Switch.getInstance().getSymbols().get(symbol,"").equals("")) {
 								Resources res = getResources();
 								int resourceId = res.getIdentifier("s"+symbol, "drawable", getPackageName());
@@ -1184,21 +1184,18 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 							}
 						}
 					}
-					for(SeekBar t : listSwitchMulti) {
-						if(Integer.parseInt(t.getTag().toString()) == id) {
 
-							for(TextView v: listSwitchMultiLabel) {
-								if(Integer.parseInt(v.getTag().toString()) == id) {
-									if(!Switch.getInstance().getSymbols().get(symbol,"").equals("")) {
-										Resources res = getResources();
-										int resourceId = res.getIdentifier("s"+symbol, "drawable", getPackageName());
-										Drawable img = res.getDrawable(resourceId);
-										v.setCompoundDrawablesWithIntrinsicBounds(img, null , null, null);
-									}
-								}
+					for(TextView v: listSwitchMultiLabel) {
+						if(Integer.parseInt(v.getTag().toString()) == id) {
+							if(!Switch.getInstance().getSymbols().get(symbol,"").equals("")) {
+								Resources res = getResources();
+								int resourceId = res.getIdentifier("s"+symbol, "drawable", getPackageName());
+								Drawable img = res.getDrawable(resourceId);
+								v.setCompoundDrawablesWithIntrinsicBounds(img, null , null, null);
 							}
 						}
 					}
+
 				}
 				catch(Exception e) {
 				}
@@ -1245,7 +1242,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 					name.setText(name1 + " " + name2);
 					name.setTag(id);
 					listSwitchMultiLabel.add(name);
-					
+
 					TextView value = new TextView(getApplicationContext());
 					value.setText(sb.getProgress()+"");
 					value.setTag(id);
