@@ -106,6 +106,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 	List<ToggleButton> listSwitch = new ArrayList<ToggleButton>();
 	List<SeekBar> listSwitchMulti = new ArrayList<SeekBar>();
 	List<TextView> listSwitchMultiValue = new ArrayList<TextView>();
+	List<TextView> listSwitchMultiLabel = new ArrayList<TextView>();
 	List<ToggleButton> listButtons = new ArrayList<ToggleButton>();
 
 	private static final int SETTINGS = 0;
@@ -1183,17 +1184,21 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 							}
 						}
 					}
-					/*for(SeekBar t : listSwitchMulti) {
+					for(SeekBar t : listSwitchMulti) {
 						if(Integer.parseInt(t.getTag().toString()) == id) {
-							t.setProgress(state);
 
-							for(TextView v: listSwitchMultiValue) {
+							for(TextView v: listSwitchMultiLabel) {
 								if(Integer.parseInt(v.getTag().toString()) == id) {
-									v.setText(t.getProgress()+"");
+									if(!Switch.getInstance().getSymbols().get(symbol,"").equals("")) {
+										Resources res = getResources();
+										int resourceId = res.getIdentifier("s"+symbol, "drawable", getPackageName());
+										Drawable img = res.getDrawable(resourceId);
+										v.setCompoundDrawablesWithIntrinsicBounds(img, null , null, null);
+									}
 								}
 							}
 						}
-					}*/
+					}
 				}
 				catch(Exception e) {
 				}
@@ -1210,6 +1215,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		listSwitch = new ArrayList<ToggleButton>();
 		listSwitchMulti = new ArrayList<SeekBar>();
 		listSwitchMultiValue = new ArrayList<TextView>();
+		listSwitchMultiLabel = new ArrayList<TextView>();
 
 		String id = "";
 		String name1 = "";
@@ -1237,7 +1243,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 					TextView name = new TextView(getApplicationContext());
 					name.setText(name1 + " " + name2);
-
+					name.setTag(id);
+					listSwitchMultiLabel.add(name);
+					
 					TextView value = new TextView(getApplicationContext());
 					value.setText(sb.getProgress()+"");
 					value.setTag(id);
