@@ -186,6 +186,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		if(lockRotation) {
 			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		}
+		
+		displayArrow(R.id.tvF8_F15, "down");
+		displayArrow(R.id.tvF16_F23, "down");
+		displayArrow(R.id.tvSwitch, "down");
 	}
 
 	@Override
@@ -227,9 +231,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			LinearLayout l = (LinearLayout) findViewById(R.id.llF8_F15);
 			if(l.getVisibility() == LinearLayout.VISIBLE) {
 				l.setVisibility(LinearLayout.GONE);
+				displayArrow(R.id.tvF8_F15, "down");
 			}
 			else {
 				l.setVisibility(LinearLayout.VISIBLE);
+				displayArrow(R.id.tvF8_F15, "up");
 				if(Settings.state == Settings.State.IDLE) {
 					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_f8_f15));
 					mTcpClient.getTrainButtonStateF8F15();
@@ -241,9 +247,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			LinearLayout l = (LinearLayout) findViewById(R.id.llF16_F23);
 			if(l.getVisibility() == LinearLayout.VISIBLE) {
 				l.setVisibility(LinearLayout.GONE);
+				displayArrow(R.id.tvF16_F23, "down");
 			}
 			else {
 				l.setVisibility(LinearLayout.VISIBLE);
+				displayArrow(R.id.tvF16_F23, "up");
 				if(Settings.state == Settings.State.IDLE) {
 					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_f16_f23));
 					mTcpClient.getTrainButtonStateF16F23();
@@ -259,10 +267,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 			if(llSwitch.getVisibility() == LinearLayout.VISIBLE) {
 				llSwitch.setVisibility(LinearLayout.GONE);
+				displayArrow(R.id.tvSwitch, "down");
 				return;
 			}
 			else {
 				llSwitch.setVisibility(LinearLayout.VISIBLE);
+				displayArrow(R.id.tvSwitch, "up");
 				if(Settings.fullVersion && Settings.state == Settings.State.IDLE) {
 					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_switching_objects));
 					mTcpClient.getAllObject();
@@ -275,6 +285,14 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		}
 	}
 
+	public void displayArrow(int label, String state) {
+		TextView t = (TextView) findViewById(label);
+		Resources res = getResources();
+		int resourceId = res.getIdentifier(state, "drawable", getPackageName());
+		Drawable img = res.getDrawable(resourceId);
+		t.setCompoundDrawablesWithIntrinsicBounds(img, null , null, null);
+	}
+	
 	@Override
 	public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) { 
 	}
@@ -471,6 +489,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		Settings.state = Settings.State.GET_TRAIN_MAIN_STATE;
 		tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_train_state));
 		mTcpClient.getTrainMainState();
+		
+		displayArrow(R.id.tvF8_F15, "down");
+		displayArrow(R.id.tvF16_F23, "down");
+		
 	}
 
 	@Override
@@ -774,6 +796,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		infoItem.setEnabled(false);
 		Settings.state = Settings.State.NONE;
 		llSwitch.removeAllViews();
+		llSwitch.setVisibility(LinearLayout.GONE);
+		
+		displayArrow(R.id.tvF8_F15, "down");
+		displayArrow(R.id.tvF16_F23, "down");
+		displayArrow(R.id.tvSwitch, "down");
 	}
 
 	/**************************************************************************/
