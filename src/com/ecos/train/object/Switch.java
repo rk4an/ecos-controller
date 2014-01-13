@@ -30,28 +30,31 @@ public class Switch {
 		symbols.put(40, "Dummy 4-states");
 		
 		/*
-		symbols.put(0, "Light signal");
-		symbols.put(0, "Switch signal");
-		symbols.put(0, "Distant signal");
-		symbols.put(0, "Double slip tournout 2-way");
-		symbols.put(0, "Curved turnout left");
-		symbols.put(0, "Curved turnout right");
-		symbols.put(0, "Double crossower turnout 2-way");
-		symbols.put(0, "Double crossower turnout 4-way left");
-		symbols.put(0, "Double crossower turnout 4-way right");
-		symbols.put(0, "Function with track");
-		symbols.put(0, "Lattice mast lightning");
-		symbols.put(0, "Decoupling track");
-		symbols.put(0, "Lightning");
-		symbols.put(0, "Engine Shed");
-		symbols.put(0, "Start goal unidirectional");
-		symbols.put(0, "Start goal bidirectional");
-		symbols.put(0, "Signal SNCB 2 states");
-		symbols.put(0, "Signal NS 2 states");
-		symbols.put(0, "Signal CFL 3 states");
-		symbols.put(0, "Signal SNCF 3 states");
-		symbols.put(0, "Signal SNCB 4 states");
-		symbols.put(0, "Signal NS 3 states");
+		symbols.put(3, "Double slip tournout 2-way");
+		symbols.put(11, "Light signal");
+		symbols.put(13, "Switch signal");
+		symbols.put(14, "Lattice mast lightning");
+		symbols.put(16, "Lightning");
+		symbols.put(17, "Decoupling track");
+		symbols.put(19, "Curved turnout left");
+		symbols.put(20, "Curved turnout right");
+		symbols.put(21, "Signal SNCB 2 states");
+		symbols.put(22, "Signal SNCB 4 states");
+		symbols.put(23, "Signal NS 2 states");
+		symbols.put(24, "Signal NS 3 states");
+		symbols.put(25, "Signal CFL 3 states");
+		symbols.put(26, "Signal SNCF 3 states");
+		symbols.put(28, "Engine Shed");
+		symbols.put(31, "Distant signal");
+		symbols.put(32, "Distant signal");
+		symbols.put(33, "Double crossower turnout 2-way");
+		symbols.put(34, "Double crossower turnout 4-way left");
+		symbols.put(35, "Double crossower turnout 4-way right");
+		symbols.put(36, "Function with track");
+		symbols.put(37, "Start goal unidirectional");
+		symbols.put(41, "Start goal bidirectional");
+
+		symbols.put(42, "Route");
 		*/
 	}
 
