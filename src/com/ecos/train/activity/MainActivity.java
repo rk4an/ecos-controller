@@ -67,8 +67,8 @@ import android.widget.ToggleButton;
 import com.ecos.train.R;
 import com.ecos.train.Settings;
 import com.ecos.train.TCPClient;
-import com.ecos.train.object.SwitchSymbol;
 import com.ecos.train.object.FunctionSymbol;
+import com.ecos.train.object.SwitchSymbol;
 import com.ecos.train.object.Train;
 import com.ecos.train.ui.TrainSpinAdapter;
 
@@ -79,11 +79,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 	public static final String LITE_PACKAGE = "com.ecos.train";  
 	public static final String FULL_PACKAGE = "com.ecos.train.unlock";
 	public static final String CONTACT = "erkan2005+ecos@gmail.com";
-
+	private String DEBUG_TAG = "STATE";
+	
 	SharedPreferences pref = null;
 	private TCPClient mTcpClient = null;
 
-	TextView tvState = null;
 	ToggleButton btnConnect = null;
 	ToggleButton cbReverse = null;
 	Spinner sTrainId = null;
@@ -131,7 +131,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
 		sTrainId = (Spinner) findViewById(R.id.sTrainId);
 		btnControl = (ToggleButton) findViewById(R.id.tbControl);
-		tvState = (TextView) findViewById(R.id.tvState);
 		btnEmergency = (ToggleButton) findViewById(R.id.btnEmergency);
 		tvSpeed = (TextView) findViewById(R.id.tvSpeed);
 
@@ -212,7 +211,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				llTrain.setVisibility(LinearLayout.GONE);
 				if(Settings.fullVersion && Settings.state == Settings.State.IDLE) {
 					if(!switchLoaded) {
-						tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_switching_objects));
+						Log.d(DEBUG_TAG, getString(R.string.state_switching_objects));
 						mTcpClient.getAllObject();
 						switchLoaded = true;
 					}
@@ -269,7 +268,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				l.setVisibility(LinearLayout.VISIBLE);
 				displayArrow(R.id.tvF8_F15, "up");
 				if(Settings.state == Settings.State.IDLE) {
-					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_f8_f15));
+					Log.d(DEBUG_TAG, getString(R.string.state_f8_f15));
 					mTcpClient.getTrainButtonStateF8F15();
 				}
 			}
@@ -285,7 +284,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				l.setVisibility(LinearLayout.VISIBLE);
 				displayArrow(R.id.tvF16_F23, "up");
 				if(Settings.state == Settings.State.IDLE) {
-					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_f16_f23));
+					Log.d(DEBUG_TAG, getString(R.string.state_f16_f23));
 					mTcpClient.getTrainButtonStateF16F23();
 				}
 			}
@@ -502,7 +501,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		btnControl.setChecked(true);
 		mTcpClient.takeViewTrain();
 		Settings.state = Settings.State.GET_TRAIN_MAIN_STATE;
-		tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_train_state));
+		Log.d(DEBUG_TAG, getString(R.string.state_train_state));
 		mTcpClient.getTrainMainState();
 
 		displayArrow(R.id.tvF8_F15, "down");
@@ -607,8 +606,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		protected void onProgressUpdate(String... values) {
 			super.onProgressUpdate(values);
 
-			Log.d("ECOS","state: " + Settings.state);
-			Log.d("ECOS","onProgressUpdate: " + values[0]);
+			Log.d(DEBUG_TAG, "STATE: " + Settings.state);
+			Log.d(DEBUG_TAG, "***" + values[0] + "***");
 
 			String respLine[] = values[0].split("\n");
 
@@ -635,16 +634,15 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 					mTcpClient.viewConsole();
 
-					tvState.setText(getApplicationContext().getString(R.string.tv_state) + " " + 
-							getApplicationContext().getString(R.string.tv_connect));
+					Log.d(DEBUG_TAG, getApplicationContext().getString(R.string.tv_connect));
 					btnConnect.setChecked(true);
 
 					Settings.state = Settings.State.INIT_GET_CONSOLE;
-					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_console_info));
+					Log.d(DEBUG_TAG, getString(R.string.state_console_info));
 					mTcpClient.getConsoleState();
 				}
 				else {
-					tvState.setText(getApplicationContext().getString(R.string.tv_state) + " " + getString(R.string.tv_disconnect));
+					Log.d(DEBUG_TAG, getString(R.string.tv_disconnect));
 					btnConnect.setChecked(false);
 				}
 			}
@@ -654,7 +652,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 					Settings.state = Settings.State.INIT_GET_TRAINS;
 					parseEmergency(respLine);
 					parseConsoleVersion(respLine);
-					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_train_list));
+					Log.d(DEBUG_TAG, getString(R.string.state_train_list));
 					mTcpClient.getAllTrains();
 				}
 			}
@@ -679,7 +677,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 					Settings.state = Settings.State.GET_TRAIN_BUTTON_STATE;
 					parseTrainState(respLine);
 					initFunctionButtons();
-					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_train_buttons));
+					Log.d(DEBUG_TAG, getString(R.string.state_train_buttons));
 					mTcpClient.getTrainButtonState();
 				}
 			}
@@ -763,10 +761,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 					parseSwitch(respLine);
 					parseSwitchSymbol(respLine);
 				}
-
-				if(Settings.state == Settings.State.IDLE) {
-					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_ready));
-				}
 			}
 		}
 	}
@@ -802,7 +796,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		if(mTcpClient != null) {
 			mTcpClient.stopClient();
 		}
-		tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.tv_disconnect));
+		Log.d(DEBUG_TAG, getString(R.string.tv_state) + " " + getString(R.string.tv_disconnect));
 		setStateButtons(false);
 		hideExtraFunctionButtons();
 		setStateControl(false);
