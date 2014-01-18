@@ -112,7 +112,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 	private static final int SETTINGS = 0;
 	private int speedStep = Settings.SPEED_STEP;
+
 	private boolean symbolLoaded = false;
+	private boolean switchLoaded = false;
 
 	/**************************************************************************/
 	/** Listeners **/
@@ -209,8 +211,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				llSwitch.setVisibility(LinearLayout.VISIBLE);
 				llTrain.setVisibility(LinearLayout.GONE);
 				if(Settings.fullVersion && Settings.state == Settings.State.IDLE) {
-					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_switching_objects));
-					mTcpClient.getAllObject();
+					if(!switchLoaded) {
+						tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_switching_objects));
+						mTcpClient.getAllObject();
+						switchLoaded = true;
+					}
 				}
 			}
 			break;
@@ -239,6 +244,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		//click on connect button
 		else if(v.getId() == R.id.btnConnect) {
 			symbolLoaded = false;
+			switchLoaded = false;
 			connectToStation(((ToggleButton) v).isChecked());
 		} 
 		//click on control button
