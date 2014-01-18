@@ -7,6 +7,8 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 
+import android.util.Log;
+
 public class TCPClient {
 
 	private String serverMessage;
@@ -30,6 +32,7 @@ public class TCPClient {
 	 * @param message text entered by client
 	 */
 	public void sendMessage(String message){
+		Log.d("SEND", message);
 		if (out != null && !out.checkError()) {
 			out.println(message);
 			out.flush();

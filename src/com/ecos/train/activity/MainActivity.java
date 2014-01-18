@@ -79,7 +79,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 	public static final String LITE_PACKAGE = "com.ecos.train";  
 	public static final String FULL_PACKAGE = "com.ecos.train.unlock";
 	public static final String CONTACT = "erkan2005+ecos@gmail.com";
-	private String DEBUG_TAG = "STATE";
 	
 	SharedPreferences pref = null;
 	private TCPClient mTcpClient = null;
@@ -211,7 +210,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				llTrain.setVisibility(LinearLayout.GONE);
 				if(Settings.fullVersion && Settings.state == Settings.State.IDLE) {
 					if(!switchLoaded) {
-						Log.d(DEBUG_TAG, getString(R.string.state_switching_objects));
 						mTcpClient.getAllObject();
 						switchLoaded = true;
 					}
@@ -268,7 +266,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				l.setVisibility(LinearLayout.VISIBLE);
 				displayArrow(R.id.tvF8_F15, "up");
 				if(Settings.state == Settings.State.IDLE) {
-					Log.d(DEBUG_TAG, getString(R.string.state_f8_f15));
 					mTcpClient.getTrainButtonStateF8F15();
 				}
 			}
@@ -284,7 +281,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				l.setVisibility(LinearLayout.VISIBLE);
 				displayArrow(R.id.tvF16_F23, "up");
 				if(Settings.state == Settings.State.IDLE) {
-					Log.d(DEBUG_TAG, getString(R.string.state_f16_f23));
 					mTcpClient.getTrainButtonStateF16F23();
 				}
 			}
@@ -501,7 +497,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		btnControl.setChecked(true);
 		mTcpClient.takeViewTrain();
 		Settings.state = Settings.State.GET_TRAIN_MAIN_STATE;
-		Log.d(DEBUG_TAG, getString(R.string.state_train_state));
 		mTcpClient.getTrainMainState();
 
 		displayArrow(R.id.tvF8_F15, "down");
@@ -606,8 +601,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		protected void onProgressUpdate(String... values) {
 			super.onProgressUpdate(values);
 
-			Log.d(DEBUG_TAG, "STATE: " + Settings.state);
-			Log.d(DEBUG_TAG, "***" + values[0] + "***");
+			Log.d("STATE", Settings.state + "");
+			Log.d("RECEIVED", values[0] + "");
 
 			String respLine[] = values[0].split("\n");
 
@@ -634,15 +629,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 					mTcpClient.viewConsole();
 
-					Log.d(DEBUG_TAG, getApplicationContext().getString(R.string.tv_connect));
 					btnConnect.setChecked(true);
 
 					Settings.state = Settings.State.INIT_GET_CONSOLE;
-					Log.d(DEBUG_TAG, getString(R.string.state_console_info));
 					mTcpClient.getConsoleState();
 				}
 				else {
-					Log.d(DEBUG_TAG, getString(R.string.tv_disconnect));
 					btnConnect.setChecked(false);
 				}
 			}
@@ -652,7 +644,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 					Settings.state = Settings.State.INIT_GET_TRAINS;
 					parseEmergency(respLine);
 					parseConsoleVersion(respLine);
-					Log.d(DEBUG_TAG, getString(R.string.state_train_list));
 					mTcpClient.getAllTrains();
 				}
 			}
@@ -677,7 +668,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 					Settings.state = Settings.State.GET_TRAIN_BUTTON_STATE;
 					parseTrainState(respLine);
 					initFunctionButtons();
-					Log.d(DEBUG_TAG, getString(R.string.state_train_buttons));
 					mTcpClient.getTrainButtonState();
 				}
 			}
@@ -796,7 +786,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		if(mTcpClient != null) {
 			mTcpClient.stopClient();
 		}
-		Log.d(DEBUG_TAG, getString(R.string.tv_state) + " " + getString(R.string.tv_disconnect));
 		setStateButtons(false);
 		hideExtraFunctionButtons();
 		setStateControl(false);

@@ -45,14 +45,5 @@
     <string name="pref_locodesc_sum">Show trains symbol (can be slow)</string>
     <string name="pref_lockrotation_title">Disable screen rotation</string>
     <string name="pref_lockrotation_sum">Disable screen rotation</string>
-
-    <string name="state_console_info">Get Console info</string>
-    <string name="state_train_list">Get Trains list</string>
-    <string name="state_train_state">Get Train state</string>
-    <string name="state_train_buttons">Get Train buttons state</string>
-    <string name="state_f8_f15">Get F8-F15 buttons state</string>
-    <string name="state_f16_f23">Get F16-F23 buttons state</string>
-    <string name="state_switching_objects">Get Switching Objets state</string>
-    <string name="state_ready">Ready</string>
     
 </resources>
