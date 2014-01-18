@@ -18,7 +18,7 @@
     <string name="tv_disconnect">Déconnecté</string>
     <string name="tv_ip">IP</string>
     <string name="tv_port">Port (15471)</string>
-    <string name="tv_id_available">Trains:</string>
+    <string name="tv_id_available">Trains</string>
     <string name="btn_emergency">Urgence</string>
     <string name="tv_f8_f15">F8...F15</string>
     <string name="tv_f16_f23">F16...F23</string>
@@ -34,7 +34,7 @@
     <string name="tv_application_version">Application:&#160;</string>
     <string name="tv_hardware_version">Matériel:&#160;</string>
     <string name="tv_ecos_version">ECoS Controller:&#160;</string>
-    <string name="tv_switch">Objets de commutation</string>
+    <string name="tv_switch">Commutateurs</string>
     <string name="pref_sort_sum">Trier la liste par ID ou par nom</string>
     <string name="pref_sort_title">Trier par ID</string>
     <string name="pref_speed_step_title">Pas de vitesse</string>

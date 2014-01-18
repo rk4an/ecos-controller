@@ -56,6 +56,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Spinner;
@@ -90,8 +91,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 	ToggleButton btnEmergency = null;
 	SeekBar sbSpeed = null;
 	TextView tvSpeed = null;
-	TextView tvSwitching = null;
 	LinearLayout llSwitch = null;
+	LinearLayout llTrain = null;
 
 	SpinAdapter dataAdapter;
 	private MenuItem editItem = null;
@@ -177,20 +178,45 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		hardwareVersion = ((TextView) infoView.findViewById(R.id.tvHardwareVersion));
 		ecosVersion = ((TextView) infoView.findViewById(R.id.tvEcosVersion));
 
-		tvSwitching = ((TextView) infoView.findViewById(R.id.tvSwitch));
-		((TextView) findViewById(R.id.tvSwitch)).setOnClickListener(this);
 		llSwitch = ((LinearLayout) findViewById(R.id.llSwitch));
 		llSwitch.setVisibility(LinearLayout.GONE);
+
+		llTrain = ((LinearLayout) findViewById(R.id.llTrain));
+		llTrain.setVisibility(LinearLayout.VISIBLE);
 
 		boolean lockRotation = pref.getBoolean("pref_lockrotation", false);
 		if(lockRotation) {
 			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		}
-		
+
 		displayArrow(R.id.tvF8_F15, "down");
 		displayArrow(R.id.tvF16_F23, "down");
-		displayArrow(R.id.tvSwitch, "down");
 	}
+
+
+	public void onRadioButtonClicked(View view) {
+		boolean checked = ((RadioButton) view).isChecked();
+
+		switch(view.getId()) {
+		case R.id.rTrain:
+			if (checked) {
+				llTrain.setVisibility(LinearLayout.VISIBLE);
+				llSwitch.setVisibility(LinearLayout.GONE);
+			}
+			break;
+		case R.id.rSwitch:
+			if (checked) {
+				llSwitch.setVisibility(LinearLayout.VISIBLE);
+				llTrain.setVisibility(LinearLayout.GONE);
+				if(Settings.fullVersion && Settings.state == Settings.State.IDLE) {
+					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_switching_objects));
+					mTcpClient.getAllObject();
+				}
+			}
+			break;
+		}
+	}
+
 
 	@Override
 	public void onClick(View v) {
@@ -262,23 +288,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		else if(v.getId() == R.id.cbReverse) {
 			mTcpClient.setDir(((ToggleButton) v).isChecked()?1:0);
 		}
-		//click on switching objects banner
-		else if(v.getId() == R.id.tvSwitch) {
-
-			if(llSwitch.getVisibility() == LinearLayout.VISIBLE) {
-				llSwitch.setVisibility(LinearLayout.GONE);
-				displayArrow(R.id.tvSwitch, "down");
-				return;
-			}
-			else {
-				llSwitch.setVisibility(LinearLayout.VISIBLE);
-				displayArrow(R.id.tvSwitch, "up");
-				if(Settings.fullVersion && Settings.state == Settings.State.IDLE) {
-					tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_switching_objects));
-					mTcpClient.getAllObject();
-				}
-			}
-		}
 		//click on switching objects button
 		else {
 			mTcpClient.changeState(Integer.parseInt(v.getTag().toString()), ((ToggleButton) v).isChecked()?1 :0);
@@ -292,7 +301,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		Drawable img = res.getDrawable(resourceId);
 		t.setCompoundDrawablesWithIntrinsicBounds(img, null , null, null);
 	}
-	
+
 	@Override
 	public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) { 
 	}
@@ -489,10 +498,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		Settings.state = Settings.State.GET_TRAIN_MAIN_STATE;
 		tvState.setText(getString(R.string.tv_state) + " " + getString(R.string.state_train_state));
 		mTcpClient.getTrainMainState();
-		
+
 		displayArrow(R.id.tvF8_F15, "down");
 		displayArrow(R.id.tvF16_F23, "down");
-		
+
 	}
 
 	@Override
@@ -797,10 +806,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		Settings.state = Settings.State.NONE;
 		llSwitch.removeAllViews();
 		llSwitch.setVisibility(LinearLayout.GONE);
-		
+
 		displayArrow(R.id.tvF8_F15, "down");
 		displayArrow(R.id.tvF16_F23, "down");
-		displayArrow(R.id.tvSwitch, "down");
 	}
 
 	/**************************************************************************/

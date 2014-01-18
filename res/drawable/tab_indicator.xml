@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- When the tab is checked but not pressed -->
+    <item android:drawable="@drawable/tab_selected" android:state_checked="true" android:state_pressed="false"/>
+    <!-- When the tab is not checked and not pressed -->
+    <item android:drawable="@android:color/transparent" android:state_checked="false" android:state_pressed="false"/>
+    <!-- When the tab is checked and pressed -->
+    <item android:drawable="@drawable/tab_selected_pressed" android:state_checked="true" android:state_pressed="true"/>
+    <!-- When the tab is not checked but pressed -->
+    <item android:drawable="@drawable/tab_unselected_pressed" android:state_checked="false" android:state_pressed="true"/>
+
+</selector>
