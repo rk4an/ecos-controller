@@ -2,12 +2,12 @@ package com.ecos.train.object;
 
 import android.util.SparseArray;
 
-public class Switch {
+public class SwitchSymbol {
 
-	private static Switch INSTANCE = null;
+	private static SwitchSymbol INSTANCE = null;
 	private SparseArray<String> symbols;
 
-	private Switch(){
+	private SwitchSymbol(){
 		symbols = new  SparseArray<String>();
 		symbols.put(0, "Turnout left");
 		symbols.put(1, "Turnout right");
@@ -54,9 +54,9 @@ public class Switch {
 		symbols.put(42, "Route");
 	}
 
-	public static synchronized Switch getInstance(){			
+	public static synchronized SwitchSymbol getInstance(){			
 		if (INSTANCE == null){ 	
-			INSTANCE = new Switch();	
+			INSTANCE = new SwitchSymbol();	
 		}
 		return INSTANCE;
 	}

@@ -67,12 +67,12 @@ import android.widget.ToggleButton;
 import com.ecos.train.R;
 import com.ecos.train.Settings;
 import com.ecos.train.TCPClient;
-import com.ecos.train.object.Switch;
-import com.ecos.train.object.Symbols;
+import com.ecos.train.object.SwitchSymbol;
+import com.ecos.train.object.FunctionSymbol;
 import com.ecos.train.object.Train;
-import com.ecos.train.ui.SpinAdapter;
+import com.ecos.train.ui.TrainSpinAdapter;
 
-public class TrainManagerActivity 
+public class MainActivity 
 extends ActionBarActivity 
 implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnTouchListener {
 
@@ -94,7 +94,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 	LinearLayout llSwitch = null;
 	LinearLayout llTrain = null;
 
-	SpinAdapter dataAdapter;
+	TrainSpinAdapter dataAdapter;
 	private MenuItem editItem = null;
 	private MenuItem infoItem = null;
 
@@ -370,7 +370,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		switch (item.getItemId()) {
 		case R.id.iSettings:
 			Intent i = new Intent(this, PreferencesActivity.class);
-			startActivityForResult(i, TrainManagerActivity.SETTINGS);
+			startActivityForResult(i, MainActivity.SETTINGS);
 			return true;
 		case R.id.iPack:
 			Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -426,7 +426,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			return true;
 		case R.id.iContact:
 			Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-					"mailto", TrainManagerActivity.CONTACT, null));
+					"mailto", MainActivity.CONTACT, null));
 			emailIntent.putExtra(Intent.EXTRA_SUBJECT, "ECoS Controller Feedback");
 			startActivity(Intent.createChooser(emailIntent, "Send email..."));
 
@@ -437,7 +437,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 	}
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if(requestCode == TrainManagerActivity.SETTINGS) {
+		if(requestCode == MainActivity.SETTINGS) {
 
 			//get speed step
 			speedStep = Integer.parseInt(pref.getString("pref_speed", Settings.SPEED_STEP+""));
@@ -667,7 +667,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 					Settings.sortById = pref.getBoolean("pref_sort", false);
 					sortTrainsList(Settings.sortById);
 
-					dataAdapter = new SpinAdapter(getApplicationContext(),
+					dataAdapter = new TrainSpinAdapter(getApplicationContext(),
 							android.R.layout.simple_spinner_item, Settings.allTrains);
 					dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 					sTrainId.setAdapter(dataAdapter);
@@ -1015,7 +1015,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 					if(fctSymbol == -1) {
 						listButtons.get(fctNum).setEnabled(false);
 					}
-					else if(!Symbols.getInstance().getSymbols().get(fctSymbol,"").equals("")) {
+					else if(!FunctionSymbol.getInstance().getSymbols().get(fctSymbol,"").equals("")) {
 						Resources res = getResources();
 						int resourceId = res.getIdentifier("f"+fctSymbol, "drawable", getPackageName());
 						Drawable img = res.getDrawable( resourceId );
@@ -1217,7 +1217,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 					for(ToggleButton t : listSwitch) {
 						if(Integer.parseInt(t.getTag().toString()) == id) {
 
-							if(!Switch.getInstance().getSymbols().get(symbol,"").equals("")) {
+							if(!SwitchSymbol.getInstance().getSymbols().get(symbol,"").equals("")) {
 								Resources res = getResources();
 								int resourceId = res.getIdentifier("s"+symbol, "drawable", getPackageName());
 								Drawable img = res.getDrawable(resourceId);
@@ -1228,7 +1228,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 					for(TextView v: listSwitchMultiLabel) {
 						if(Integer.parseInt(v.getTag().toString()) == id) {
-							if(!Switch.getInstance().getSymbols().get(symbol,"").equals("")) {
+							if(!SwitchSymbol.getInstance().getSymbols().get(symbol,"").equals("")) {
 								Resources res = getResources();
 								int resourceId = res.getIdentifier("s"+symbol, "drawable", getPackageName());
 								Drawable img = res.getDrawable(resourceId);

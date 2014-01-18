@@ -14,13 +14,13 @@ import android.widget.TextView;
 import com.ecos.train.R;
 import com.ecos.train.object.Train;
 
-public class SpinAdapter extends ArrayAdapter<Train>{
+public class TrainSpinAdapter extends ArrayAdapter<Train>{
 
 	private Context context;
 
 	private List<Train> values;
 
-	public SpinAdapter(Context context, int textViewResourceId, List<Train> values) {
+	public TrainSpinAdapter(Context context, int textViewResourceId, List<Train> values) {
 		super(context, textViewResourceId, values);
 		this.context = context;
 		this.values = values;

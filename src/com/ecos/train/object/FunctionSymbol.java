@@ -2,12 +2,12 @@ package com.ecos.train.object;
 
 import android.util.SparseArray;
 
-public class Symbols {
+public class FunctionSymbol {
 
-	private static Symbols INSTANCE = null;
+	private static FunctionSymbol INSTANCE = null;
 	private SparseArray<String> symbols;
 
-	private Symbols(){
+	private FunctionSymbol(){
 		symbols = new  SparseArray<String>();
 		symbols.put(2, "Function");
 		symbols.put(3, "Head light");
@@ -59,9 +59,9 @@ public class Symbols {
 		symbols.put(5640, "Diesel Engine Notch Down");
 	}
 
-	public static synchronized Symbols getInstance(){			
+	public static synchronized FunctionSymbol getInstance(){			
 		if (INSTANCE == null){ 	
-			INSTANCE = new Symbols();	
+			INSTANCE = new FunctionSymbol();	
 		}
 		return INSTANCE;
 	}
