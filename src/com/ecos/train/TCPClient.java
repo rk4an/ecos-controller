@@ -100,6 +100,7 @@ public class TCPClient {
 
 		} catch (Exception e) {
 			mMessageListener.messageReceived("DISCONNECT");
+			mMessageListener.messageReceived(e.getMessage());
 		}
 
 	}
