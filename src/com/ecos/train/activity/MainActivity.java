@@ -94,7 +94,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 	TrainSpinAdapter dataAdapter;
 	private MenuItem editItem = null;
-	private MenuItem infoItem = null;
 
 	Dialog infoDialog = null;
 	TextView protocolVersion = null;
@@ -339,7 +338,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		inflater.inflate(R.menu.menu, menu);
 
 		editItem = menu.getItem(2);
-		infoItem = menu.getItem(3);
 
 		return true;
 	}   
@@ -351,10 +349,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		}
 		if(Settings.currentTrainIndex == -1) {
 			menu.getItem(2).setEnabled(false);
-			menu.getItem(3).setEnabled(false);
-		}
-		if(Settings.state == Settings.State.IDLE) {
-			menu.getItem(3).setEnabled(true);
 		}
 		return true;
 	}
@@ -783,7 +777,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		setStateControl(false);
 		setStateEmergency(false);
 		setStateList(false);
-		infoItem.setEnabled(false);
 		Settings.state = Settings.State.NONE;
 		llSwitch.removeAllViews();
 		llSwitch.setVisibility(LinearLayout.GONE);
