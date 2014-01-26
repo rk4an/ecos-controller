@@ -217,6 +217,10 @@ public class TCPClient {
 				"funcexists[17], funcexists[18], funcexists[19], funcexists[20], funcexists[21], funcexists[22], funcexists[23])");
 	}
 	
+	public void delete() {
+		sendMessage("delete("+Settings.getCurrentTrain().getId()+")");
+	}
+	
 	/**************************************************************************/
 	/** Command Switching Objects **/
 	/**************************************************************************/
