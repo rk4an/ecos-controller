@@ -146,79 +146,79 @@ public class TCPClient {
 	/** Command Train **/
 	/**************************************************************************/
 	
-	public void getTrainMainState() {
-		sendMessage("get("+Settings.getCurrentTrain().getId()+",name,speed,dir,speedindicator)");
+	public void getTrainMainState(int id) {
+		sendMessage("get("+id+",name,speed,dir,speedindicator)");
 	}
 	
 	public void getTrainSymbol(int id) {
 		sendMessage("get("+id+",locodesc)");
 	}
 	
-	public void getTrainButtonState() {
-		sendMessage("get("+Settings.getCurrentTrain().getId()+",func[0],func[1],func[2],func[3]," +
+	public void getTrainButtonState(int id) {
+		sendMessage("get("+id+",func[0],func[1],func[2],func[3]," +
 				"func[4],func[5],func[6],func[7])");
 	}
 	
-	public void getTrainButtonStateF8F15() {
-		sendMessage("get("+Settings.getCurrentTrain().getId()+",func[8],func[9],func[10],func[11]," +
+	public void getTrainButtonStateF8F15(int id) {
+		sendMessage("get("+id+",func[8],func[9],func[10],func[11]," +
 				"func[12],func[13],func[14],func[15])");
 	}
 	
-	public void getTrainButtonStateF16F23() {
-		sendMessage("get("+Settings.getCurrentTrain().getId()+",func[16],func[17],func[18],func[19]," +
+	public void getTrainButtonStateF16F23(int id) {
+		sendMessage("get("+id+",func[16],func[17],func[18],func[19]," +
 				"func[20],func[21],func[22],func[23])");
 	}
 	
-	public void setButton(int i, boolean enabled) {
+	public void setButton(int id, int i, boolean enabled) {
 		int value = (enabled) ? 1 : 0;
-		sendMessage("set("+Settings.getCurrentTrain().getId()+", func["+i+", "+value+"])");
+		sendMessage("set("+id+", func["+i+", "+value+"])");
 	}
 	
-	public void setSpeed(int speed) {
-		sendMessage("set("+Settings.getCurrentTrain().getId()+", speed["+speed+"])");
+	public void setSpeed(int id,int speed) {
+		sendMessage("set("+id+", speed["+speed+"])");
 	}
 	
-	public void setDir(int dir) {
-		sendMessage("set("+Settings.getCurrentTrain().getId()+", dir["+dir+"])");
+	public void setDir(int id,int dir) {
+		sendMessage("set("+id+", dir["+dir+"])");
 	}
 	
-	public void takeControl() {
-		sendMessage("request("+Settings.getCurrentTrain().getId()+", control, force)");
+	public void takeControl(int id) {
+		sendMessage("request("+id+", control, force)");
 	}
 	
-	public void releaseControl() {
-		sendMessage("release("+Settings.getCurrentTrain().getId()+", control)");
+	public void releaseControl(int id) {
+		sendMessage("release("+id+", control)");
 	}
 
-	public void takeViewTrain() {
-		sendMessage("request("+Settings.getCurrentTrain().getId()+", view)");
+	public void takeViewTrain(int id) {
+		sendMessage("request("+id+", view)");
 	}
 	
-	public void releaseViewTrain() {
-		sendMessage("release("+Settings.getCurrentTrain().getId()+", view)");
+	public void releaseViewTrain(int id) {
+		sendMessage("release("+id+", view)");
 	}
 	
-	public void setName(String name) {
-		sendMessage("set("+Settings.getCurrentTrain().getId()+", name[\""+name+"\"])");
+	public void setName(int id, String name) {
+		sendMessage("set("+id+", name[\""+name+"\"])");
 	}
 	
-	public void getButtonName() {
-		sendMessage("get("+Settings.getCurrentTrain().getId()+", funcexists[0], " +
+	public void getButtonName(int id) {
+		sendMessage("get("+id+", funcexists[0], " +
 				"funcexists[1], funcexists[2], funcexists[3], funcexists[4], funcexists[5], funcexists[6], funcexists[7])");
 	}
 	
-	public void getButtonNameF8F15() {
-		sendMessage("get("+Settings.getCurrentTrain().getId()+", funcexists[8], " +
+	public void getButtonNameF8F15(int id) {
+		sendMessage("get("+id+", funcexists[8], " +
 				"funcexists[9], funcexists[10], funcexists[11], funcexists[12], funcexists[13], funcexists[14], funcexists[15])");
 	}
 	
-	public void getButtonNameF16F23() {
-		sendMessage("get("+Settings.getCurrentTrain().getId()+", funcexists[16], " +
+	public void getButtonNameF16F23(int id) {
+		sendMessage("get("+id+", funcexists[16], " +
 				"funcexists[17], funcexists[18], funcexists[19], funcexists[20], funcexists[21], funcexists[22], funcexists[23])");
 	}
 	
-	public void delete() {
-		sendMessage("delete("+Settings.getCurrentTrain().getId()+")");
+	public void delete(int id) {
+		sendMessage("delete("+id+")");
 	}
 	
 	/**************************************************************************/

@@ -228,7 +228,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 			if(v.getTag(R.string.btn_name).toString().startsWith("btn")) {
 				String token[] = v.getTag(R.string.btn_name).toString().split(";");
-				mTcpClient.setButton(Integer.parseInt(
+				mTcpClient.setButton(Settings.getCurrentTrain().getId(), Integer.parseInt(
 						token[1]), ((ToggleButton) v).isChecked());
 				return;
 			}
@@ -247,11 +247,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		//click on control button
 		else if(v.getId() == R.id.tbControl) {
 			if(((ToggleButton) v).isChecked()) {
-				mTcpClient.takeControl();
+				mTcpClient.takeControl(Settings.getCurrentTrain().getId());
 				setStateButtons(true);
 			}
 			else {
-				mTcpClient.releaseControl();
+				mTcpClient.releaseControl(Settings.getCurrentTrain().getId());
 				setStateButtons(false);
 			}
 		}
@@ -266,7 +266,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				l.setVisibility(LinearLayout.VISIBLE);
 				displayArrow(R.id.tvF8_F15, "up");
 				if(Settings.state == Settings.State.IDLE) {
-					mTcpClient.getTrainButtonStateF8F15();
+					mTcpClient.getTrainButtonStateF8F15(Settings.getCurrentTrain().getId());
 				}
 			}
 		}
@@ -281,13 +281,13 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				l.setVisibility(LinearLayout.VISIBLE);
 				displayArrow(R.id.tvF16_F23, "up");
 				if(Settings.state == Settings.State.IDLE) {
-					mTcpClient.getTrainButtonStateF16F23();
+					mTcpClient.getTrainButtonStateF16F23(Settings.getCurrentTrain().getId());
 				}
 			}
 		}
 		//click on reverse button
 		else if(v.getId() == R.id.cbReverse) {
-			mTcpClient.setDir(((ToggleButton) v).isChecked()?1:0);
+			mTcpClient.setDir(Settings.getCurrentTrain().getId(),((ToggleButton) v).isChecked()?1:0);
 		}
 		//click on switching objects button
 		else {
@@ -315,7 +315,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 	public void onStopTrackingTouch(SeekBar sb) {
 		//speed seekbar
 		if(sb.getId() == R.id.sbSpeed) {
-			mTcpClient.setSpeed(sb.getProgress());
+			mTcpClient.setSpeed(Settings.getCurrentTrain().getId(), sb.getProgress());
 			displaySpeed(sb.getProgress());
 		}
 		//switching object seekbar
@@ -392,7 +392,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				public void onClick(DialogInterface dialog, int which) {
 
 					String name = edName.getText().toString();
-					mTcpClient.setName(name);
+					mTcpClient.setName(Settings.getCurrentTrain().getId(), name);
 
 					for (Train t : Settings.allTrains) {
 						if(t.getId() == Settings.getCurrentTrain().getId()) {
@@ -486,18 +486,18 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 		//release old train
 		if(Settings.currentTrainIndex != -1) {
-			mTcpClient.releaseViewTrain();
-			mTcpClient.releaseControl();
+			mTcpClient.releaseViewTrain(Settings.getCurrentTrain().getId());
+			mTcpClient.releaseControl(Settings.getCurrentTrain().getId());
 		}
 
 		//get train and take control
 		Settings.currentTrainIndex = pos;
 
-		mTcpClient.takeControl();
+		mTcpClient.takeControl(Settings.getCurrentTrain().getId());
 		btnControl.setChecked(true);
-		mTcpClient.takeViewTrain();
+		mTcpClient.takeViewTrain(Settings.getCurrentTrain().getId());
 		Settings.state = Settings.State.GET_TRAIN_MAIN_STATE;
-		mTcpClient.getTrainMainState();
+		mTcpClient.getTrainMainState(Settings.getCurrentTrain().getId());
 
 		displayArrow(R.id.tvF8_F15, "down");
 		displayArrow(R.id.tvF16_F23, "down");
@@ -668,7 +668,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 					Settings.state = Settings.State.GET_TRAIN_BUTTON_STATE;
 					parseTrainState(respLine);
 					initFunctionButtons();
-					mTcpClient.getTrainButtonState();
+					mTcpClient.getTrainButtonState(Settings.getCurrentTrain().getId());
 				}
 			}
 			//train buttons state response
@@ -684,7 +684,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 					setStateControl(true);
 
 					if(!Settings.protocolVersion.equals("0.1")) {
-						mTcpClient.getButtonName();
+						mTcpClient.getButtonName(Settings.getCurrentTrain().getId());
 					}
 				}
 			}
@@ -732,7 +732,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 					parseButtons(respLine);
 
 					if(!Settings.protocolVersion.equals("0.1")) {
-						mTcpClient.getButtonNameF8F15();
+						mTcpClient.getButtonNameF8F15(Settings.getCurrentTrain().getId());
 					}
 				}
 				//train buttons response 16-23
@@ -742,7 +742,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 					parseButtons(respLine);
 
 					if(!Settings.protocolVersion.equals("0.1")) {
-						mTcpClient.getButtonNameF16F23();
+						mTcpClient.getButtonNameF16F23(Settings.getCurrentTrain().getId());
 					}
 				}
 				//a switching object response
@@ -1452,7 +1452,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				sbSpeed.setProgress(new_value);
 
 			}
-			mTcpClient.setSpeed(sbSpeed.getProgress());
+			mTcpClient.setSpeed(Settings.getCurrentTrain().getId(), sbSpeed.getProgress());
 			displaySpeed(sbSpeed.getProgress());
 		}
 	}
@@ -1464,12 +1464,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			if(v.getTag(R.string.btn_type).toString().equals("moment")) {
 				String token[] = v.getTag(R.string.btn_name).toString().split(";");
 				if (me.getAction() == MotionEvent.ACTION_DOWN) {
-					mTcpClient.setButton(Integer.parseInt(token[1]), true);
+					mTcpClient.setButton(Settings.getCurrentTrain().getId(), Integer.parseInt(token[1]), true);
 					((ToggleButton) v).setChecked(true);
 					return true;
 				}
 				else if (me.getAction() == MotionEvent.ACTION_UP) {
-					mTcpClient.setButton(Integer.parseInt(token[1]), false);
+					mTcpClient.setButton(Settings.getCurrentTrain().getId(), Integer.parseInt(token[1]), false);
 					((ToggleButton) v).setChecked(false);
 					return true;
 				}
