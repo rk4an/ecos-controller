@@ -78,7 +78,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 	public static final String LITE_PACKAGE = "com.ecos.train";  
 	public static final String FULL_PACKAGE = "com.ecos.train.unlock";
-	public static final String CONTACT = "erkan2005+ecos@gmail.com";
 	
 	SharedPreferences pref = null;
 	private TCPClient mTcpClient = null;
@@ -417,13 +416,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				PackageInfo manager = getPackageManager().getPackageInfo(getPackageName(), 0);
 				ecosVersion.setText(manager.versionName);
 			} catch (Exception e) { }
-
-			return true;
-		case R.id.iContact:
-			Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-					"mailto", MainActivity.CONTACT, null));
-			emailIntent.putExtra(Intent.EXTRA_SUBJECT, "ECoS Controller Feedback");
-			startActivity(Intent.createChooser(emailIntent, "Send email..."));
 
 			return true;
 		default:

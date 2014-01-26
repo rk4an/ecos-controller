@@ -20,9 +20,5 @@
         android:id="@+id/iInfo"
         android:alphabeticShortcut="i"
         android:title="@string/btn_info"/>
-    <item
-        android:id="@+id/iContact"
-        android:alphabeticShortcut="c"
-        android:title="@string/btn_contact"/>
 
 </menu>
