@@ -78,7 +78,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 	public static final String LITE_PACKAGE = "com.ecos.train";  
 	public static final String FULL_PACKAGE = "com.ecos.train.unlock";
-	
+
 	SharedPreferences pref = null;
 	private TCPClient mTcpClient = null;
 
@@ -110,6 +110,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 	private static final int SETTINGS = 0;
 	private int speedStep = Settings.SPEED_STEP;
 
+	private boolean connected = false;
 	private boolean symbolLoaded = false;
 	private boolean switchLoaded = false;
 
@@ -206,7 +207,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			if (checked) {
 				llSwitch.setVisibility(LinearLayout.VISIBLE);
 				llTrain.setVisibility(LinearLayout.GONE);
-				if(Settings.fullVersion && Settings.state == Settings.State.IDLE) {
+				if(Settings.fullVersion && connected) {
 					if(!switchLoaded) {
 						mTcpClient.getAllObject();
 						switchLoaded = true;
@@ -246,6 +247,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		else if(v.getId() == R.id.tbControl) {
 			if(((ToggleButton) v).isChecked()) {
 				mTcpClient.takeControl(Settings.getCurrentTrain().getId());
+				mTcpClient.takeViewTrain(Settings.getCurrentTrain().getId());
 				setStateButtons(true);
 			}
 			else {
@@ -263,9 +265,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			else {
 				l.setVisibility(LinearLayout.VISIBLE);
 				displayArrow(R.id.tvF8_F15, "up");
-				if(Settings.state == Settings.State.IDLE) {
-					mTcpClient.getTrainButtonStateF8F15(Settings.getCurrentTrain().getId());
-				}
+
+				mTcpClient.getTrainButtonStateF8F15(Settings.getCurrentTrain().getId());
+
 			}
 		}
 		//click on F16-F23 banner
@@ -278,9 +280,9 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			else {
 				l.setVisibility(LinearLayout.VISIBLE);
 				displayArrow(R.id.tvF16_F23, "up");
-				if(Settings.state == Settings.State.IDLE) {
-					mTcpClient.getTrainButtonStateF16F23(Settings.getCurrentTrain().getId());
-				}
+
+				mTcpClient.getTrainButtonStateF16F23(Settings.getCurrentTrain().getId());
+
 			}
 		}
 		//click on reverse button
@@ -432,15 +434,14 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			//check if something change on sorting preference
 			if(Settings.sortById != pref.getBoolean("pref_sort", false)) {
 				Settings.sortById = pref.getBoolean("pref_sort", false);
-				if(Settings.state != Settings.State.NONE) {
-					sortTrainsList(Settings.sortById);
-					dataAdapter.notifyDataSetChanged();
-					//restore the latest selection
-					for(int i=0; i<Settings.allTrains.size(); i++) {
-						if(Settings.allTrains.get(i).getId() == Settings.getCurrentTrain().getId()) {
-							sTrainId.setSelection(i);
-							break;
-						}
+
+				sortTrainsList(Settings.sortById);
+				dataAdapter.notifyDataSetChanged();
+				//restore the latest selection
+				for(int i=0; i<Settings.allTrains.size(); i++) {
+					if(Settings.allTrains.get(i).getId() == Settings.getCurrentTrain().getId()) {
+						sTrainId.setSelection(i);
+						break;
 					}
 				}
 			}
@@ -482,7 +483,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		mTcpClient.takeControl(Settings.getCurrentTrain().getId());
 		btnControl.setChecked(true);
 		mTcpClient.takeViewTrain(Settings.getCurrentTrain().getId());
-		Settings.state = Settings.State.GET_TRAIN_MAIN_STATE;
+
 		mTcpClient.getTrainMainState(Settings.getCurrentTrain().getId());
 
 		displayArrow(R.id.tvF8_F15, "down");
@@ -552,7 +553,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 	}
 
 	public void setStateEmergency(boolean state) {
-
 		btnEmergency.setEnabled(state);
 	}
 
@@ -587,7 +587,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		protected void onProgressUpdate(String... values) {
 			super.onProgressUpdate(values);
 
-			Log.d("STATE", Settings.state + "");
 			Log.d("RECEIVED", values[0] + "");
 
 			String respLine[] = values[0].split("\n");
@@ -606,140 +605,126 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				}
 			}
 
-			//state machine
-			if(Settings.state == Settings.State.NONE) {
+			if(!connected) {
 				//check if connection ok
 				if(values[0].equals("READY")) {
+					connected = true;
 					setStateList(true);
 					setStateEmergency(true);
 
 					mTcpClient.viewConsole();
 
 					btnConnect.setChecked(true);
-
-					Settings.state = Settings.State.INIT_GET_CONSOLE;
 					mTcpClient.getConsoleState();
 				}
 				else {
+					connected = false;
 					btnConnect.setChecked(false);
 				}
 			}
+
 			//emergency state response
-			else if(Settings.state == Settings.State.INIT_GET_CONSOLE) {
-				if(respLine[0].equals("<REPLY get(1, status, info)>")) {
-					Settings.state = Settings.State.INIT_GET_TRAINS;
-					parseEmergency(respLine);
-					parseConsoleVersion(respLine);
-					mTcpClient.getAllTrains();
-				}
+			if(respLine[0].equals("<REPLY get(1, status, info)>")) {
+				parseEmergency(respLine);
+				parseConsoleVersion(respLine);
+				mTcpClient.getAllTrains();
 			}
 			//train list response
-			else if(Settings.state == Settings.State.INIT_GET_TRAINS) {
-				if(respLine[0].equals("<REPLY queryObjects(10, name, addr)>")) {
-					Settings.state = Settings.State.GET_TRAIN_MAIN_STATE;
-					Settings.allTrains = parseTrainsList(values[0]);
+			else if(respLine[0].equals("<REPLY queryObjects(10, name, addr)>")) {
+				Settings.allTrains = parseTrainsList(values[0]);
 
-					Settings.sortById = pref.getBoolean("pref_sort", false);
-					sortTrainsList(Settings.sortById);
+				Settings.sortById = pref.getBoolean("pref_sort", false);
+				sortTrainsList(Settings.sortById);
 
-					dataAdapter = new TrainSpinAdapter(getApplicationContext(),
-							android.R.layout.simple_spinner_item, Settings.allTrains);
-					dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-					sTrainId.setAdapter(dataAdapter);
-				}
+				dataAdapter = new TrainSpinAdapter(getApplicationContext(),
+						android.R.layout.simple_spinner_item, Settings.allTrains);
+				dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+				sTrainId.setAdapter(dataAdapter);
 			}
 			//train state response
-			else if(Settings.state == Settings.State.GET_TRAIN_MAIN_STATE) {
-				if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",name,speed,dir,speedindicator)>")) {
-					Settings.state = Settings.State.GET_TRAIN_BUTTON_STATE;
-					parseTrainState(respLine);
-					initFunctionButtons();
-					mTcpClient.getTrainButtonState(Settings.getCurrentTrain().getId());
-				}
+			else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",name,speed,dir,speedindicator)>")) {
+				parseTrainState(respLine);
+				initFunctionButtons();
+				mTcpClient.getTrainButtonState(Settings.getCurrentTrain().getId());
 			}
 			//train buttons state response
-			else if(Settings.state == Settings.State.GET_TRAIN_BUTTON_STATE) {
-				if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",func[0],func[1],func[2],func[3]," +
-						"func[4],func[5],func[6],func[7])>")) {
-					Settings.state = Settings.State.IDLE;
+			else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",func[0],func[1],func[2],func[3]," +
+					"func[4],func[5],func[6],func[7])>")) {
 
-					parseButtons(respLine);
-					setStateButtons(true);
-					hideExtraFunctionButtons();
-					setStateList(true);
-					setStateControl(true);
+				parseButtons(respLine);
+				setStateButtons(true);
+				hideExtraFunctionButtons();
+				setStateList(true);
+				setStateControl(true);
 
-					if(!Settings.protocolVersion.equals("0.1")) {
-						mTcpClient.getButtonName(Settings.getCurrentTrain().getId());
+				if(!Settings.protocolVersion.equals("0.1")) {
+					mTcpClient.getButtonName(Settings.getCurrentTrain().getId());
+				}
+			}
+			//manage event
+			else if(respLine[0].startsWith("<EVENT")) {	
+				parseEvent(respLine);
+			}
+			//console info response
+			else if(respLine[0].equals("<REPLY get(1, info)>")) {
+				parseConsoleVersion(respLine);
+			}
+			//switching objects list response
+			else if(respLine[0].equals("<REPLY queryObjects(11, name1, name2, addrext)>")) {
+				parseSwitchList(respLine);
+			}
+			//train buttons name response 0-7
+			else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[0], " +
+					"funcexists[1], funcexists[2], funcexists[3], funcexists[4], funcexists[5], funcexists[6], funcexists[7])>")){
+				parseButtonSymbol(respLine);
+
+				boolean locodesc = pref.getBoolean("pref_locodesc", false);
+				if(locodesc) {
+					if(!symbolLoaded) {
+						symbolLoaded = true;
+						getTrainsSymbol();
 					}
 				}
 			}
-			else if(Settings.state == Settings.State.IDLE) {
-				//manage event
-				if(respLine[0].startsWith("<EVENT")) {	
-					parseEvent(respLine);
-				}
-				//console info response
-				else if(respLine[0].equals("<REPLY get(1, info)>")) {
-					parseConsoleVersion(respLine);
-				}
-				//switching objects list response
-				else if(respLine[0].equals("<REPLY queryObjects(11, name1, name2, addrext)>")) {
-					parseSwitchList(respLine);
-				}
-				//train buttons name response 0-7
-				else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[0], " +
-						"funcexists[1], funcexists[2], funcexists[3], funcexists[4], funcexists[5], funcexists[6], funcexists[7])>")){
-					parseButtonSymbol(respLine);
+			//train buttons name response 8-15
+			else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[8], " +
+					"funcexists[9], funcexists[10], funcexists[11], funcexists[12], funcexists[13], funcexists[14], funcexists[15])>")){
+				parseButtonSymbol(respLine);
+			}
+			//train buttons name response 16-23
+			else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[16], " +
+					"funcexists[17], funcexists[18], funcexists[19], funcexists[20], funcexists[21], funcexists[22], funcexists[23])>")){
+				parseButtonSymbol(respLine);
+			}
+			//train buttons response 8-15
+			else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",func[8],func[9],func[10],func[11]," +
+					"func[12],func[13],func[14],func[15])>")) {
 
-					boolean locodesc = pref.getBoolean("pref_locodesc", false);
-					if(locodesc) {
-						if(!symbolLoaded) {
-							symbolLoaded = true;
-							getTrainsSymbol();
-						}
-					}
+				parseButtons(respLine);
 
+				if(!Settings.protocolVersion.equals("0.1")) {
+					mTcpClient.getButtonNameF8F15(Settings.getCurrentTrain().getId());
 				}
-				//train buttons name response 8-15
-				else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[8], " +
-						"funcexists[9], funcexists[10], funcexists[11], funcexists[12], funcexists[13], funcexists[14], funcexists[15])>")){
-					parseButtonSymbol(respLine);
-				}
-				//train buttons name response 16-23
-				else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[16], " +
-						"funcexists[17], funcexists[18], funcexists[19], funcexists[20], funcexists[21], funcexists[22], funcexists[23])>")){
-					parseButtonSymbol(respLine);
-				}
-				//train buttons response 8-15
-				else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",func[8],func[9],func[10],func[11]," +
-						"func[12],func[13],func[14],func[15])>")) {
+			}
+			//train buttons response 16-23
+			else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",func[16],func[17],func[18],func[19]," +
+					"func[20],func[21],func[22],func[23])>")) {
 
-					parseButtons(respLine);
+				parseButtons(respLine);
 
-					if(!Settings.protocolVersion.equals("0.1")) {
-						mTcpClient.getButtonNameF8F15(Settings.getCurrentTrain().getId());
-					}
+				if(!Settings.protocolVersion.equals("0.1")) {
+					mTcpClient.getButtonNameF16F23(Settings.getCurrentTrain().getId());
 				}
-				//train buttons response 16-23
-				else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",func[16],func[17],func[18],func[19]," +
-						"func[20],func[21],func[22],func[23])>")) {
-
-					parseButtons(respLine);
-
-					if(!Settings.protocolVersion.equals("0.1")) {
-						mTcpClient.getButtonNameF16F23(Settings.getCurrentTrain().getId());
-					}
-				}
-				//a switching object response
-				else {
-					parseTrainsSymbol(respLine);
-					parseSwitch(respLine);
-					parseSwitchSymbol(respLine);
-				}
+			}
+			//a switching object response
+			else {
+				parseTrainsSymbol(respLine);
+				parseSwitch(respLine);
+				parseSwitchSymbol(respLine);
 			}
 		}
 	}
+
 
 	/**************************************************************************/
 	/** Connect/Disconnect to console **/
@@ -758,9 +743,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				Settings.consolePort = Settings.CONSOLE_PORT;
 			}
 
-			//connect, begin state machine
-			Settings.state = Settings.State.NONE;
-
 			new connectTask().execute("");
 		}
 		else {
@@ -772,12 +754,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		if(mTcpClient != null) {
 			mTcpClient.stopClient();
 		}
+		connected = false;
 		setStateButtons(false);
 		hideExtraFunctionButtons();
 		setStateControl(false);
 		setStateEmergency(false);
 		setStateList(false);
-		Settings.state = Settings.State.NONE;
 		llSwitch.removeAllViews();
 		llSwitch.setVisibility(LinearLayout.GONE);
 

@@ -15,8 +15,6 @@ public class Settings {
 	public static List<Train> allTrains = new ArrayList<Train>();
 	public static int currentTrainIndex = -1;
 
-	public static State state = State.NONE;
-
 	public static boolean fullVersion = false;
 
 	public static final int SPEED_MIN = 0;
@@ -26,15 +24,6 @@ public class Settings {
 
 	public static boolean sortById = false;
 	public static String protocolVersion = "0.2";
-
-	public enum State {
-		NONE, 
-		INIT_GET_CONSOLE, 
-		INIT_GET_TRAINS, 
-		GET_TRAIN_MAIN_STATE,
-		GET_TRAIN_BUTTON_STATE, 
-		IDLE;
-	}
 
 	public static Train getCurrentTrain() {
 		if(currentTrainIndex != -1) {
