@@ -263,11 +263,14 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				displayArrow(R.id.tvF8_F15, "down");
 			}
 			else {
+				if(!connected) {
+					return;
+				}
+				
 				l.setVisibility(LinearLayout.VISIBLE);
 				displayArrow(R.id.tvF8_F15, "up");
 
 				mTcpClient.getTrainButtonStateF8F15(Settings.getCurrentTrain().getId());
-
 			}
 		}
 		//click on F16-F23 banner
@@ -278,11 +281,14 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				displayArrow(R.id.tvF16_F23, "down");
 			}
 			else {
+				if(!connected) {
+					return;
+				}
+				
 				l.setVisibility(LinearLayout.VISIBLE);
 				displayArrow(R.id.tvF16_F23, "up");
 
 				mTcpClient.getTrainButtonStateF16F23(Settings.getCurrentTrain().getId());
-
 			}
 		}
 		//click on reverse button
