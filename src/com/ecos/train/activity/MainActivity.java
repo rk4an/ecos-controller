@@ -114,6 +114,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 	private boolean symbolLoaded = false;
 	private boolean switchLoaded = false;
 
+	private boolean volumeDownPressed = false;
+
 	/**************************************************************************/
 	/** Listeners **/
 	/**************************************************************************/
@@ -266,7 +268,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				if(!connected) {
 					return;
 				}
-				
+
 				l.setVisibility(LinearLayout.VISIBLE);
 				displayArrow(R.id.tvF8_F15, "up");
 
@@ -284,7 +286,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				if(!connected) {
 					return;
 				}
-				
+
 				l.setVisibility(LinearLayout.VISIBLE);
 				displayArrow(R.id.tvF16_F23, "up");
 
@@ -816,10 +818,13 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 	public boolean parseSpeed(String[] list) {
 
+		if(volumeDownPressed) {
+			return true;
+		}
+		
 		String id = "";
 		int iid = 0;
 		boolean match = false;
-
 
 		Pattern p = Pattern.compile("(.*) speedindicator\\[(.*)\\]");
 
@@ -1392,12 +1397,19 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			return true;
 		case KeyEvent.KEYCODE_VOLUME_DOWN:
 			if (action == KeyEvent.ACTION_DOWN) {
+				volumeDownPressed = true;
 				changeSpeed(false);
 			}
 			return true;
 		default:
 			return super.dispatchKeyEvent(event);
 		}
+	}
+
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+		volumeDownPressed = false;
+		return super.onKeyUp(keyCode, event);
 	}
 
 	public void changeSpeed(boolean increase) {
