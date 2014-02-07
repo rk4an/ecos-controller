@@ -443,13 +443,15 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			if(Settings.sortById != pref.getBoolean("pref_sort", false)) {
 				Settings.sortById = pref.getBoolean("pref_sort", false);
 
-				sortTrainsList(Settings.sortById);
-				dataAdapter.notifyDataSetChanged();
-				//restore the latest selection
-				for(int i=0; i<Settings.allTrains.size(); i++) {
-					if(Settings.allTrains.get(i).getId() == Settings.getCurrentTrain().getId()) {
-						sTrainId.setSelection(i);
-						break;
+				if(connected) {
+					sortTrainsList(Settings.sortById);
+					dataAdapter.notifyDataSetChanged();
+					//restore the latest selection
+					for(int i=0; i<Settings.allTrains.size(); i++) {
+						if(Settings.allTrains.get(i).getId() == Settings.getCurrentTrain().getId()) {
+							sTrainId.setSelection(i);
+							break;
+						}
 					}
 				}
 			}
@@ -821,7 +823,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		if(volumeDownPressed) {
 			return true;
 		}
-		
+
 		String id = "";
 		int iid = 0;
 		boolean match = false;
