@@ -17,7 +17,7 @@
     <string name="tv_connect">Connected</string>
     <string name="tv_disconnect">Not connected</string>
     <string name="tv_ip">IP</string>
-    <string name="tv_port">Port (15471)</string>
+    <string name="tv_port">Port</string>
     <string name="tv_id_available">Trains</string>
     <string name="btn_emergency">Emergency</string>
     <string name="tv_f8_f15">F8...F15</string>

@@ -4,12 +4,14 @@
     <PreferenceCategory android:title="@string/tv_network" >
         <EditTextPreference
             android:key="ip"
-            android:title="@string/tv_ip" >
+            android:title="@string/tv_ip"
+            android:defaultValue="192.168.1.10" >
         </EditTextPreference>
         <EditTextPreference
             android:inputType="number"
             android:key="port"
-            android:title="@string/tv_port" >
+            android:title="@string/tv_port"
+            android:defaultValue="15471" >
         </EditTextPreference>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/tv_console" >
