@@ -162,7 +162,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		((TextView) findViewById(R.id.tvF16_F23)).setOnClickListener(this);
 
 		pref = PreferenceManager.getDefaultSharedPreferences(this);
-		Settings.fullVersion = checkSig(this);
+		Settings.fullVersion = true; //checkSig(this);
 
 		//get speed step in save preference
 		speedStep = Integer.parseInt(pref.getString("pref_speed", Settings.SPEED_STEP+""));
