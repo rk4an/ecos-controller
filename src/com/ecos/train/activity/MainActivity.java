@@ -609,7 +609,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			else if(cmd_result.equals("READY")) {
 			}
 			else {
-				if(!cmd_result.startsWith("<END 0 (OK")) {
+				//just check the return code
+				if(!cmd_result.startsWith("<END 0 ")) {
 					Toast.makeText(getApplicationContext(), cmd_result, Toast.LENGTH_SHORT).show();
 					return;
 				}
