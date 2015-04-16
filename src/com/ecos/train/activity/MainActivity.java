@@ -347,18 +347,15 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.menu, menu);
 
-		editItem = menu.getItem(2);
+		editItem = menu.getItem(1);
 
 		return true;
 	}   
 
 	@Override
 	public boolean onPrepareOptionsMenu (Menu menu) {
-		if(Settings.fullVersion) {
-			menu.getItem(1).setEnabled(false);
-		}
 		if(Settings.currentTrainIndex == -1) {
-			menu.getItem(2).setEnabled(false);
+			menu.getItem(1).setEnabled(false);
 		}
 		return true;
 	}
@@ -369,11 +366,6 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		case R.id.iSettings:
 			Intent i = new Intent(this, PreferencesActivity.class);
 			startActivityForResult(i, MainActivity.SETTINGS);
-			return true;
-		case R.id.iPack:
-			Intent intent = new Intent(Intent.ACTION_VIEW);
-			intent.setData(Uri.parse("market://details?id="+FULL_PACKAGE));
-			startActivity(intent);
 			return true;
 		case R.id.iEdit:
 			//show alert dialog to edit train name
