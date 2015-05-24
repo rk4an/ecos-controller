@@ -9,10 +9,6 @@
         app:showAsAction="ifRoom"
         android:title="@string/btn_settings"/>
     <item
-        android:id="@+id/iPack"
-        android:alphabeticShortcut="p"
-        android:title="@string/btn_pack"/>
-    <item
         android:id="@+id/iEdit"
         android:alphabeticShortcut="e"
         android:title="@string/btn_edit"/>
