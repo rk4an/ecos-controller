@@ -8,7 +8,7 @@ android {
         applicationId "com.ecos.train"
         minSdkVersion 8
         targetSdkVersion 22
-        versionCode 501
+        versionCode 502
         versionName "3.14"
     }
 
@@ -19,7 +19,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
             applicationVariants.all { variant ->
                 variant.outputs.each  { output ->
-                    output.outputFile = new File(output.outputFile.parent, "EcoSController-" + defaultConfig.versionName + ".apk")
+                    output.outputFile = new File(output.outputFile.parent, "EcoSController-" + defaultConfig.versionName + "-" +
+                            defaultConfig.versionCode + ".apk")
                 }
             }
         }
@@ -31,5 +32,5 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:22.0+'
+    compile 'com.android.support:appcompat-v7:22.2+'
 }
