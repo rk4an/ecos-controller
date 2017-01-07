@@ -39,6 +39,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -123,6 +124,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		//Workaround for Android > 24 : writing to a TCP socket on the main thread is a strict-mode violation
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+		StrictMode.setThreadPolicy(policy);
 
 		//get elements
 		setContentView(R.layout.main);
