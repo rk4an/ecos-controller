@@ -19,12 +19,7 @@
 
 package com.ecos.train.activity;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -36,10 +31,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.StrictMode;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -68,10 +61,17 @@ import android.widget.ToggleButton;
 import com.ecos.train.R;
 import com.ecos.train.Settings;
 import com.ecos.train.TCPClient;
+import com.ecos.train.TCPWrite;
 import com.ecos.train.object.FunctionSymbol;
 import com.ecos.train.object.SwitchSymbol;
 import com.ecos.train.object.Train;
 import com.ecos.train.ui.TrainSpinAdapter;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainActivity 
 extends ActionBarActivity 
@@ -81,7 +81,13 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 	public static final String FULL_PACKAGE = "com.ecos.train.unlock";
 
 	SharedPreferences pref = null;
-	private TCPClient mTcpClient = null;
+
+	public static TCPClient mTcpClient = null;
+	public static TCPWrite mTcpWrite = null;
+	private static Handler mainHandler;
+	private static Runnable mainUpdate;
+	private static String mMessage = "";
+
 
 	ToggleButton btnConnect = null;
 	ToggleButton cbReverse = null;
@@ -117,6 +123,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 	private boolean volumeDownPressed = false;
 
+	public static Activity activity;
+
 	/**************************************************************************/
 	/** Listeners **/
 	/**************************************************************************/
@@ -125,9 +133,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		//Workaround for Android > 24 : writing to a TCP socket on the main thread is a strict-mode violation
-		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-		StrictMode.setThreadPolicy(policy);
+		//StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+		//StrictMode.setThreadPolicy(policy);
 
 		//get elements
 		setContentView(R.layout.main);
@@ -197,6 +204,19 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 		displayArrow(R.id.tvF8_F15, "down");
 		displayArrow(R.id.tvF16_F23, "down");
+
+		activity = this;
+
+		mainHandler = new Handler();
+		mainUpdate = new Runnable()
+		{
+			public void run()
+			{
+				traitement();
+			}
+		};
+
+
 	}
 
 
@@ -216,7 +236,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				llTrain.setVisibility(LinearLayout.GONE);
 				if(Settings.fullVersion && connected) {
 					if(!switchLoaded) {
-						mTcpClient.getAllObject();
+						mTcpWrite.getAllObject();
 						switchLoaded = true;
 					}
 				}
@@ -234,7 +254,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 			if(v.getTag(R.string.btn_name).toString().startsWith("btn")) {
 				String token[] = v.getTag(R.string.btn_name).toString().split(";");
-				mTcpClient.setButton(Settings.getCurrentTrain().getId(), Integer.parseInt(
+				mTcpWrite.setButton(Settings.getCurrentTrain().getId(), Integer.parseInt(
 						token[1]), ((ToggleButton) v).isChecked());
 				return;
 			}
@@ -242,7 +262,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 		//click on emergency button
 		if(v.getId() == R.id.btnEmergency) {
-			mTcpClient.emergencyStop(((ToggleButton) v).isChecked());
+			mTcpWrite.emergencyStop(((ToggleButton) v).isChecked());
 		}
 		//click on connect button
 		else if(v.getId() == R.id.btnConnect) {
@@ -253,12 +273,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		//click on control button
 		else if(v.getId() == R.id.tbControl) {
 			if(((ToggleButton) v).isChecked()) {
-				mTcpClient.takeControl(Settings.getCurrentTrain().getId());
-				mTcpClient.takeViewTrain(Settings.getCurrentTrain().getId());
+				mTcpWrite.takeControl(Settings.getCurrentTrain().getId());
+				mTcpWrite.takeViewTrain(Settings.getCurrentTrain().getId());
 				setStateButtons(true);
 			}
 			else {
-				mTcpClient.releaseControl(Settings.getCurrentTrain().getId());
+				mTcpWrite.releaseControl(Settings.getCurrentTrain().getId());
 				setStateButtons(false);
 			}
 		}
@@ -277,7 +297,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				l.setVisibility(LinearLayout.VISIBLE);
 				displayArrow(R.id.tvF8_F15, "up");
 
-				mTcpClient.getTrainButtonStateF8F15(Settings.getCurrentTrain().getId());
+				mTcpWrite.getTrainButtonStateF8F15(Settings.getCurrentTrain().getId());
 			}
 		}
 		//click on F16-F23 banner
@@ -295,16 +315,16 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				l.setVisibility(LinearLayout.VISIBLE);
 				displayArrow(R.id.tvF16_F23, "up");
 
-				mTcpClient.getTrainButtonStateF16F23(Settings.getCurrentTrain().getId());
+				mTcpWrite.getTrainButtonStateF16F23(Settings.getCurrentTrain().getId());
 			}
 		}
 		//click on reverse button
 		else if(v.getId() == R.id.cbReverse) {
-			mTcpClient.setDir(Settings.getCurrentTrain().getId(),((ToggleButton) v).isChecked()?1:0);
+			mTcpWrite.setDir(Settings.getCurrentTrain().getId(),((ToggleButton) v).isChecked()?1:0);
 		}
 		//click on switching objects button
 		else {
-			mTcpClient.changeState(Integer.parseInt(v.getTag().toString()), ((ToggleButton) v).isChecked()?1 :0);
+			mTcpWrite.changeState(Integer.parseInt(v.getTag().toString()), ((ToggleButton) v).isChecked()?1 :0);
 		}
 	}
 
@@ -328,14 +348,14 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 	public void onStopTrackingTouch(SeekBar sb) {
 		//speed seekbar
 		if(sb.getId() == R.id.sbSpeed) {
-			mTcpClient.setSpeed(Settings.getCurrentTrain().getId(), sb.getProgress());
+			mTcpWrite.setSpeed(Settings.getCurrentTrain().getId(), sb.getProgress());
 			displaySpeed(sb.getProgress());
 		}
 		//switching object seekbar
 		else {
 			try {
 				int id = Integer.parseInt(sb.getTag().toString());
-				mTcpClient.changeState(id, sb.getProgress());
+				mTcpWrite.changeState(id, sb.getProgress());
 
 				for(TextView t: listSwitchMultiValue) {
 					if(Integer.parseInt(t.getTag().toString()) == id) {
@@ -392,7 +412,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				public void onClick(DialogInterface dialog, int which) {
 
 					String name = edName.getText().toString();
-					mTcpClient.setName(Settings.getCurrentTrain().getId(), name);
+					mTcpWrite.setName(Settings.getCurrentTrain().getId(), name);
 
 					for (Train t : Settings.allTrains) {
 						if(t.getId() == Settings.getCurrentTrain().getId()) {
@@ -480,18 +500,18 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 		//release old train
 		if(Settings.currentTrainIndex != -1) {
-			mTcpClient.releaseViewTrain(Settings.getCurrentTrain().getId());
-			mTcpClient.releaseControl(Settings.getCurrentTrain().getId());
+			mTcpWrite.releaseViewTrain(Settings.getCurrentTrain().getId());
+			mTcpWrite.releaseControl(Settings.getCurrentTrain().getId());
 		}
 
 		//get train and take control
 		Settings.currentTrainIndex = pos;
 
-		mTcpClient.takeControl(Settings.getCurrentTrain().getId());
+		mTcpWrite.takeControl(Settings.getCurrentTrain().getId());
 		btnControl.setChecked(true);
-		mTcpClient.takeViewTrain(Settings.getCurrentTrain().getId());
+		mTcpWrite.takeViewTrain(Settings.getCurrentTrain().getId());
 
-		mTcpClient.getTrainMainState(Settings.getCurrentTrain().getId());
+		mTcpWrite.getTrainMainState(Settings.getCurrentTrain().getId());
 
 		displayArrow(R.id.tvF8_F15, "down");
 		displayArrow(R.id.tvF16_F23, "down");
@@ -567,170 +587,158 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		sTrainId.setEnabled(state);
 	}
 
-	/**************************************************************************/
-	/** AsyncTask for UI change **/
-	/**************************************************************************/
-	public class connectTask extends AsyncTask<String,String,TCPClient> {
 
-		@Override
-		protected TCPClient doInBackground(String... message) {
+	public void traitement() {
 
-			//we create a TCPClient object and
-			mTcpClient = new TCPClient(new TCPClient.OnMessageReceived() {
-				@Override
-				//here the messageReceived method is implemented
-				public void messageReceived(String message) {
-					//this method calls the onProgressUpdate
-					publishProgress(message);
-				}
-			});
-
-			mTcpClient.run();
-
-			return null;
+		if(mMessage == null) {
+			return;
 		}
 
-		@Override
-		protected void onProgressUpdate(String... values) {
-			super.onProgressUpdate(values);
+		//Check last line
+		Log.d("RECEIVED", mMessage + "");
+		String respLine[] = mMessage.split("\n");
 
-			Log.d("RECEIVED", values[0] + "");
-
-			String respLine[] = values[0].split("\n");
-
-			//check command result before
-			String cmd_result = respLine[respLine.length-1];
-			if(cmd_result.equals("DISCONNECT")) {
-				disconnect();
+		//check command result before
+		String cmd_result = respLine[respLine.length-1];
+		if(cmd_result.equals("DISCONNECT")) {
+			disconnect();
+		}
+		else if(cmd_result.equals("READY")) {
+		}
+		else {
+			//just check the return code
+			if(!cmd_result.startsWith("<END 0 ")) {
+				Toast.makeText(getApplicationContext(), cmd_result, Toast.LENGTH_SHORT).show();
+				return;
 			}
-			else if(cmd_result.equals("READY")) {
-			}
-			else {
-				//just check the return code
-				if(!cmd_result.startsWith("<END 0 ")) {
-					Toast.makeText(getApplicationContext(), cmd_result, Toast.LENGTH_SHORT).show();
-					return;
-				}
-			}
+		}
 
-			if(!connected) {
-				//check if connection ok
-				if(values[0].equals("READY")) {
-					connected = true;
-					setStateList(true);
-					setStateEmergency(true);
-
-					mTcpClient.viewConsole();
-
-					btnConnect.setChecked(true);
-					mTcpClient.getConsoleState();
-				}
-				else {
-					connected = false;
-					btnConnect.setChecked(false);
-				}
-			}
-
-			//emergency state response
-			if(respLine[0].equals("<REPLY get(1, status, info)>")) {
-				parseEmergency(respLine);
-				parseConsoleVersion(respLine);
-				mTcpClient.getAllTrains();
-			}
-			//train list response
-			else if(respLine[0].equals("<REPLY queryObjects(10, name, addr)>")) {
-				Settings.allTrains = parseTrainsList(values[0]);
-
-				Settings.sortById = pref.getBoolean("pref_sort", false);
-				sortTrainsList(Settings.sortById);
-
-				dataAdapter = new TrainSpinAdapter(getApplicationContext(),
-						android.R.layout.simple_spinner_item, Settings.allTrains);
-				dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-				sTrainId.setAdapter(dataAdapter);
-			}
-			//train state response
-			else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",name,speed,dir,speedindicator)>")) {
-				parseTrainState(respLine);
-				initFunctionButtons();
-				mTcpClient.getTrainButtonState(Settings.getCurrentTrain().getId());
-			}
-			//train buttons state response
-			else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",func[0],func[1],func[2],func[3]," +
-					"func[4],func[5],func[6],func[7])>")) {
-
-				parseButtons(respLine);
-				setStateButtons(true);
-				hideExtraFunctionButtons();
+		//if not connected, set connection!
+		if(!connected) {
+			//check if connection ok
+			if(mMessage.equals("READY")) {
+				connected = true;
 				setStateList(true);
-				setStateControl(true);
+				setStateEmergency(true);
 
-				if(!Settings.protocolVersion.equals("0.1")) {
-					mTcpClient.getButtonName(Settings.getCurrentTrain().getId());
-				}
-			}
-			//manage event
-			else if(respLine[0].startsWith("<EVENT")) {	
-				parseEvent(respLine);
-			}
-			//console info response
-			else if(respLine[0].equals("<REPLY get(1, info)>")) {
-				parseConsoleVersion(respLine);
-			}
-			//switching objects list response
-			else if(respLine[0].equals("<REPLY queryObjects(11, name1, name2, addrext)>")) {
-				parseSwitchList(respLine);
-			}
-			//train buttons name response 0-7
-			else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[0], " +
-					"funcexists[1], funcexists[2], funcexists[3], funcexists[4], funcexists[5], funcexists[6], funcexists[7])>")){
-				parseButtonSymbol(respLine);
+				mTcpWrite.viewConsole();
 
-				boolean locodesc = pref.getBoolean("pref_locodesc", false);
-				if(locodesc) {
-					if(!symbolLoaded) {
-						symbolLoaded = true;
-						getTrainsSymbol();
-					}
-				}
+				btnConnect.setChecked(true);
+				mTcpWrite.getConsoleState();
 			}
-			//train buttons name response 8-15
-			else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[8], " +
-					"funcexists[9], funcexists[10], funcexists[11], funcexists[12], funcexists[13], funcexists[14], funcexists[15])>")){
-				parseButtonSymbol(respLine);
-			}
-			//train buttons name response 16-23
-			else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[16], " +
-					"funcexists[17], funcexists[18], funcexists[19], funcexists[20], funcexists[21], funcexists[22], funcexists[23])>")){
-				parseButtonSymbol(respLine);
-			}
-			//train buttons response 8-15
-			else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",func[8],func[9],func[10],func[11]," +
-					"func[12],func[13],func[14],func[15])>")) {
-
-				parseButtons(respLine);
-
-				if(!Settings.protocolVersion.equals("0.1")) {
-					mTcpClient.getButtonNameF8F15(Settings.getCurrentTrain().getId());
-				}
-			}
-			//train buttons response 16-23
-			else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",func[16],func[17],func[18],func[19]," +
-					"func[20],func[21],func[22],func[23])>")) {
-
-				parseButtons(respLine);
-
-				if(!Settings.protocolVersion.equals("0.1")) {
-					mTcpClient.getButtonNameF16F23(Settings.getCurrentTrain().getId());
-				}
-			}
-			//a switching object response
 			else {
-				parseTrainsSymbol(respLine);
-				parseSwitch(respLine);
-				parseSwitchSymbol(respLine);
+				connected = false;
+				btnConnect.setChecked(false);
 			}
 		}
+
+		//emergency state response
+		if(respLine[0].equals("<REPLY get(1, status, info)>")) {
+			parseEmergency(respLine);
+			parseConsoleVersion(respLine);
+			mTcpWrite.getAllTrains();
+		}
+		//train list response
+		else if(respLine[0].equals("<REPLY queryObjects(10, name, addr)>")) {
+			Settings.allTrains = parseTrainsList(mMessage);
+
+			Settings.sortById = pref.getBoolean("pref_sort", false);
+			sortTrainsList(Settings.sortById);
+
+			dataAdapter = new TrainSpinAdapter(getApplicationContext(),
+					android.R.layout.simple_spinner_item, Settings.allTrains);
+			dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+			sTrainId.setAdapter(dataAdapter);
+		}
+		//train state response
+		else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",name,speed,dir,speedindicator)>")) {
+			parseTrainState(respLine);
+			initFunctionButtons();
+			mTcpWrite.getTrainButtonState(Settings.getCurrentTrain().getId());
+		}
+		//train buttons state response
+		else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",func[0],func[1],func[2],func[3]," +
+				"func[4],func[5],func[6],func[7])>")) {
+
+			parseButtons(respLine);
+			setStateButtons(true);
+			hideExtraFunctionButtons();
+			setStateList(true);
+			setStateControl(true);
+
+			if(!Settings.protocolVersion.equals("0.1")) {
+				mTcpWrite.getButtonName(Settings.getCurrentTrain().getId());
+			}
+		}
+		//manage event
+		else if(respLine[0].startsWith("<EVENT")) {
+			parseEvent(respLine);
+		}
+		//console info response
+		else if(respLine[0].equals("<REPLY get(1, info)>")) {
+			parseConsoleVersion(respLine);
+		}
+		//switching objects list response
+		else if(respLine[0].equals("<REPLY queryObjects(11, name1, name2, addrext)>")) {
+			parseSwitchList(respLine);
+		}
+		//train buttons name response 0-7
+		else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[0], " +
+				"funcexists[1], funcexists[2], funcexists[3], funcexists[4], funcexists[5], funcexists[6], funcexists[7])>")){
+			parseButtonSymbol(respLine);
+
+			boolean locodesc = pref.getBoolean("pref_locodesc", false);
+			if(locodesc) {
+				if(!symbolLoaded) {
+					symbolLoaded = true;
+					getTrainsSymbol();
+				}
+			}
+		}
+		//train buttons name response 8-15
+		else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[8], " +
+				"funcexists[9], funcexists[10], funcexists[11], funcexists[12], funcexists[13], funcexists[14], funcexists[15])>")){
+			parseButtonSymbol(respLine);
+		}
+		//train buttons name response 16-23
+		else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[16], " +
+				"funcexists[17], funcexists[18], funcexists[19], funcexists[20], funcexists[21], funcexists[22], funcexists[23])>")){
+			parseButtonSymbol(respLine);
+		}
+		//train buttons response 8-15
+		else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",func[8],func[9],func[10],func[11]," +
+				"func[12],func[13],func[14],func[15])>")) {
+
+			parseButtons(respLine);
+
+			if(!Settings.protocolVersion.equals("0.1")) {
+				mTcpWrite.getButtonNameF8F15(Settings.getCurrentTrain().getId());
+			}
+		}
+		//train buttons response 16-23
+		else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",func[16],func[17],func[18],func[19]," +
+				"func[20],func[21],func[22],func[23])>")) {
+
+			parseButtons(respLine);
+
+			if(!Settings.protocolVersion.equals("0.1")) {
+				mTcpWrite.getButtonNameF16F23(Settings.getCurrentTrain().getId());
+			}
+		}
+		//a switching object response
+		else {
+			parseTrainsSymbol(respLine);
+			parseSwitch(respLine);
+			parseSwitchSymbol(respLine);
+		}
+	}
+
+	public static void getMessage(String message)
+	{
+		MainActivity.mMessage = message;
+		Log.d("RECEIVED", message+"");
+		if(mainHandler != null)
+			mainHandler.post(mainUpdate);
 	}
 
 
@@ -751,7 +759,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				Settings.consolePort = Settings.CONSOLE_PORT;
 			}
 
-			new connectTask().execute("");
+			//new connectTask().execute("");
+			mTcpClient = new TCPClient();
+			mTcpWrite = new TCPWrite();
+
 		}
 		else {
 			disconnect();
@@ -761,6 +772,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 	public void disconnect() {
 		if(mTcpClient != null) {
 			mTcpClient.stopClient();
+			mTcpWrite.stopClient();
 		}
 		connected = false;
 		setStateButtons(false);
@@ -1260,10 +1272,10 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 		//get initial state
 		for (ToggleButton t : listSwitch) {
-			mTcpClient.getState(Integer.parseInt(t.getTag().toString()));
+			mTcpWrite.getState(Integer.parseInt(t.getTag().toString()));
 		}
 		for (SeekBar s : listSwitchMulti) {
-			mTcpClient.getState(Integer.parseInt(s.getTag().toString()));
+			mTcpWrite.getState(Integer.parseInt(s.getTag().toString()));
 		}
 	}
 
@@ -1437,7 +1449,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				sbSpeed.setProgress(new_value);
 
 			}
-			mTcpClient.setSpeed(Settings.getCurrentTrain().getId(), sbSpeed.getProgress());
+			mTcpWrite.setSpeed(Settings.getCurrentTrain().getId(), sbSpeed.getProgress());
 			displaySpeed(sbSpeed.getProgress());
 		}
 	}
@@ -1449,12 +1461,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 			if(v.getTag(R.string.btn_type).toString().equals("moment")) {
 				String token[] = v.getTag(R.string.btn_name).toString().split(";");
 				if (me.getAction() == MotionEvent.ACTION_DOWN) {
-					mTcpClient.setButton(Settings.getCurrentTrain().getId(), Integer.parseInt(token[1]), true);
+					mTcpWrite.setButton(Settings.getCurrentTrain().getId(), Integer.parseInt(token[1]), true);
 					((ToggleButton) v).setChecked(true);
 					return true;
 				}
 				else if (me.getAction() == MotionEvent.ACTION_UP) {
-					mTcpClient.setButton(Settings.getCurrentTrain().getId(), Integer.parseInt(token[1]), false);
+					mTcpWrite.setButton(Settings.getCurrentTrain().getId(), Integer.parseInt(token[1]), false);
 					((ToggleButton) v).setChecked(false);
 					return true;
 				}
@@ -1467,7 +1479,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		List<Train> list = Settings.allTrains;
 
 		for (Train train : list) {
-			mTcpClient.getTrainSymbol(train.getId());
+			mTcpWrite.getTrainSymbol(train.getId());
 		}
 	}
 }

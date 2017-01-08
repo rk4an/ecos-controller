@@ -6,10 +6,10 @@ android {
 
     defaultConfig {
         applicationId "com.ecos.train"
-        minSdkVersion 24
+        minSdkVersion 9
         targetSdkVersion 25
-        versionCode 510
-        versionName "3.15"
+        versionCode 520
+        versionName "3.16"
     }
 
 
