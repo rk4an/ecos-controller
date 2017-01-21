@@ -34,7 +34,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -74,7 +74,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MainActivity 
-extends ActionBarActivity 
+extends AppCompatActivity
 implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnTouchListener {
 
 	public static final String LITE_PACKAGE = "com.ecos.train";  
