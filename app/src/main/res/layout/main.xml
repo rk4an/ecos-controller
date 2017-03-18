@@ -94,16 +94,16 @@
             <LinearLayout
                 android:id="@+id/llList"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
                     android:gravity="center_vertical"
-                    android:orientation="vertical" >
+                    android:orientation="vertical">
 
                     <Spinner
                         android:id="@+id/sTrainId"
@@ -118,9 +118,9 @@
             <LinearLayout
                 android:id="@+id/llControl"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ToggleButton
                     android:id="@+id/tbControl"
@@ -145,7 +145,7 @@
             <TextView
                 android:id="@+id/tvSpeed"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="@string/tv_speed" />
@@ -153,7 +153,7 @@
             <SeekBar
                 android:id="@+id/sbSpeed"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:max="127"
                 android:padding="20dip" />
@@ -161,8 +161,8 @@
             <LinearLayout
                 android:id="@+id/llButtons1"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" >
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
 
                 <ToggleButton
                     android:id="@+id/btnF0"
@@ -199,8 +199,8 @@
             <LinearLayout
                 android:id="@+id/llButtons2"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" >
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
 
                 <ToggleButton
                     android:id="@+id/btnF4"
@@ -234,7 +234,7 @@
             <TextView
                 android:id="@+id/tvF8_F15"
                 android:layout_width="wrap_content"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_margin="5dp"
                 android:layout_weight="1"
                 android:background="#444242"
@@ -244,16 +244,16 @@
             <LinearLayout
                 android:id="@+id/llF8_F15"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:visibility="gone" >
+                android:visibility="gone">
 
                 <LinearLayout
                     android:id="@+id/llButtons3"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" >
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
 
                     <ToggleButton
                         android:id="@+id/btnF8"
@@ -287,8 +287,8 @@
                 <LinearLayout
                     android:id="@+id/llButtons4"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" >
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
 
                     <ToggleButton
                         android:id="@+id/btnF12"
@@ -323,7 +323,7 @@
             <TextView
                 android:id="@+id/tvF16_F23"
                 android:layout_width="wrap_content"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_margin="5dp"
                 android:layout_weight="1"
                 android:background="#444242"
@@ -333,16 +333,16 @@
             <LinearLayout
                 android:id="@+id/llF16_F23"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:visibility="gone" >
+                android:visibility="gone">
 
                 <LinearLayout
                     android:id="@+id/llButtons5"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" >
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
 
                     <ToggleButton
                         android:id="@+id/btnF16"
@@ -376,8 +376,8 @@
                 <LinearLayout
                     android:id="@+id/llButtons6"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" >
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
 
                     <ToggleButton
                         android:id="@+id/btnF20"

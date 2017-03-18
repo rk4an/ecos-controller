@@ -8,8 +8,8 @@ android {
         applicationId "com.ecos.train"
         minSdkVersion 24
         targetSdkVersion 25
-        versionCode 531
-        versionName "3.17"
+        versionCode 542
+        versionName "3.18"
     }
 
 
@@ -32,5 +32,5 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:25.1.0'
+    compile 'com.android.support:appcompat-v7:25.2.0'
 }

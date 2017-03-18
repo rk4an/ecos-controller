@@ -20,7 +20,8 @@
             android:layout_height="match_parent"
             android:paddingLeft="5sp"
             android:textSize="20sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:textColor="#ffffff"/>
     </TableRow>
 
 </TableLayout>

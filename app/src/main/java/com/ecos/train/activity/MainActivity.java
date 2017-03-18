@@ -1252,12 +1252,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 					SeekBar sb = createSeekBar(id, addr.length - 1);
 					listSwitchMulti.add(sb);
 
-					TextView name = new TextView(getApplicationContext());
+					TextView name = new TextView(this);
 					name.setText(name1 + " " + name2);
 					name.setTag(id);
 					listSwitchMultiLabel.add(name);
 
-					TextView value = new TextView(getApplicationContext());
+					TextView value = new TextView(this);
 					value.setText(sb.getProgress()+"");
 					value.setTag(id);
 					value.setGravity(Gravity.CENTER);
@@ -1343,7 +1343,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 	public ToggleButton createButton(String id, String name) {
 
-		ToggleButton tg = new ToggleButton(getApplicationContext());
+		ToggleButton tg = new ToggleButton(this);
 		tg.setText(name);
 		tg.setTextOn(name);
 		tg.setTextOff(name);
@@ -1367,7 +1367,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 	public SeekBar createSeekBar(String id, int max) {
 
-		SeekBar sb = new SeekBar(getApplicationContext());
+		SeekBar sb = new SeekBar(this);
 		sb.setMax(max);
 		sb.setProgress(0);
 		sb.setTag(id);
