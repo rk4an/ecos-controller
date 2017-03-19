@@ -35,7 +35,7 @@ public class TCPWrite extends Thread {
 	 * @param message text entered by client
 	 */
 	public void sendMessage(String message) {
-		lstMessage.add(message);
+		lstMessage.offer(message);
 	}
 
 	public void sendTCP(String message){
@@ -53,8 +53,14 @@ public class TCPWrite extends Thread {
 	public void run() {
 		mRun = true;
 		while (mRun) {
-			if( lstMessage.size() > 0) {
-				sendTCP((String)lstMessage.remove());
+
+			synchronized(lstMessage) {
+				while(!lstMessage.isEmpty()) {
+					String m = (String) lstMessage.poll();
+					if (m != null) {
+						sendTCP(m);
+					}
+				}
 			}
 		}
 	}
