@@ -8,7 +8,7 @@ android {
         applicationId "com.ecos.train"
         minSdkVersion 24
         targetSdkVersion 25
-        versionCode 545
+        versionCode 546
         versionName "3.18"
     }
 

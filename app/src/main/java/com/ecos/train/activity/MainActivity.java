@@ -70,6 +70,8 @@ import com.ecos.train.ui.TrainSpinAdapter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -86,7 +88,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 	public static TCPWrite mTcpWrite = null;
 	private static Handler mainHandler;
 	private static Runnable mainUpdate;
-	private static String mMessage = "";
+	private static Queue lstMessage = new ConcurrentLinkedDeque();
 
 
 	ToggleButton btnConnect = null;
@@ -212,7 +214,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 		{
 			public void run()
 			{
-				traitement();
+				readSocket();
 			}
 		};
 
@@ -588,12 +590,21 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 	}
 
 
-	public void traitement() {
+	public void readSocket() {
 
-		if(mMessage == null) {
-			return;
+
+		synchronized (lstMessage) {
+			while (!lstMessage.isEmpty()) {
+				String m = (String) lstMessage.poll();
+				if (m != null) {
+					readMessage(m);
+				}
+			}
 		}
+	}
 
+	public void readMessage(String mMessage)
+	{
 		//Check last line
 		Log.d("RECEIVED", mMessage + "");
 		String respLine[] = mMessage.split("\n");
@@ -735,7 +746,8 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 	public static void getMessage(String message)
 	{
-		MainActivity.mMessage = message;
+		lstMessage.offer(message);
+
 		Log.d("RECEIVED", message+"");
 		if(mainHandler != null)
 			mainHandler.post(mainUpdate);
