@@ -52,11 +52,12 @@ public class TCPWrite extends Thread {
 
 	public void run() {
 		mRun = true;
+        String m;
 		while (mRun) {
 
 			synchronized(lstMessage) {
 				while(!lstMessage.isEmpty()) {
-					String m = (String) lstMessage.poll();
+                    m = (String) lstMessage.poll();
 					if (m != null) {
 						sendTCP(m);
 					}
@@ -121,6 +122,10 @@ public class TCPWrite extends Thread {
 		sendMessage("get("+id+",func[16],func[17],func[18],func[19]," +
 				"func[20],func[21],func[22],func[23])");
 	}
+
+    public void getTrainButtonStateF24F27(int id) {
+        sendMessage("get("+id+",func[24],func[25],func[26],func[27])");
+    }
 	
 	public void setButton(int id, int i, boolean enabled) {
 		int value = (enabled) ? 1 : 0;
@@ -169,6 +174,11 @@ public class TCPWrite extends Thread {
 		sendMessage("get("+id+", funcexists[16], " +
 				"funcexists[17], funcexists[18], funcexists[19], funcexists[20], funcexists[21], funcexists[22], funcexists[23])");
 	}
+
+    public void getButtonNameF24F27(int id) {
+        sendMessage("get("+id+", funcexists[24], " +
+                "funcexists[25], funcexists[26], funcexists[27])");
+    }
 	
 	public void delete(int id) {
 		sendMessage("delete("+id+")");

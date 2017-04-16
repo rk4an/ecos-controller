@@ -408,6 +408,60 @@
                         android:state_enabled="false" />
                 </LinearLayout>
             </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvF24_F27"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_weight="1"
+                    android:background="#444242"
+                    android:padding="5dp"
+                    android:text="@string/tv_f24_f27" />
+
+                <LinearLayout
+                    android:id="@+id/llF24_F27"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:id="@+id/llButtons7"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <ToggleButton
+                            android:id="@+id/btnF24"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:state_enabled="false" />
+
+                        <ToggleButton
+                            android:id="@+id/btnF25"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:state_enabled="false" />
+
+                        <ToggleButton
+                            android:id="@+id/btnF26"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:state_enabled="false" />
+
+                        <ToggleButton
+                            android:id="@+id/btnF27"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:state_enabled="false" />
+                    </LinearLayout>
+        </LinearLayout>
         </LinearLayout>
 
         <LinearLayout

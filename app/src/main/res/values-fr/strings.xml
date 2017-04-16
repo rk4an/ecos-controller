@@ -22,6 +22,7 @@
     <string name="btn_emergency">Urgence</string>
     <string name="tv_f8_f15">F8...F15</string>
     <string name="tv_f16_f23">F16...F23</string>
+    <string name="tv_f24_f27">F24...F27</string>
     <string name="btn_pack">Acheter Unlock</string>
     <string name="btn_edit">Modifier</string>
     <string name="tv_save">Sauvegarder</string>

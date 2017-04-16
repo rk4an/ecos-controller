@@ -174,6 +174,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 		((TextView) findViewById(R.id.tvF8_F15)).setOnClickListener(this);
 		((TextView) findViewById(R.id.tvF16_F23)).setOnClickListener(this);
+		((TextView) findViewById(R.id.tvF24_F27)).setOnClickListener(this);
 
 		pref = PreferenceManager.getDefaultSharedPreferences(this);
 		Settings.fullVersion = true; //checkSig(this);
@@ -206,6 +207,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 		displayArrow(R.id.tvF8_F15, "down");
 		displayArrow(R.id.tvF16_F23, "down");
+		displayArrow(R.id.tvF24_F27, "down");
 
 		activity = this;
 
@@ -318,6 +320,24 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				displayArrow(R.id.tvF16_F23, "up");
 
 				mTcpWrite.getTrainButtonStateF16F23(Settings.getCurrentTrain().getId());
+			}
+		}
+		//click on F24-F27 banner
+		else if(v.getId() == R.id.tvF24_F27) {
+			LinearLayout l = (LinearLayout) findViewById(R.id.llF24_F27);
+			if(l.getVisibility() == LinearLayout.VISIBLE) {
+				l.setVisibility(LinearLayout.GONE);
+				displayArrow(R.id.tvF24_F27, "down");
+			}
+			else {
+				if(!connected) {
+					return;
+				}
+
+				l.setVisibility(LinearLayout.VISIBLE);
+				displayArrow(R.id.tvF24_F27, "up");
+
+				mTcpWrite.getTrainButtonStateF24F27(Settings.getCurrentTrain().getId());
 			}
 		}
 		//click on reverse button
@@ -437,7 +457,7 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 			try {
 				PackageInfo manager = getPackageManager().getPackageInfo(getPackageName(), 0);
-				ecosVersion.setText(manager.versionName);
+				ecosVersion.setText(manager.versionName + " - build " + manager.versionCode);
 			} catch (Exception e) { }
 
 			return true;
@@ -592,10 +612,11 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 
 	public void readSocket() {
 
+        String m;
 
 		synchronized (lstMessage) {
 			while (!lstMessage.isEmpty()) {
-				String m = (String) lstMessage.poll();
+                m = (String) lstMessage.poll();
 				if (m != null) {
 					readMessage(m);
 				}
@@ -716,6 +737,12 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				"funcexists[17], funcexists[18], funcexists[19], funcexists[20], funcexists[21], funcexists[22], funcexists[23])>")){
 			parseButtonSymbol(respLine);
 		}
+        //train buttons name response 24-27
+        else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+", funcexists[24], " +
+                "funcexists[25], funcexists[26], funcexists[27])>")){
+            parseButtonSymbol(respLine);
+        }
+
 		//train buttons response 8-15
 		else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",func[8],func[9],func[10],func[11]," +
 				"func[12],func[13],func[14],func[15])>")) {
@@ -736,6 +763,16 @@ implements OnClickListener, OnSeekBarChangeListener, OnItemSelectedListener, OnT
 				mTcpWrite.getButtonNameF16F23(Settings.getCurrentTrain().getId());
 			}
 		}
+		//train buttons response 24-27
+		else if(respLine[0].equals("<REPLY get("+Settings.getCurrentTrain().getId()+",func[24],func[25],func[26],func[27])>")) {
+
+			parseButtons(respLine);
+
+			if(!Settings.protocolVersion.equals("0.1")) {
+				mTcpWrite.getButtonNameF24F27(Settings.getCurrentTrain().getId());
+			}
+		}
+
 		//a switching object response
 		else {
 			parseTrainsSymbol(respLine);
